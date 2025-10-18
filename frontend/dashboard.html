@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Auth App - Dashboard</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="container">
+    <div class="auth-container">
+      <h1>Dashboard</h1>
+      
+      <div class="user-info">
+        <h2>Welcome <span id="user-name">User</span></h2>
+        <p>Email: <span id="user-email">user@example.com</span></p>
+        <p>Account created: <span id="user-created">Date</span></p>
+      </div>
+      
+      <button id="logout-btn" class="btn btn-outline btn-block">Logout</button>
+    </div>
+  </div>
+
+  <script src="js/auth.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Check if user is logged in
+      if (!isLoggedIn()) {
+        window.location.href = 'login.html';
+      }
+      
+      // Get user information
+      getUserInfo();
+      
+      // Handle logout
+      document.getElementById('logout-btn').addEventListener('click', logout);
+    });
+  </script>
+</body>
+</html>
