@@ -2,15 +2,13 @@ const mongoose = require('mongoose');
 
 const connectDB = async () => {
   try {
-    const conn = await mongoose.connect(process.env.MONGODB_URI);
+    const conn = await mongoose.connect(process.env.MONGODB_URI, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
     console.log(`✅ MongoDB Connected: ${conn.connection.host}`);
-    console.log(`📁 Using Database: ${conn.connection.db.databaseName}`);
   } catch (error) {
-    console.error(`❌ Error connecting to MongoDB: ${error.message}`);
-    console.error('Troubleshooting tips:');
-    console.error('1. Check your MongoDB connection string in .env');
-    console.error('2. Ensure your IP is whitelisted in MongoDB Atlas');
-    console.error('3. Verify database user credentials');
+    console.error('❌ Database connection error:', error.message);
     process.exit(1);
   }
 };
