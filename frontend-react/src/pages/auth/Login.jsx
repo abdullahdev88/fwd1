@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
-import { useAuth } from '../context/AuthContext'
-import Button from '../components/Button'
-import Input from '../components/Input'
-import ErrorMessage from '../components/ErrorMessage'
+import { Link, useNavigate, useLocation } from 'react-router-dom'
+import { useAuth } from '../../context/AuthContext'
+import Button from '../../components/common/Button'
+import Input from '../../components/common/Input'
+import ErrorMessage from '../../components/common/ErrorMessage'
 
 const Login = () => {
   const [formData, setFormData] = useState({
@@ -14,13 +14,40 @@ const Login = () => {
   
   const { login, loading, error, setError, user } = useAuth()
   const navigate = useNavigate()
+  const location = useLocation()
+
+  // Role-based dashboard redirect function
+  const redirectToDashboard = (userRole) => {
+    const role = userRole.toLowerCase()
+    console.log('Redirecting user with role:', role)
+    
+    switch (role) {
+      case 'admin':
+        navigate('/admin/dashboard', { replace: true })
+        break
+      case 'doctor':
+        navigate('/doctor/dashboard', { replace: true })
+        break
+      case 'patient':
+        navigate('/patient/dashboard', { replace: true })
+        break
+      default:
+        console.log('Unknown role, redirecting to patient dashboard')
+        navigate('/patient/dashboard', { replace: true })
+    }
+  }
 
   useEffect(() => {
     if (user) {
-      console.log('User already logged in, redirecting to dashboard')
-      navigate('/dashboard')
+      console.log('User already logged in:', user)
+      redirectToDashboard(user.role)
     }
-  }, [user, navigate])
+    
+    // Show success message from signup
+    if (location.state?.message) {
+      console.log('Signup success message:', location.state.message)
+    }
+  }, [user, navigate, location])
 
   const handleChange = (e) => {
     const { name, value } = e.target
@@ -28,14 +55,14 @@ const Login = () => {
       ...prev,
       [name]: value
     }))
-    // Clear field error when user starts typing
+    
     if (errors[name]) {
       setErrors(prev => ({
         ...prev,
         [name]: ''
       }))
     }
-    // Clear global error
+    
     if (error) {
       setError('')
     }
@@ -68,14 +95,23 @@ const Login = () => {
       return
     }
 
-    const result = await login(formData.email, formData.password)
-    console.log('Login result:', result)
-    
-    if (result.success) {
-      console.log('Login successful, navigating to dashboard')
-      navigate('/dashboard')
-    } else {
-      console.log('Login failed:', result.message)
+    try {
+      const result = await login(formData.email, formData.password)
+      console.log('Login result:', result)
+      
+      if (result.success && result.role) {
+        console.log('Login successful, user role:', result.role)
+        // Small delay to ensure state update
+        setTimeout(() => {
+          redirectToDashboard(result.role)
+        }, 100)
+      } else {
+        console.log('Login failed:', result.message)
+        setError(result.message || 'Login failed')
+      }
+    } catch (err) {
+      console.error('Login error:', err)
+      setError('An error occurred during login')
     }
   }
 
@@ -96,6 +132,13 @@ const Login = () => {
             </Link>
           </p>
         </div>
+
+        {/* Show signup success message */}
+        {location.state?.message && (
+          <div className="rounded-md bg-green-50 p-4">
+            <p className="text-sm text-green-800">{location.state.message}</p>
+          </div>
+        )}
         
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <div className="space-y-4">
@@ -136,6 +179,13 @@ const Login = () => {
           >
             {loading ? 'Signing in...' : 'Sign in'}
           </Button>
+
+          {/* Admin credentials help */}
+          <div className="text-center">
+            <p className="text-xs text-gray-500 mt-4">
+              Admin Login: admin@hospital.com / admin123456
+            </p>
+          </div>
         </form>
       </div>
     </div>

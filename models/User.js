@@ -1,56 +1,123 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
 
-const UserSchema = new mongoose.Schema({
+// User schema supporting multiple roles with dynamic fields
+const userSchema = new mongoose.Schema({
+  // Common fields for all users
   name: {
     type: String,
-    required: [true, 'Please provide a name'],
-    maxlength: 50,
+    required: [true, 'Name is required'],
     trim: true
   },
   email: {
     type: String,
-    required: [true, 'Please provide an email'],
+    required: [true, 'Email is required'],
     unique: true,
     lowercase: true,
     trim: true,
-    match: [
-      /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/,
-      'Please provide a valid email'
-    ]
+    match: [/^\S+@\S+\.\S+$/, 'Please provide a valid email']
   },
   password: {
     type: String,
-    required: [true, 'Please provide a password'],
+    required: [true, 'Password is required'],
     minlength: 6,
-    select: false
+    select: false // Don't return password by default
   },
-  createdAt: {
-    type: Date,
-    default: Date.now
+  role: {
+    type: String,
+    enum: ['patient', 'doctor', 'admin'],
+    default: 'patient'
+  },
+  phone: {
+    type: String,
+    trim: true
+  },
+  isActive: {
+    type: Boolean,
+    default: true
+  },
+  
+  // Doctor-specific fields (only used when role is 'doctor')
+  specialization: {
+    type: String,
+    required: function() { return this.role === 'doctor'; }
+  },
+  licenseNumber: {
+    type: String,
+    unique: true,
+    sparse: true, // Allows null/undefined for non-doctors
+    required: function() { return this.role === 'doctor'; }
+  },
+  qualification: {
+    type: String,
+    required: function() { return this.role === 'doctor'; }
+  },
+  experience: {
+    type: Number, // Years of experience
+    min: 0
+  },
+  consultationFee: {
+    type: Number,
+    min: 0
+  },
+  availability: [{
+    day: {
+      type: String,
+      enum: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+    },
+    slots: [{
+      startTime: String, // Format: "09:00"
+      endTime: String,   // Format: "17:00"
+      isAvailable: { type: Boolean, default: true }
+    }]
+  }],
+  
+  // Patient-specific fields (optional enhancements)
+  dateOfBirth: Date,
+  gender: {
+    type: String,
+    enum: ['male', 'female', 'other']
+  },
+  bloodGroup: String,
+  address: {
+    street: String,
+    city: String,
+    state: String,
+    zipCode: String,
+    country: String
+  },
+  emergencyContact: {
+    name: String,
+    phone: String,
+    relationship: String
   }
+}, {
+  timestamps: true // Adds createdAt and updatedAt
 });
 
-// Encrypt password before saving
-UserSchema.pre('save', async function(next) {
-  if (!this.isModified('password')) {
+// Hash password before saving
+userSchema.pre('save', async function(next) {
+  if (!this.isModified('password')) return next();
+  
+  try {
+    const salt = await bcrypt.genSalt(10);
+    this.password = await bcrypt.hash(this.password, salt);
     next();
+  } catch (error) {
+    next(error);
   }
-  const salt = await bcrypt.genSalt(10);
-  this.password = await bcrypt.hash(this.password, salt);
 });
 
-// Sign JWT and return
-UserSchema.methods.getSignedJwtToken = function() {
-  return jwt.sign({ id: this._id }, process.env.JWT_SECRET, {
-    expiresIn: process.env.JWT_EXPIRES_IN || '30d'
-  });
+// Method to compare passwords
+userSchema.methods.comparePassword = async function(candidatePassword) {
+  return await bcrypt.compare(candidatePassword, this.password);
 };
 
-// Match user entered password to hashed password in database
-UserSchema.methods.matchPassword = async function(enteredPassword) {
-  return await bcrypt.compare(enteredPassword, this.password);
+// Method to get public profile (without sensitive data)
+userSchema.methods.getPublicProfile = function() {
+  const user = this.toObject();
+  delete user.password;
+  return user;
 };
 
-module.exports = mongoose.model('User', UserSchema);
+module.exports = mongoose.model('User', userSchema);
