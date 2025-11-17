@@ -1,6 +1,32 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 
+const availabilitySlotSchema = new mongoose.Schema({
+  date: {
+    type: Date,
+    required: true
+  },
+  timeSlots: [{
+    startTime: {
+      type: String,
+      required: true // Format: "09:00"
+    },
+    endTime: {
+      type: String,
+      required: true // Format: "10:00"
+    },
+    isBooked: {
+      type: Boolean,
+      default: false
+    },
+    bookedBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      default: null
+    }
+  }]
+});
+
 const userSchema = new mongoose.Schema({
   name: {
     type: String,
@@ -29,10 +55,6 @@ const userSchema = new mongoose.Schema({
     enum: ['patient', 'doctor', 'admin'],
     default: 'patient'
   },
-  isActive: {
-    type: Boolean,
-    default: true
-  },
   // Doctor-specific fields
   specialization: {
     type: String,
@@ -45,6 +67,21 @@ const userSchema = new mongoose.Schema({
   education: {
     type: String,
     required: function() { return this.role === 'doctor'; }
+  },
+  // Doctor approval system
+  status: {
+    type: String,
+    enum: ['pending', 'approved', 'rejected'],
+    default: function() {
+      return this.role === 'doctor' ? 'pending' : 'approved';
+    }
+  },
+  // Doctor availability
+  availability: [availabilitySlotSchema],
+  
+  isActive: {
+    type: Boolean,
+    default: true
   },
   createdAt: {
     type: Date,

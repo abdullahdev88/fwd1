@@ -66,17 +66,20 @@ router.post('/signup', async (req, res) => {
       userData.specialization = specialization;
       userData.experience = parseInt(experience);
       userData.education = education;
+      userData.status = 'pending'; // Set to pending for approval
     }
 
     // Create new user
     const user = await User.create(userData);
 
-    console.log('User created successfully:', {
-      id: user._id,
-      name: user.name,
-      email: user.email,
-      role: user.role
-    });
+    // Different response for doctors
+    if (role === 'doctor') {
+      return res.status(201).json({
+        success: true,
+        message: 'Your request has been sent to the admin for approval.',
+        requiresApproval: true
+      });
+    }
 
     res.status(201).json({
       success: true,
@@ -153,6 +156,21 @@ router.post('/login', async (req, res) => {
       });
     }
 
+    // Check doctor approval status
+    if (user.role === 'doctor' && user.status === 'pending') {
+      return res.status(403).json({
+        success: false,
+        message: 'Your account is pending admin approval.'
+      });
+    }
+
+    if (user.role === 'doctor' && user.status === 'rejected') {
+      return res.status(403).json({
+        success: false,
+        message: 'Your account has been rejected. Please contact admin.'
+      });
+    }
+
     // Check if user is active
     if (!user.isActive) {
       return res.status(401).json({
@@ -189,7 +207,8 @@ router.post('/login', async (req, res) => {
         id: user._id,
         name: user.name,
         email: user.email,
-        role: user.role
+        role: user.role,
+        status: user.status
       }
     });
 

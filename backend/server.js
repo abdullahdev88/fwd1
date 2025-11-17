@@ -2,9 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const dotenv = require('dotenv');
-const { MongoClient } = require('mongodb');
 
-// Load environment variables
 dotenv.config();
 
 const app = express();
@@ -16,14 +14,8 @@ app.use(express.urlencoded({ extended: true }));
 
 // MongoDB Connection
 const connectDB = async () => {
-  const uri = process.env.MONGODB_URI || 'mongodb://localhost:27017/hospital-management';
-  const client = new MongoClient(uri);
   try {
-    await client.connect();
-    await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/hospital-management', {
-      useNewUrlParser: true,
-      useUnifiedTopology: true
-    });
+    await mongoose.connect(process.env.MONGODB_URI);
     console.log('✅ MongoDB Connected Successfully');
   } catch (error) {
     console.error('❌ MongoDB Connection Error:', error.message);
@@ -35,6 +27,9 @@ connectDB();
 
 // Routes
 app.use('/api/auth', require('./routes/authRoutes'));
+app.use('/api/admin', require('./routes/adminRoutes'));
+app.use('/api/doctor', require('./routes/doctorRoutes'));
+app.use('/api/patient', require('./routes/patientRoutes'));
 
 // Health check route
 app.get('/api/health', (req, res) => {
@@ -67,7 +62,4 @@ const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
   console.log(`📍 API URL: http://localhost:${PORT}`);
-  console.log(`\n👤 Admin Credentials:`);
-  console.log(`   Email: admin@hospital.com`);
-  console.log(`   Password: admin123456\n`);
 });

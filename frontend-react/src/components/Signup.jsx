@@ -8,6 +8,7 @@ const Signup = () => {
   const { signup } = useAuth();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -26,11 +27,13 @@ const Signup = () => {
       [e.target.name]: e.target.value
     });
     setError('');
+    setSuccess('');
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+    setSuccess('');
 
     if (formData.password !== formData.confirmPassword) {
       setError('Passwords do not match');
@@ -69,15 +72,20 @@ const Signup = () => {
       const result = await signup(dataToSend);
 
       if (result.success) {
-        // Success - redirect to login with message
-        setTimeout(() => {
+        if (result.requiresApproval) {
+          // Doctor signup - show approval message
+          setSuccess(result.message);
+          setTimeout(() => {
+            navigate('/login');
+          }, 3000);
+        } else {
+          // Patient signup - redirect to login
           navigate('/login', { 
-            state: { message: 'Account created successfully! Please login.' },
-            replace: true
+            state: { message: 'Account created successfully! Please login.' }
           });
-        }, 100);
+        }
       } else {
-        setError(result.message || 'Signup failed. Please try again.');
+        setError(result.message);
       }
     } catch (err) {
       console.error('Signup error:', err);
@@ -100,6 +108,22 @@ const Signup = () => {
           {error && (
             <div className="rounded-md bg-red-50 p-4">
               <p className="text-sm text-red-800">{error}</p>
+            </div>
+          )}
+
+          {success && (
+            <div className="rounded-md bg-green-50 p-4">
+              <div className="flex">
+                <div className="flex-shrink-0">
+                  <svg className="h-5 w-5 text-green-400" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                  </svg>
+                </div>
+                <div className="ml-3">
+                  <p className="text-sm text-green-800">{success}</p>
+                  <p className="text-xs text-green-600 mt-1">Redirecting to login page...</p>
+                </div>
+              </div>
             </div>
           )}
 
@@ -207,7 +231,7 @@ const Signup = () => {
 
           <button
             type="submit"
-            disabled={loading}
+            disabled={loading || success}
             className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {loading ? 'Creating Account...' : 'Sign Up'}
