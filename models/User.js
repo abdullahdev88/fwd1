@@ -113,6 +113,14 @@ userSchema.methods.comparePassword = async function(candidatePassword) {
   return await bcrypt.compare(candidatePassword, this.password);
 };
 
+// Method to generate JWT token
+userSchema.methods.getSignedJwtToken = function() {
+  const jwt = require('jsonwebtoken');
+  return jwt.sign({ id: this._id, role: this.role }, process.env.JWT_SECRET, {
+    expiresIn: process.env.JWT_EXPIRES_IN || '15m'
+  });
+};
+
 // Method to get public profile (without sensitive data)
 userSchema.methods.getPublicProfile = function() {
   const user = this.toObject();
