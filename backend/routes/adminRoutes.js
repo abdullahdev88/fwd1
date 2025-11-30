@@ -228,4 +228,101 @@ router.delete('/delete-user/:id', protect, adminOnly, async (req, res) => {
   }
 });
 
+// @route   GET /api/admin/profile/:id
+// @desc    Get user profile by ID (Admin only)
+// @access  Admin only
+router.get('/profile/:id', protect, adminOnly, async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id).select('-password');
+    
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found'
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      data: user
+    });
+  } catch (error) {
+    console.error('Get User Profile Error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error'
+    });
+  }
+});
+
+// @route   PUT /api/admin/profile/:id
+// @desc    Update user profile by ID (Admin only)
+// @access  Admin only
+router.put('/profile/:id', protect, adminOnly, async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id);
+    
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found'
+      });
+    }
+
+    // Admin can update any field except password and role
+    const restrictedFields = ['password', '_id', '__v'];
+    const updateData = {};
+    
+    Object.keys(req.body).forEach(key => {
+      if (!restrictedFields.includes(key) && req.body[key] !== undefined) {
+        updateData[key] = req.body[key];
+      }
+    });
+
+    // Email validation for admin updates
+    if (req.body.email && req.body.email !== user.email) {
+      const emailExists = await User.findOne({ 
+        email: req.body.email, 
+        _id: { $ne: user._id } 
+      });
+      
+      if (emailExists) {
+        return res.status(400).json({
+          success: false,
+          message: 'Email already in use by another account'
+        });
+      }
+    }
+
+    const updatedUser = await User.findByIdAndUpdate(
+      req.params.id,
+      updateData,
+      { new: true, runValidators: true }
+    ).select('-password');
+
+    res.status(200).json({
+      success: true,
+      message: 'Profile updated successfully',
+      data: updatedUser
+    });
+
+  } catch (error) {
+    console.error('Update User Profile Error:', error);
+    
+    if (error.name === 'ValidationError') {
+      const errors = Object.values(error.errors).map(err => err.message);
+      return res.status(400).json({
+        success: false,
+        message: 'Validation error',
+        errors: errors
+      });
+    }
+
+    res.status(500).json({
+      success: false,
+      message: 'Server error'
+    });
+  }
+});
+
 module.exports = router;

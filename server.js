@@ -80,6 +80,15 @@ app.get('/api/test-db', async (req, res) => {
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/users', require('./routes/users'));
 
+// Mount backend routes (when frontend is calling top-level API URL)
+// These route files live in the `backend/routes` folder and contain
+// the medical-records, doctor, patient, admin and profile handlers.
+app.use('/api/medical-records', require('./backend/routes/medicalRecordRoutes'));
+app.use('/api/profile', require('./backend/routes/profileRoutes'));
+app.use('/api/doctor', require('./backend/routes/doctorRoutes'));
+app.use('/api/patient', require('./backend/routes/patientRoutes'));
+app.use('/api/admin', require('./backend/routes/adminRoutes'));
+
 // Handle 404 for API routes specifically
 app.use('/api/*', (req, res) => {
   console.log('❌ API route not found:', req.originalUrl);

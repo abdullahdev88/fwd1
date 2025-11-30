@@ -6,7 +6,11 @@ const {
   updateUser,
   deleteUser,
   createAdmin
-} = require('../controllers/auth/adminController');
+} = require('../controllers/admin/adminController');
+const {
+  getUserProfile,
+  updateUserProfile
+} = require('../controllers/profile/profileController');
 const { protect } = require('../middleware/authMiddleware');
 const { authorizeRole } = require('../middleware/roleMiddleware');
 
@@ -22,5 +26,9 @@ router.get('/users/:id', getUserById);
 router.put('/users/:id', updateUser);
 router.delete('/users/:id', deleteUser);
 router.post('/users/create-admin', createAdmin);
+
+// Profile management routes for admin
+router.get('/profile/:id', getUserProfile);
+router.put('/profile/:id', updateUserProfile);
 
 module.exports = router;

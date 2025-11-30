@@ -46,6 +46,46 @@ export const authAPI = {
   getMe: () => api.get('/auth/me'),
 };
 
+// Profile API calls
+export const profileAPI = {
+  getMyProfile: () => api.get('/profile/me'),
+  updateMyProfile: (data) => api.put('/profile/update', data),
+  uploadProfilePicture: (data) => api.post('/profile/upload-picture', data),
+};
+
+// Admin Profile API calls
+export const adminProfileAPI = {
+  getUserProfile: (id) => api.get(`/admin/profile/${id}`),
+  updateUserProfile: (id, data) => api.put(`/admin/profile/${id}`, data),
+};
+
+// Medical Records API calls
+export const medicalRecordsAPI = {
+  // Create new medical record (Doctor only)
+  createRecord: (data) => api.post('/medical-records', data),
+  
+  // Get patient's own records (Patient only)
+  getMyRecords: () => api.get('/medical-records/me'),
+  
+  // Get doctor's created records (Doctor only)
+  getDoctorRecords: () => api.get('/medical-records/doctor/my-records'),
+  
+  // Get all records (Admin only)
+  getAllRecords: (page = 1, limit = 20) => api.get(`/medical-records/admin/all?page=${page}&limit=${limit}`),
+  
+  // Get specific patient's records (Doctor + Admin)
+  getPatientRecords: (patientId) => api.get(`/medical-records/patient/${patientId}`),
+  
+  // Get single record by ID
+  getRecordById: (recordId) => api.get(`/medical-records/${recordId}`),
+  
+  // Update medical record (Doctor own + Admin)
+  updateRecord: (recordId, data) => api.put(`/medical-records/${recordId}`, data),
+  
+  // Delete medical record (Admin only)
+  deleteRecord: (recordId) => api.delete(`/medical-records/${recordId}`)
+};
+
 // Patient API calls
 export const patientAPI = {
   getDashboard: () => api.get('/patient/dashboard'),

@@ -1,6 +1,7 @@
 import React from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
+import { ROUTES } from "../../config/routes";
 
 // Navbar component with role-based navigation
 const Navbar = () => {
@@ -49,16 +50,20 @@ const Navbar = () => {
 
   const dashboardLinks = {
     patient: [
-      { name: 'Dashboard', path: '/patient/dashboard' },
-      { name: 'Appointments', path: '/patient/appointments' }
+      { name: 'Dashboard', path: ROUTES.PATIENT.DASHBOARD },
+      { name: 'Appointments', path: ROUTES.PATIENT.APPOINTMENTS },
+      { name: 'Medical Records', path: ROUTES.MEDICAL_RECORDS.PATIENT_LIST }
     ],
     doctor: [
-      { name: 'Dashboard', path: '/doctor/dashboard' },
-      { name: 'Appointments', path: '/doctor/appointments' }
+      { name: 'Dashboard', path: ROUTES.DOCTOR.DASHBOARD },
+      { name: 'Appointments', path: '/doctor/appointments' },
+      { name: 'Medical Records', path: ROUTES.MEDICAL_RECORDS.DOCTOR_LIST },
+      { name: 'Create Record', path: ROUTES.MEDICAL_RECORDS.CREATE }
     ],
     admin: [
-      { name: 'Dashboard', path: '/admin/dashboard' },
+      { name: 'Dashboard', path: ROUTES.ADMIN.DASHBOARD },
       { name: 'Users', path: '/admin/users' },
+      { name: 'Medical Records', path: ROUTES.MEDICAL_RECORDS.ADMIN_LIST },
       { name: 'Reports', path: '/admin/reports' }
     ]
   };
@@ -99,6 +104,18 @@ const Navbar = () => {
             <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">
               {user.role.toUpperCase()}
             </span>
+            
+            {/* Profile Icon */}
+            <Link
+              to="/profile"
+              className="p-2 text-gray-400 hover:text-blue-600 rounded-full hover:bg-gray-100 transition-colors duration-200"
+              title="Profile Settings"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+              </svg>
+            </Link>
+            
             <button
               onClick={handleLogout}
               className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md text-sm font-medium"

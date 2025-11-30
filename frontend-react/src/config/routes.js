@@ -23,8 +23,23 @@ export const ROUTES = {
     USERS: '/admin/users',
     DOCTORS: '/admin/doctors',
     PATIENTS: '/admin/patients',
-    APPOINTMENTS: '/admin/appointments'
-  }
+    APPOINTMENTS: '/admin/appointments',
+    PROFILE: '/admin/profile'
+  },
+  
+  // Medical Records routes
+  MEDICAL_RECORDS: {
+    LIST: '/medical-records',
+    CREATE: '/doctor/medical-records/create',
+    DETAIL: '/medical-records/:id',
+    EDIT: '/medical-records/:id/edit',
+    DOCTOR_LIST: '/doctor/medical-records',
+    PATIENT_LIST: '/patient/medical-records',
+    ADMIN_LIST: '/admin/medical-records'
+  },
+  
+  // Common routes
+  PROFILE: '/profile'
 };
 
 // Role-based dashboard redirects
