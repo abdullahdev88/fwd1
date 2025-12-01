@@ -51,18 +51,20 @@ const Navbar = () => {
   const dashboardLinks = {
     patient: [
       { name: 'Dashboard', path: ROUTES.PATIENT.DASHBOARD },
-      { name: 'Appointments', path: ROUTES.PATIENT.APPOINTMENTS },
+      { name: 'My Appointments', path: ROUTES.PATIENT.APPOINTMENTS },
+      { name: 'Book Appointment', path: ROUTES.APPOINTMENTS.BOOK },
       { name: 'Medical Records', path: ROUTES.MEDICAL_RECORDS.PATIENT_LIST }
     ],
     doctor: [
       { name: 'Dashboard', path: ROUTES.DOCTOR.DASHBOARD },
-      { name: 'Appointments', path: '/doctor/appointments' },
+      { name: 'Appointment Requests', path: ROUTES.APPOINTMENTS.DOCTOR_REQUESTS },
       { name: 'Medical Records', path: ROUTES.MEDICAL_RECORDS.DOCTOR_LIST },
       { name: 'Create Record', path: ROUTES.MEDICAL_RECORDS.CREATE }
     ],
     admin: [
       { name: 'Dashboard', path: ROUTES.ADMIN.DASHBOARD },
       { name: 'Users', path: '/admin/users' },
+      { name: 'All Appointments', path: ROUTES.APPOINTMENTS.ADMIN_LIST },
       { name: 'Medical Records', path: ROUTES.MEDICAL_RECORDS.ADMIN_LIST },
       { name: 'Reports', path: '/admin/reports' }
     ]

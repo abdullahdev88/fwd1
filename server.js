@@ -85,6 +85,7 @@ app.use('/api/users', require('./routes/users'));
 // the medical-records, doctor, patient, admin and profile handlers.
 app.use('/api/medical-records', require('./backend/routes/medicalRecordRoutes'));
 app.use('/api/profile', require('./backend/routes/profileRoutes'));
+app.use('/api/appointments', require('./backend/routes/appointmentRoutes'));
 app.use('/api/doctor', require('./backend/routes/doctorRoutes'));
 app.use('/api/patient', require('./backend/routes/patientRoutes'));
 app.use('/api/admin', require('./backend/routes/adminRoutes'));

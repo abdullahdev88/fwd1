@@ -59,6 +59,27 @@ export const adminProfileAPI = {
   updateUserProfile: (id, data) => api.put(`/admin/profile/${id}`, data),
 };
 
+// Appointment API calls
+export const appointmentAPI = {
+  // Patient functions
+  bookAppointment: (data) => api.post('/appointments/book', data),
+  getMyAppointments: () => api.get('/appointments/my-appointments'),
+  getAvailableDoctors: () => api.get('/appointments/available-doctors'),
+  
+  // Doctor functions
+  getDoctorRequests: (status = 'pending') => api.get(`/appointments/doctor-requests?status=${status}`),
+  getDoctorAppointments: () => api.get('/appointments/doctor-appointments'),
+  approveAppointment: (appointmentId, notes) => api.put(`/appointments/${appointmentId}/approve`, { notes }),
+  rejectAppointment: (appointmentId, rejectionReason) => api.put(`/appointments/${appointmentId}/reject`, { rejectionReason }),
+  
+  // Admin functions
+  getAllAppointments: (status, page = 1, limit = 20) => {
+    let url = `/appointments/admin/all?page=${page}&limit=${limit}`;
+    if (status) url += `&status=${status}`;
+    return api.get(url);
+  }
+};
+
 // Medical Records API calls
 export const medicalRecordsAPI = {
   // Create new medical record (Doctor only)

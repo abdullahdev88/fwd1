@@ -37,6 +37,14 @@ export const ROUTES = {
     PATIENT_LIST: '/patient/medical-records',
     ADMIN_LIST: '/admin/medical-records'
   },
+
+  // Appointment routes
+  APPOINTMENTS: {
+    BOOK: '/appointments/book',
+    PATIENT_LIST: '/patient/appointments',
+    DOCTOR_REQUESTS: '/doctor/appointment-requests',
+    ADMIN_LIST: '/admin/appointments'
+  },
   
   // Common routes
   PROFILE: '/profile'

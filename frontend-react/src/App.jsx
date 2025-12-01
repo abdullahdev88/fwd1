@@ -6,13 +6,16 @@ import Navbar from './components/layout/Navbar';
 import Login from './pages/auth/Login';
 import Signup from './components/Signup';
 import PatientDashboard from './pages/patient/PatientDashboard';
-import PatientAppointments from './pages/patient/PatientAppointments';
+
 import DoctorDashboard from './pages/doctor/DoctorDashboard';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import ProfileSettings from './pages/ProfileSettings';
 import CreateMedicalRecord from './pages/medicalRecords/CreateMedicalRecord';
 import MedicalRecordsList from './pages/medicalRecords/MedicalRecordsList';
 import MedicalRecordDetail from './pages/medicalRecords/MedicalRecordDetail';
+import BookAppointment from './pages/appointments/BookAppointment';
+import PatientAppointments from './pages/appointments/PatientAppointments';
+import DoctorAppointmentRequests from './pages/appointments/DoctorAppointmentRequests';
 import { ROUTES } from './config/routes';
 
 function App() {
@@ -61,6 +64,27 @@ function App() {
               element={
                 <PrivateRoute allowedRoles={['admin']}>
                   <AdminDashboard />
+                </PrivateRoute>
+              }
+            />
+
+            {/* Appointment Routes */}
+            {/* Book Appointment - Patient only */}
+            <Route
+              path={ROUTES.APPOINTMENTS.BOOK}
+              element={
+                <PrivateRoute allowedRoles={['patient']}>
+                  <BookAppointment />
+                </PrivateRoute>
+              }
+            />
+            
+            {/* Doctor Appointment Requests */}
+            <Route
+              path={ROUTES.APPOINTMENTS.DOCTOR_REQUESTS}
+              element={
+                <PrivateRoute allowedRoles={['doctor']}>
+                  <DoctorAppointmentRequests />
                 </PrivateRoute>
               }
             />
