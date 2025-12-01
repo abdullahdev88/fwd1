@@ -4,7 +4,8 @@ const {
   getDoctorAppointments,
   updateAppointmentStatus,
   createPrescription,
-  updateAvailability
+  updateAvailability,
+  getDoctorPrescriptions
 } = require('../controllers/doctor/doctorController');
 const { protect } = require('../middleware/authMiddleware');
 const { authorizeRole } = require('../middleware/roleMiddleware');
@@ -19,6 +20,7 @@ router.get('/dashboard', getDoctorDashboard);
 router.get('/appointments', getDoctorAppointments);
 router.put('/appointments/:id', updateAppointmentStatus);
 router.post('/prescriptions', createPrescription);
+router.get('/prescriptions', getDoctorPrescriptions);
 router.put('/availability', updateAvailability);
 
 module.exports = router;

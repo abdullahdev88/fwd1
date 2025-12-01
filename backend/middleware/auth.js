@@ -30,6 +30,8 @@ const protect = async (req, res, next) => {
     next();
   } catch (error) {
     console.error('Auth middleware error:', error);
+    console.error('Token:', token);
+    console.error('Decoded token attempt failed');
     res.status(401).json({
       success: false,
       message: 'Not authorized, token failed'

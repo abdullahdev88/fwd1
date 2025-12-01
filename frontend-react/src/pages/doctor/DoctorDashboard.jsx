@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import axios from 'axios';
+import PrescriptionForm from '../../components/doctor/PrescriptionForm';
+import PrescriptionList from '../../components/doctor/PrescriptionList';
+import PrescriptionView from '../../components/doctor/PrescriptionView';
 
 const DoctorDashboard = () => {
   const { user } = useAuth();
@@ -13,6 +16,13 @@ const DoctorDashboard = () => {
   const [timeSlots, setTimeSlots] = useState([]);
   const [newSlot, setNewSlot] = useState({ startTime: '', endTime: '' });
   const [editingAvailability, setEditingAvailability] = useState(null);
+  
+  // Prescription state
+  const [activeTab, setActiveTab] = useState('dashboard');
+  const [showPrescriptionForm, setShowPrescriptionForm] = useState(false);
+  const [editingPrescription, setEditingPrescription] = useState(null);
+  const [selectedPrescription, setSelectedPrescription] = useState(null);
+  const [successMessage, setSuccessMessage] = useState('');
 
   // Only fetch data once when user is loaded and approved
   useEffect(() => {
@@ -129,6 +139,37 @@ const DoctorDashboard = () => {
     setShowAvailabilityModal(true);
   };
 
+  // Prescription handlers
+  const handleCreatePrescription = () => {
+    setEditingPrescription(null);
+    setShowPrescriptionForm(true);
+  };
+
+  const handleEditPrescription = (prescription) => {
+    setEditingPrescription(prescription);
+    setShowPrescriptionForm(true);
+  };
+
+  const handleViewPrescription = (prescription) => {
+    setSelectedPrescription(prescription);
+  };
+
+  const handlePrescriptionSuccess = (message) => {
+    setSuccessMessage(message);
+    setShowPrescriptionForm(false);
+    setEditingPrescription(null);
+    setTimeout(() => setSuccessMessage(''), 5000);
+  };
+
+  const handleClosePrescriptionForm = () => {
+    setShowPrescriptionForm(false);
+    setEditingPrescription(null);
+  };
+
+  const handleClosePrescriptionView = () => {
+    setSelectedPrescription(null);
+  };
+
   if (user?.role === 'doctor' && user?.status === 'pending') {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
@@ -161,6 +202,19 @@ const DoctorDashboard = () => {
     return new Date(apt.appointmentDate).toDateString() === today;
   });
 
+  const TabButton = ({ id, label, isActive, onClick }) => (
+    <button
+      onClick={() => onClick(id)}
+      className={`px-6 py-3 font-medium text-sm rounded-t-lg transition-colors duration-200 ${
+        isActive
+          ? 'bg-white text-blue-600 border-b-2 border-blue-600'
+          : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100'
+      }`}
+    >
+      {label}
+    </button>
+  );
+
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
@@ -168,81 +222,110 @@ const DoctorDashboard = () => {
           <h1 className="text-3xl font-bold text-gray-900">Doctor Dashboard</h1>
           <p className="mt-2 text-gray-600">Welcome back, Dr. {user?.name}!</p>
           
-          {/* Show availability status */}
-          {availability.length > 0 && (
-            <div className="mt-2 text-sm text-green-600">
-              ✅ Your availability is visible to patients ({availability.length} available days)
+          {successMessage && (
+            <div className="mt-4 p-4 bg-green-100 border border-green-400 text-green-700 rounded">
+              {successMessage}
             </div>
           )}
-          {availability.length === 0 && (
-            <div className="mt-2 text-sm text-orange-600">
-              ⚠️ You have no availability set. Add availability to receive appointments.
-            </div>
-          )}
+
+          {/* Tab Navigation */}
+          <div className="mt-6 border-b border-gray-200">
+            <nav className="-mb-px flex space-x-8">
+              <TabButton
+                id="dashboard"
+                label="Dashboard"
+                isActive={activeTab === 'dashboard'}
+                onClick={setActiveTab}
+              />
+              <TabButton
+                id="prescriptions"
+                label="Prescriptions"
+                isActive={activeTab === 'prescriptions'}
+                onClick={setActiveTab}
+              />
+            </nav>
+          </div>
+          
         </div>
 
-        {/* Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <div className="bg-white overflow-hidden shadow rounded-lg">
-            <div className="p-5">
-              <div className="flex items-center">
-                <div className="flex-shrink-0">
-                  <span className="text-2xl">📅</span>
+        {/* Tab Content */}
+        <div className="mt-6">
+          {activeTab === 'dashboard' && (
+            <>
+              {/* Show availability status */}
+              {availability.length > 0 && (
+                <div className="mb-4 text-sm text-green-600">
+                  ✅ Your availability is visible to patients ({availability.length} available days)
                 </div>
-                <div className="ml-3">
-                  <p className="text-sm font-medium text-gray-500">Today's Appointments</p>
-                  <p className="text-2xl font-semibold text-blue-600">{todayAppointments.length}</p>
+              )}
+              {availability.length === 0 && (
+                <div className="mb-4 text-sm text-orange-600">
+                  ⚠️ You have no availability set. Add availability to receive appointments.
+                </div>
+              )}
+
+              {/* Stats */}
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                <div className="bg-white overflow-hidden shadow rounded-lg">
+                  <div className="p-5">
+                    <div className="flex items-center">
+                      <div className="flex-shrink-0">
+                        <span className="text-2xl">📅</span>
+                      </div>
+                      <div className="ml-3">
+                        <p className="text-sm font-medium text-gray-500">Today's Appointments</p>
+                        <p className="text-2xl font-semibold text-blue-600">{todayAppointments.length}</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-white overflow-hidden shadow rounded-lg">
+                  <div className="p-5">
+                    <div className="flex items-center">
+                      <div className="flex-shrink-0">
+                        <span className="text-2xl">📊</span>
+                      </div>
+                      <div className="ml-3">
+                        <p className="text-sm font-medium text-gray-500">Total Appointments</p>
+                        <p className="text-2xl font-semibold text-green-600">{appointments.length}</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-white overflow-hidden shadow rounded-lg">
+                  <div className="p-5">
+                    <div className="flex items-center">
+                      <div className="flex-shrink-0">
+                        <span className="text-2xl">✅</span>
+                      </div>
+                      <div className="ml-3">
+                        <p className="text-sm font-medium text-gray-500">Completed</p>
+                        <p className="text-2xl font-semibold text-purple-600">
+                          {appointments.filter(apt => apt.status === 'completed').length}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-white overflow-hidden shadow rounded-lg">
+                  <div className="p-5">
+                    <div className="flex items-center">
+                      <div className="flex-shrink-0">
+                        <span className="text-2xl">⏰</span>
+                      </div>
+                      <div className="ml-3">
+                        <p className="text-sm font-medium text-gray-500">Available Days</p>
+                        <p className="text-2xl font-semibold text-orange-600">{availability.length}</p>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
-          </div>
 
-          <div className="bg-white overflow-hidden shadow rounded-lg">
-            <div className="p-5">
-              <div className="flex items-center">
-                <div className="flex-shrink-0">
-                  <span className="text-2xl">📊</span>
-                </div>
-                <div className="ml-3">
-                  <p className="text-sm font-medium text-gray-500">Total Appointments</p>
-                  <p className="text-2xl font-semibold text-green-600">{appointments.length}</p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white overflow-hidden shadow rounded-lg">
-            <div className="p-5">
-              <div className="flex items-center">
-                <div className="flex-shrink-0">
-                  <span className="text-2xl">✅</span>
-                </div>
-                <div className="ml-3">
-                  <p className="text-sm font-medium text-gray-500">Completed</p>
-                  <p className="text-2xl font-semibold text-purple-600">
-                    {appointments.filter(apt => apt.status === 'completed').length}
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white overflow-hidden shadow rounded-lg">
-            <div className="p-5">
-              <div className="flex items-center">
-                <div className="flex-shrink-0">
-                  <span className="text-2xl">⏰</span>
-                </div>
-                <div className="ml-3">
-                  <p className="text-sm font-medium text-gray-500">Available Days</p>
-                  <p className="text-2xl font-semibold text-orange-600">{availability.length}</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Availability Management */}
           <div className="bg-white shadow overflow-hidden sm:rounded-md">
             <div className="px-4 py-5 sm:px-6 flex justify-between items-center">
@@ -373,9 +456,41 @@ const DoctorDashboard = () => {
             </div>
           </div>
         </div>
-      </div>
+              </>
+            )}
 
-      {/* Availability Modal */}
+            {activeTab === 'prescriptions' && (
+              <div className="space-y-6">
+                {showPrescriptionForm ? (
+                  <PrescriptionForm
+                    onSuccess={handlePrescriptionSuccess}
+                    onCancel={handleClosePrescriptionForm}
+                    editMode={!!editingPrescription}
+                    existingPrescription={editingPrescription}
+                  />
+                ) : (
+                  <PrescriptionList
+                    onViewPrescription={handleViewPrescription}
+                    onEditPrescription={handleEditPrescription}
+                    onCreateNew={handleCreatePrescription}
+                  />
+                )}
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Prescription View Modal */}
+        {selectedPrescription && (
+          <PrescriptionView
+            prescription={selectedPrescription}
+            onClose={handleClosePrescriptionView}
+            onEdit={handleEditPrescription}
+            userRole={user?.role}
+          />
+        )}
+
+        {/* Availability Modal */}
       {showAvailabilityModal && (
         <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
           <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">

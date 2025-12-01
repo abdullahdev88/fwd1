@@ -220,10 +220,36 @@ const updateAvailability = async (req, res) => {
   }
 };
 
+// @desc    Get doctor's prescriptions
+// @route   GET /api/doctor/prescriptions
+// @access  Private (Doctor only)
+const getDoctorPrescriptions = async (req, res) => {
+  try {
+    const prescriptions = await Prescription.find({ doctor: req.user.id })
+      .populate('patient', 'name email phone')
+      .populate('appointment', 'appointmentDate')
+      .sort({ createdAt: -1 });
+
+    res.status(200).json({
+      success: true,
+      count: prescriptions.length,
+      data: { prescriptions }
+    });
+  } catch (error) {
+    console.error('Get doctor prescriptions error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error fetching prescriptions',
+      error: error.message
+    });
+  }
+};
+
 module.exports = {
   getDoctorDashboard,
   getDoctorAppointments,
   updateAppointmentStatus,
   createPrescription,
-  updateAvailability
+  updateAvailability,
+  getDoctorPrescriptions
 };

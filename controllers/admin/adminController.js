@@ -245,11 +245,50 @@ const createAdmin = async (req, res) => {
   }
 };
 
+// @desc    Get all prescriptions (Admin only)
+// @route   GET /api/admin/prescriptions
+// @access  Private (Admin only)
+const getAdminPrescriptions = async (req, res) => {
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 20;
+    const skip = (page - 1) * limit;
+
+    const prescriptions = await Prescription.find()
+      .populate('patient', 'name email phone')
+      .populate('doctor', 'name specialization')
+      .populate('appointment', 'appointmentDate')
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit);
+
+    const totalPrescriptions = await Prescription.countDocuments();
+    const totalPages = Math.ceil(totalPrescriptions / limit);
+
+    res.status(200).json({
+      success: true,
+      count: prescriptions.length,
+      totalCount: totalPrescriptions,
+      totalPages,
+      currentPage: page,
+      data: { prescriptions }
+    });
+  } catch (error) {
+    console.error('Get admin prescriptions error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error fetching prescriptions',
+      error: error.message
+    });
+  }
+};
+
 module.exports = {
   getAdminDashboard,
   getAllUsers,
   getUserById,
   updateUser,
   deleteUser,
-  createAdmin
+  createAdmin,
+  getAdminPrescriptions
 };

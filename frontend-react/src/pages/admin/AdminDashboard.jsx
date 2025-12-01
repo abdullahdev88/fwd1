@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import axios from 'axios';
+import AdminPrescriptionManager from '../../components/admin/AdminPrescriptionManager';
+import PrescriptionView from '../../components/doctor/PrescriptionView';
 
 const AdminDashboard = () => {
   const { user } = useAuth();
@@ -10,6 +12,10 @@ const AdminDashboard = () => {
   const [allUsers, setAllUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('overview');
+  
+  // Prescription state
+  const [selectedPrescription, setSelectedPrescription] = useState(null);
+  const [deleteMessage, setDeleteMessage] = useState('');
 
   useEffect(() => {
     fetchDashboardData();
@@ -60,6 +66,20 @@ const AdminDashboard = () => {
       console.error('Error fetching appointment logs:', error);
       setLoading(false);
     }
+  };
+
+  // Prescription handlers
+  const handleViewPrescription = (prescription) => {
+    setSelectedPrescription(prescription);
+  };
+
+  const handleClosePrescriptionView = () => {
+    setSelectedPrescription(null);
+  };
+
+  const handleDeletePrescription = (prescription) => {
+    setDeleteMessage(`Prescription #${prescription.prescriptionNumber} has been deleted successfully.`);
+    setTimeout(() => setDeleteMessage(''), 5000);
   };
 
   const fetchAllUsers = async () => {
@@ -140,7 +160,7 @@ const AdminDashboard = () => {
         <div className="mb-8">
           <div className="border-b border-gray-200">
             <nav className="-mb-px flex space-x-8">
-              {['overview', 'doctors', 'users', 'appointments'].map((tab) => (
+              {['overview', 'doctors', 'users', 'appointments', 'prescriptions'].map((tab) => (
                 <button
                   key={tab}
                   onClick={() => setActiveTab(tab)}
@@ -150,7 +170,8 @@ const AdminDashboard = () => {
                       : 'border-transparent text-gray-500 hover:text-gray-700'
                   }`}
                 >
-                  {tab === 'doctors' ? `Doctor Approvals (${pendingDoctors.length})` : tab}
+                  {tab === 'doctors' ? `Doctor Approvals (${pendingDoctors.length})` : 
+                   tab === 'prescriptions' ? 'Prescription Management' : tab}
                 </button>
               ))}
             </nav>
@@ -504,6 +525,30 @@ const AdminDashboard = () => {
               </div>
             )}
           </div>
+        )}
+
+        {/* Prescriptions Tab */}
+        {activeTab === 'prescriptions' && (
+          <div>
+            {deleteMessage && (
+              <div className="mb-4 p-4 bg-green-100 border border-green-400 text-green-700 rounded">
+                {deleteMessage}
+              </div>
+            )}
+            <AdminPrescriptionManager
+              onViewPrescription={handleViewPrescription}
+              onDeletePrescription={handleDeletePrescription}
+            />
+          </div>
+        )}
+
+        {/* Prescription View Modal */}
+        {selectedPrescription && (
+          <PrescriptionView
+            prescription={selectedPrescription}
+            onClose={handleClosePrescriptionView}
+            userRole={user?.role}
+          />
         )}
       </div>
     </div>

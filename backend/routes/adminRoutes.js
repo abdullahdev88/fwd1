@@ -3,6 +3,7 @@ const router = express.Router();
 const User = require('../models/User');
 const Appointment = require('../models/Appointment');
 const { protect, adminOnly } = require('../middleware/auth');
+const { getAdminPrescriptions } = require('../controllers/admin/adminController');
 
 // @route   GET /api/admin/pending-doctors
 // @desc    Get all pending doctors for approval
@@ -324,5 +325,10 @@ router.put('/profile/:id', protect, adminOnly, async (req, res) => {
     });
   }
 });
+
+// @route   GET /api/admin/prescriptions
+// @desc    Get all prescriptions (Admin overview)
+// @access  Admin only
+router.get('/prescriptions', protect, adminOnly, getAdminPrescriptions);
 
 module.exports = router;

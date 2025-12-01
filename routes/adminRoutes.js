@@ -5,7 +5,8 @@ const {
   getUserById,
   updateUser,
   deleteUser,
-  createAdmin
+  createAdmin,
+  getAdminPrescriptions
 } = require('../controllers/admin/adminController');
 const {
   getUserProfile,
@@ -26,6 +27,7 @@ router.get('/users/:id', getUserById);
 router.put('/users/:id', updateUser);
 router.delete('/users/:id', deleteUser);
 router.post('/users/create-admin', createAdmin);
+router.get('/prescriptions', getAdminPrescriptions);
 
 // Profile management routes for admin
 router.get('/profile/:id', getUserProfile);

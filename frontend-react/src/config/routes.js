@@ -46,6 +46,14 @@ export const ROUTES = {
     ADMIN_LIST: '/admin/appointments'
   },
   
+  // Prescription routes
+  PRESCRIPTIONS: {
+    DOCTOR_LIST: '/doctor/prescriptions',
+    DOCTOR_CREATE: '/doctor/prescriptions/create',
+    PATIENT_LIST: '/patient/prescriptions',
+    ADMIN_LIST: '/admin/prescriptions'
+  },
+
   // Common routes
   PROFILE: '/profile'
 };

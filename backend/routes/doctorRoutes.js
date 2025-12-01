@@ -3,6 +3,7 @@ const router = express.Router();
 const User = require('../models/User');
 const Appointment = require('../models/Appointment');
 const { protect, doctorOnly } = require('../middleware/auth');
+const { getDoctorPrescriptions } = require('../controllers/doctor/doctorController');
 
 // @route   POST /api/doctor/availability
 // @desc    Add availability slots
@@ -113,5 +114,10 @@ router.get('/appointments', protect, doctorOnly, async (req, res) => {
     });
   }
 });
+
+// @route   GET /api/doctor/prescriptions
+// @desc    Get current doctor's prescriptions
+// @access  Doctor only
+router.get('/prescriptions', protect, doctorOnly, getDoctorPrescriptions);
 
 module.exports = router;

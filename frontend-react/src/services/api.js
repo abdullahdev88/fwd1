@@ -33,7 +33,10 @@ api.interceptors.response.use(
       // Unauthorized - clear token and redirect to login
       localStorage.removeItem('token');
       localStorage.removeItem('user');
-      window.location.href = '/login';
+      // Force reload to trigger authentication check
+      setTimeout(() => {
+        window.location.reload();
+      }, 100);
     }
     return Promise.reject(error);
   }
@@ -124,6 +127,61 @@ export const doctorAPI = {
   updateAvailability: (data) => api.put('/doctor/availability', data),
 };
 
+// Prescription API calls
+export const prescriptionAPI = {
+  // Doctor functions
+  createPrescription: (data) => api.post('/prescriptions', data),
+  getDoctorPrescriptions: (params = {}) => {
+    const queryParams = new URLSearchParams();
+    if (params.page) queryParams.append('page', params.page);
+    if (params.limit) queryParams.append('limit', params.limit);
+    if (params.status) queryParams.append('status', params.status);
+    if (params.patientName) queryParams.append('patientName', params.patientName);
+    
+    const queryString = queryParams.toString();
+    return api.get(`/doctor/prescriptions${queryString ? `?${queryString}` : ''}`);
+  },
+  updatePrescription: (prescriptionId, data) => api.put(`/prescriptions/${prescriptionId}`, data),
+  
+  // Patient functions
+  getMyPrescriptions: (params = {}) => {
+    const queryParams = new URLSearchParams();
+    if (params.page) queryParams.append('page', params.page);
+    if (params.limit) queryParams.append('limit', params.limit);
+    if (params.status) queryParams.append('status', params.status);
+    
+    const queryString = queryParams.toString();
+    return api.get(`/prescriptions/me${queryString ? `?${queryString}` : ''}`);
+  },
+  
+  // Shared functions (with permission checks on backend)
+  getPrescriptionById: (prescriptionId) => api.get(`/prescriptions/${prescriptionId}`),
+  getPrescriptionByAppointment: (appointmentId) => api.get(`/prescriptions/appointment/${appointmentId}`),
+  
+  // Admin functions
+  getAllPrescriptions: (params = {}) => {
+    const queryParams = new URLSearchParams();
+    if (params.page) queryParams.append('page', params.page);
+    if (params.limit) queryParams.append('limit', params.limit);
+    if (params.status) queryParams.append('status', params.status);
+    if (params.doctorName) queryParams.append('doctorName', params.doctorName);
+    if (params.patientName) queryParams.append('patientName', params.patientName);
+    
+    const queryString = queryParams.toString();
+    return api.get(`/prescriptions${queryString ? `?${queryString}` : ''}`);
+  },
+  getPatientPrescriptions: (patientId, params = {}) => {
+    const queryParams = new URLSearchParams();
+    if (params.page) queryParams.append('page', params.page);
+    if (params.limit) queryParams.append('limit', params.limit);
+    if (params.status) queryParams.append('status', params.status);
+    
+    const queryString = queryParams.toString();
+    return api.get(`/prescriptions/patient/${patientId}${queryString ? `?${queryString}` : ''}`);
+  },
+  deletePrescription: (prescriptionId) => api.delete(`/prescriptions/${prescriptionId}`),
+};
+
 // Admin API calls
 export const adminAPI = {
   getDashboard: () => api.get('/admin/dashboard'),
@@ -132,6 +190,14 @@ export const adminAPI = {
   updateUser: (id, data) => api.put(`/admin/users/${id}`, data),
   deleteUser: (id) => api.delete(`/admin/users/${id}`),
   createAdmin: (data) => api.post('/admin/users/create-admin', data),
+  getPrescriptions: (params = {}) => {
+    const queryParams = new URLSearchParams();
+    if (params.page) queryParams.append('page', params.page);
+    if (params.limit) queryParams.append('limit', params.limit);
+    
+    const queryString = queryParams.toString();
+    return api.get(`/admin/prescriptions${queryString ? `?${queryString}` : ''}`);
+  },
 };
 
 export default api;
