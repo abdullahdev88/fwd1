@@ -3,6 +3,327 @@ import { useAuth } from '../../context/AuthContext';
 import axios from 'axios';
 import AdminPrescriptionManager from '../../components/admin/AdminPrescriptionManager';
 import PrescriptionView from '../../components/doctor/PrescriptionView';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, BarChart, Bar, PieChart, Pie, Cell } from 'recharts';
+
+// Reports Section Component
+const ReportsSection = () => {
+  const [reportsData, setReportsData] = useState({
+    overview: {},
+    doctors: [],
+    appointments: {},
+    patients: {},
+    prescriptions: {}
+  });
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    fetchReportsData();
+  }, []);
+
+  const fetchReportsData = async () => {
+    try {
+      setLoading(true);
+      const token = localStorage.getItem('token');
+      const headers = { Authorization: `Bearer ${token}` };
+
+      // Fetch all reports data in parallel
+      const [overviewRes, doctorsRes, appointmentsRes, patientsRes, prescriptionsRes] = await Promise.all([
+        axios.get('http://localhost:5000/api/admin/reports/overview', { headers }),
+        axios.get('http://localhost:5000/api/admin/reports/doctors', { headers }),
+        axios.get('http://localhost:5000/api/admin/reports/appointments', { headers }),
+        axios.get('http://localhost:5000/api/admin/reports/patients', { headers }),
+        axios.get('http://localhost:5000/api/admin/reports/prescriptions', { headers })
+      ]);
+
+      setReportsData({
+        overview: overviewRes.data.data || {},
+        doctors: doctorsRes.data.data || [],
+        appointments: appointmentsRes.data.data || {},
+        patients: patientsRes.data.data || {},
+        prescriptions: prescriptionsRes.data.data || {}
+      });
+    } catch (error) {
+      console.error('Error fetching reports data:', error);
+      setError('Failed to load reports data');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+        <span className="ml-2 text-gray-600">Loading reports...</span>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="bg-red-50 border border-red-200 rounded-md p-4">
+        <div className="text-red-800">{error}</div>
+        <button 
+          onClick={fetchReportsData}
+          className="mt-2 bg-red-100 hover:bg-red-200 text-red-800 px-3 py-1 rounded text-sm"
+        >
+          Retry
+        </button>
+      </div>
+    );
+  }
+
+  const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <h2 className="text-2xl font-bold text-gray-900">Performance & Reports Dashboard</h2>
+        <button
+          onClick={fetchReportsData}
+          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm"
+        >
+          Refresh Data
+        </button>
+      </div>
+
+      {/* Summary Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <div className="bg-white overflow-hidden shadow rounded-lg">
+          <div className="p-5">
+            <div className="flex items-center">
+              <div className="flex-shrink-0">
+                <span className="text-2xl">👨‍⚕️</span>
+              </div>
+              <div className="ml-3">
+                <p className="text-sm font-medium text-gray-500">Total Doctors</p>
+                <p className="text-2xl font-semibold text-gray-900">
+                  {reportsData.overview.overview?.totalDoctors || 0}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white overflow-hidden shadow rounded-lg">
+          <div className="p-5">
+            <div className="flex items-center">
+              <div className="flex-shrink-0">
+                <span className="text-2xl">👥</span>
+              </div>
+              <div className="ml-3">
+                <p className="text-sm font-medium text-gray-500">Total Patients</p>
+                <p className="text-2xl font-semibold text-gray-900">
+                  {reportsData.overview.overview?.totalPatients || 0}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white overflow-hidden shadow rounded-lg">
+          <div className="p-5">
+            <div className="flex items-center">
+              <div className="flex-shrink-0">
+                <span className="text-2xl">📅</span>
+              </div>
+              <div className="ml-3">
+                <p className="text-sm font-medium text-gray-500">Today's Appointments</p>
+                <p className="text-2xl font-semibold text-gray-900">
+                  {reportsData.overview.overview?.todayAppointments || 0}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white overflow-hidden shadow rounded-lg">
+          <div className="p-5">
+            <div className="flex items-center">
+              <div className="flex-shrink-0">
+                <span className="text-2xl">💊</span>
+              </div>
+              <div className="ml-3">
+                <p className="text-sm font-medium text-gray-500">Today's Prescriptions</p>
+                <p className="text-2xl font-semibold text-gray-900">
+                  {reportsData.overview.overview?.todayPrescriptions || 0}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Charts Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Doctor Performance Chart */}
+        <div className="bg-white p-6 rounded-lg shadow">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">Doctor Performance</h3>
+          <ResponsiveContainer width="100%" height={300}>
+            <BarChart data={reportsData.doctors.topPerformers || []}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="doctorName" />
+              <YAxis />
+              <Tooltip />
+              <Legend />
+              <Bar dataKey="totalAppointments" fill="#8884d8" />
+              <Bar dataKey="completedAppointments" fill="#82ca9d" />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+
+        {/* Appointment Trends */}
+        <div className="bg-white p-6 rounded-lg shadow">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">Monthly Appointment Trends</h3>
+          <ResponsiveContainer width="100%" height={300}>
+            <LineChart data={reportsData.appointments.monthlyTrends || []}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="month" />
+              <YAxis />
+              <Tooltip />
+              <Legend />
+              <Line type="monotone" dataKey="count" stroke="#8884d8" strokeWidth={2} />
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
+
+        {/* Appointment Status Distribution */}
+        <div className="bg-white p-6 rounded-lg shadow">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">Appointment Status Distribution</h3>
+          <ResponsiveContainer width="100%" height={300}>
+            <PieChart>
+              <Pie
+                data={reportsData.appointments.statusDistribution || []}
+                cx="50%"
+                cy="50%"
+                innerRadius={60}
+                outerRadius={100}
+                paddingAngle={5}
+                dataKey="count"
+              >
+                {(reportsData.appointments.statusDistribution || []).map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                ))}
+              </Pie>
+              <Tooltip />
+              <Legend />
+            </PieChart>
+          </ResponsiveContainer>
+        </div>
+
+        {/* Top Medications */}
+        <div className="bg-white p-6 rounded-lg shadow">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">Most Prescribed Medications</h3>
+          <ResponsiveContainer width="100%" height={300}>
+            <BarChart data={(reportsData.prescriptions.medicationFrequency || []).slice(0, 10)}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="medication" angle={-45} textAnchor="end" height={100} />
+              <YAxis />
+              <Tooltip />
+              <Bar dataKey="count" fill="#82ca9d" />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
+
+      {/* Tables */}
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+        {/* Top Performing Doctors Table */}
+        <div className="bg-white shadow rounded-lg">
+          <div className="px-6 py-4 border-b border-gray-200">
+            <h3 className="text-lg font-semibold text-gray-900">Top Performing Doctors</h3>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Doctor
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Appointments
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Completion Rate
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {(reportsData.doctors.topPerformers || []).map((doctor, index) => (
+                  <tr key={index}>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div>
+                        <div className="text-sm font-medium text-gray-900">
+                          {doctor.doctorName}
+                        </div>
+                        <div className="text-sm text-gray-500">
+                          {doctor.specialization}
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      {doctor.totalAppointments}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      {doctor.completionRate?.toFixed(1)}%
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        {/* Recent Appointments */}
+        <div className="bg-white shadow rounded-lg">
+          <div className="px-6 py-4 border-b border-gray-200">
+            <h3 className="text-lg font-semibold text-gray-900">Recent Appointments</h3>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Patient
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Doctor
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Status
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {(reportsData.overview.recentAppointments || []).slice(0, 10).map((appointment, index) => (
+                  <tr key={index}>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      {appointment.patient?.name}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      {appointment.doctor?.name}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                        appointment.status === 'completed' ? 'bg-green-100 text-green-800' :
+                        appointment.status === 'scheduled' ? 'bg-blue-100 text-blue-800' :
+                        appointment.status === 'cancelled' ? 'bg-red-100 text-red-800' :
+                        'bg-gray-100 text-gray-800'
+                      }`}>
+                        {appointment.status}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 const AdminDashboard = () => {
   const { user } = useAuth();
@@ -160,7 +481,7 @@ const AdminDashboard = () => {
         <div className="mb-8">
           <div className="border-b border-gray-200">
             <nav className="-mb-px flex space-x-8">
-              {['overview', 'doctors', 'users', 'appointments', 'prescriptions'].map((tab) => (
+              {['overview', 'doctors', 'users', 'appointments', 'prescriptions', 'reports'].map((tab) => (
                 <button
                   key={tab}
                   onClick={() => setActiveTab(tab)}
@@ -540,6 +861,11 @@ const AdminDashboard = () => {
               onDeletePrescription={handleDeletePrescription}
             />
           </div>
+        )}
+
+        {/* Reports Tab */}
+        {activeTab === 'reports' && (
+          <ReportsSection />
         )}
 
         {/* Prescription View Modal */}

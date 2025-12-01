@@ -2,9 +2,9 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 
 const protect = async (req, res, next) => {
+  let token;
+  
   try {
-    let token;
-
     if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
       token = req.headers.authorization.split(' ')[1];
     }
@@ -30,7 +30,7 @@ const protect = async (req, res, next) => {
     next();
   } catch (error) {
     console.error('Auth middleware error:', error);
-    console.error('Token:', token);
+    console.error('Token:', token || 'No token found');
     console.error('Decoded token attempt failed');
     res.status(401).json({
       success: false,

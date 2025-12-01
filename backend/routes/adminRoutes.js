@@ -4,6 +4,13 @@ const User = require('../models/User');
 const Appointment = require('../models/Appointment');
 const { protect, adminOnly } = require('../middleware/auth');
 const { getAdminPrescriptions } = require('../controllers/admin/adminController');
+const {
+  getOverviewStats,
+  getDoctorPerformance,
+  getAppointmentStats,
+  getPatientReports,
+  getPrescriptionAnalytics
+} = require('../controllers/admin/adminReportsController');
 
 // @route   GET /api/admin/pending-doctors
 // @desc    Get all pending doctors for approval
@@ -330,5 +337,31 @@ router.put('/profile/:id', protect, adminOnly, async (req, res) => {
 // @desc    Get all prescriptions (Admin overview)
 // @access  Admin only
 router.get('/prescriptions', protect, adminOnly, getAdminPrescriptions);
+
+// REPORTS ROUTES
+// @route   GET /api/admin/reports/overview
+// @desc    Get overview statistics for admin dashboard
+// @access  Admin only
+router.get('/reports/overview', protect, adminOnly, getOverviewStats);
+
+// @route   GET /api/admin/reports/doctors
+// @desc    Get doctor performance metrics
+// @access  Admin only
+router.get('/reports/doctors', protect, adminOnly, getDoctorPerformance);
+
+// @route   GET /api/admin/reports/appointments
+// @desc    Get appointment statistics and analytics
+// @access  Admin only
+router.get('/reports/appointments', protect, adminOnly, getAppointmentStats);
+
+// @route   GET /api/admin/reports/patients
+// @desc    Get patient activity reports
+// @access  Admin only
+router.get('/reports/patients', protect, adminOnly, getPatientReports);
+
+// @route   GET /api/admin/reports/prescriptions
+// @desc    Get prescription analytics
+// @access  Admin only
+router.get('/reports/prescriptions', protect, adminOnly, getPrescriptionAnalytics);
 
 module.exports = router;
