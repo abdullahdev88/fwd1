@@ -10,6 +10,7 @@ const PatientPrescriptionList = ({ onViewPrescription }) => {
   const [error, setError] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [searchQuery, setSearchQuery] = useState('');
   const [filters, setFilters] = useState({
     status: '',
     limit: 10
@@ -104,7 +105,7 @@ const PatientPrescriptionList = ({ onViewPrescription }) => {
     if (totalPages <= 1) return null;
 
     return (
-      <div className="flex items-center justify-between border-t border-gray-200 bg-white px-4 py-3 sm:px-6">
+      <div className="flex items-center justify-between border-t border-[rgb(var(--border-color))] px-4 py-3 sm:px-6">
         <div className="flex flex-1 justify-between sm:hidden">
           <Button
             onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
@@ -171,27 +172,70 @@ const PatientPrescriptionList = ({ onViewPrescription }) => {
     return <LoadingSpinner message="Loading your prescriptions..." />;
   }
 
+  // Filter prescriptions by search query
+  const filteredPrescriptions = prescriptions.filter(prescription => {
+    if (!searchQuery) return true;
+    const searchLower = searchQuery.toLowerCase();
+    return (
+      prescription.prescriptionNumber?.toLowerCase().includes(searchLower) ||
+      prescription.doctor?.name?.toLowerCase().includes(searchLower) ||
+      prescription.diagnosis?.toLowerCase().includes(searchLower) ||
+      prescription.medicines?.some(med => med.name?.toLowerCase().includes(searchLower))
+    );
+  });
+
   return (
     <div className="space-y-6">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">My Prescriptions</h2>
-          <p className="text-gray-600">View and manage your medical prescriptions</p>
+          <h2 className="text-2xl font-bold text-[rgb(var(--text-heading))]">My Prescriptions</h2>
+          <p className="text-[rgb(var(--text-secondary))]">View and manage your medical prescriptions</p>
         </div>
       </div>
 
+      {/* Search Bar */}
+      <div className="card p-4">
+        <div className="relative">
+          <input
+            type="text"
+            placeholder="Search by prescription number, doctor name, diagnosis, or medicine..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="search-input"
+          />
+          <svg
+            className="absolute left-3 top-2.5 h-5 w-5 text-[rgb(var(--text-secondary))]"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+            />
+          </svg>
+        </div>
+        {searchQuery && (
+          <p className="mt-2 text-sm text-[rgb(var(--text-secondary))]">
+            Found {filteredPrescriptions.length} result(s)
+          </p>
+        )}
+      </div>
+
       {/* Filters */}
-      <div className="bg-white rounded-lg shadow p-6">
+      <div className="card p-6">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="label">
               Status
             </label>
             <select
               value={filters.status}
               onChange={(e) => handleFilterChange('status', e.target.value)}
-              className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="input-field"
             >
               <option value="">All Statuses</option>
               <option value="active">Active</option>
@@ -200,13 +244,13 @@ const PatientPrescriptionList = ({ onViewPrescription }) => {
             </select>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="label">
               Results per page
             </label>
             <select
               value={filters.limit}
               onChange={(e) => handleFilterChange('limit', parseInt(e.target.value))}
-              className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="input-field"
             >
               <option value={10}>10</option>
               <option value={20}>20</option>
@@ -228,35 +272,37 @@ const PatientPrescriptionList = ({ onViewPrescription }) => {
       {error && <ErrorMessage message={error} />}
 
       {/* Prescriptions List */}
-      {prescriptions.length === 0 ? (
-        <div className="bg-white rounded-lg shadow p-12 text-center">
-          <div className="text-gray-400 mb-4">
+      {filteredPrescriptions.length === 0 ? (
+        <div className="card p-12 text-center">
+          <div className="text-[rgb(var(--text-secondary))] mb-4">
             <svg className="mx-auto h-16 w-16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
             </svg>
           </div>
-          <h3 className="text-lg font-medium text-gray-900 mb-2">No prescriptions found</h3>
-          <p className="text-gray-500">
-            {filters.status ? 
-              'No prescriptions match your current filters.' : 
-              'You don\'t have any prescriptions yet. Book an appointment with a doctor to get started.'
+          <h3 className="text-lg font-medium text-[rgb(var(--text-heading))] mb-2">No prescriptions found</h3>
+          <p className="text-[rgb(var(--text-secondary))]">
+            {searchQuery ? 
+              'No prescriptions match your search query.' :
+              filters.status ? 
+                'No prescriptions match your current filters.' : 
+                'You don\'t have any prescriptions yet. Book an appointment with a doctor to get started.'
             }
           </p>
         </div>
       ) : (
         <div className="space-y-4">
-          {prescriptions.map((prescription) => (
-            <div key={prescription._id} className="bg-white rounded-lg shadow hover:shadow-md transition-shadow duration-200">
+          {filteredPrescriptions.map((prescription) => (
+            <div key={prescription._id} className="card hover:shadow-md transition-shadow duration-200">
               <div className="p-6">
                 <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
                   <div className="flex-1">
                     <div className="flex items-center justify-between mb-4">
                       <div className="flex items-center space-x-3">
                         <div>
-                          <h3 className="text-lg font-semibold text-gray-900">
+                          <h3 className="text-lg font-semibold text-[rgb(var(--text-heading))]">
                             Prescription #{prescription.prescriptionNumber}
                           </h3>
-                          <p className="text-sm text-gray-500">
+                          <p className="text-sm text-[rgb(var(--text-secondary))]">
                             Issued {getPrescriptionAge(prescription.createdAt)} by Dr. {prescription.doctor?.name}
                           </p>
                         </div>
@@ -268,23 +314,23 @@ const PatientPrescriptionList = ({ onViewPrescription }) => {
 
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
                       <div>
-                        <span className="text-sm font-medium text-gray-700">Doctor:</span>
-                        <p className="text-sm text-gray-900">{prescription.doctor?.name}</p>
-                        <p className="text-xs text-gray-500">{prescription.doctor?.specialization}</p>
+                        <span className="text-sm font-medium text-[rgb(var(--text-primary))]">Doctor:</span>
+                        <p className="text-sm text-[rgb(var(--text-primary))]">{prescription.doctor?.name}</p>
+                        <p className="text-xs text-[rgb(var(--text-secondary))]">{prescription.doctor?.specialization}</p>
                       </div>
                       
                       <div>
-                        <span className="text-sm font-medium text-gray-700">Diagnosis:</span>
-                        <p className="text-sm text-gray-900 line-clamp-2">{prescription.diagnosis}</p>
+                        <span className="text-sm font-medium text-[rgb(var(--text-primary))]">Diagnosis:</span>
+                        <p className="text-sm text-[rgb(var(--text-primary))] line-clamp-2">{prescription.diagnosis}</p>
                       </div>
 
                       <div>
-                        <span className="text-sm font-medium text-gray-700">Medicines:</span>
-                        <p className="text-sm text-gray-900">
+                        <span className="text-sm font-medium text-[rgb(var(--text-primary))]">Medicines:</span>
+                        <p className="text-sm text-[rgb(var(--text-primary))]">
                           {prescription.medicines?.length || 0} medicine(s)
                         </p>
                         {prescription.medicines?.length > 0 && (
-                          <p className="text-xs text-gray-500">
+                          <p className="text-xs text-[rgb(var(--text-secondary))]">
                             {prescription.medicines[0].name}
                             {prescription.medicines.length > 1 && ` +${prescription.medicines.length - 1} more`}
                           </p>
@@ -341,7 +387,7 @@ const PatientPrescriptionList = ({ onViewPrescription }) => {
           
           {/* Pagination */}
           {totalPages > 1 && (
-            <div className="bg-white rounded-lg shadow">
+            <div className="card">
               <Pagination />
             </div>
           )}

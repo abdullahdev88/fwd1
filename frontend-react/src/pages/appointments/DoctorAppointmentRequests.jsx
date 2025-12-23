@@ -16,6 +16,7 @@ const DoctorAppointmentRequests = () => {
   const [selectedAppointment, setSelectedAppointment] = useState(null);
   const [consultationFee, setConsultationFee] = useState('2000');
   const [approvalNotes, setApprovalNotes] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
     if (user && user.role === 'doctor') {
@@ -134,13 +135,29 @@ const DoctorAppointmentRequests = () => {
 
   if (loading) return <LoadingSpinner />;
 
-  const currentAppointments = activeTab === 'pending' ? pendingRequests : allAppointments;
+  // Filter appointments based on search query
+  const filterAppointments = (appointments) => {
+    if (!searchQuery) return appointments;
+    const searchLower = searchQuery.toLowerCase();
+    return appointments.filter(appointment => 
+      appointment.patient?.name?.toLowerCase().includes(searchLower) ||
+      appointment.patient?.email?.toLowerCase().includes(searchLower) ||
+      appointment.patient?.phone?.toLowerCase().includes(searchLower) ||
+      appointment.status?.toLowerCase().includes(searchLower) ||
+      appointment.requestMessage?.toLowerCase().includes(searchLower) ||
+      formatDateTime(appointment.appointmentDate, appointment.startTime).toLowerCase().includes(searchLower)
+    );
+  };
+
+  const filteredPendingRequests = filterAppointments(pendingRequests);
+  const filteredAllAppointments = filterAppointments(allAppointments);
+  const currentAppointments = activeTab === 'pending' ? filteredPendingRequests : filteredAllAppointments;
 
   return (
     <div className="max-w-6xl mx-auto p-6">
       <div className="mb-6">
-        <h1 className="text-3xl font-bold text-gray-900">Appointment Requests</h1>
-        <p className="text-gray-600 mt-2">
+        <h1 className="text-3xl font-bold text-[rgb(var(--text-heading))]">Appointment Requests</h1>
+        <p className="text-[rgb(var(--text-secondary))] mt-2">
           Manage your appointment requests from patients
         </p>
       </div>
@@ -152,8 +169,8 @@ const DoctorAppointmentRequests = () => {
             onClick={() => setActiveTab('pending')}
             className={`py-2 px-1 border-b-2 font-medium text-sm ${
               activeTab === 'pending'
-                ? 'border-blue-500 text-blue-600'
-                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                ? 'border-[rgb(var(--accent))] text-[rgb(var(--accent))]'
+                : 'border-transparent text-[rgb(var(--text-secondary))] hover:text-[rgb(var(--text-primary))] hover:border-[rgb(var(--border-color))]'
             }`}
           >
             Pending Requests ({pendingRequests.length})
@@ -162,8 +179,8 @@ const DoctorAppointmentRequests = () => {
             onClick={() => setActiveTab('all')}
             className={`py-2 px-1 border-b-2 font-medium text-sm ${
               activeTab === 'all'
-                ? 'border-blue-500 text-blue-600'
-                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                ? 'border-[rgb(var(--accent))] text-[rgb(var(--accent))]'
+                : 'border-transparent text-[rgb(var(--text-secondary))] hover:text-[rgb(var(--text-primary))] hover:border-[rgb(var(--border-color))]'
             }`}
           >
             All Appointments ({allAppointments.length})
@@ -171,48 +188,81 @@ const DoctorAppointmentRequests = () => {
         </nav>
       </div>
 
+      {/* Search Bar */}
+      <div className="card p-4 mb-6">
+        <div className="relative">
+          <input
+            type="text"
+            placeholder="Search by patient name, email, phone, status, message, or date..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="search-input"
+          />
+          <svg
+            className="absolute left-3 top-2.5 h-5 w-5 text-[rgb(var(--text-secondary))]"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+            />
+          </svg>
+        </div>
+        {searchQuery && (
+          <p className="mt-2 text-sm text-[rgb(var(--text-secondary))]">
+            Found {currentAppointments.length} result(s) in {activeTab === 'pending' ? 'Pending Requests' : 'All Appointments'}
+          </p>
+        )}
+      </div>
+
       {error && <ErrorMessage message={error} />}
 
       {currentAppointments.length === 0 ? (
-        <div className="bg-white shadow rounded-lg p-8 text-center">
-          <div className="text-gray-400 text-6xl mb-4">📋</div>
-          <h3 className="text-lg font-medium text-gray-900 mb-2">
-            {activeTab === 'pending' ? 'No Pending Requests' : 'No Appointments'}
+        <div className="card p-8 text-center">
+          <div className="text-[rgb(var(--text-secondary))] text-6xl mb-4">📋</div>
+          <h3 className="text-lg font-medium text-[rgb(var(--text-heading))] mb-2">
+            {searchQuery ? 'No Results Found' : activeTab === 'pending' ? 'No Pending Requests' : 'No Appointments'}
           </h3>
-          <p className="text-gray-500">
-            {activeTab === 'pending' 
-              ? "You don't have any pending appointment requests."
-              : "You don't have any appointments yet."}
+          <p className="text-[rgb(var(--text-secondary))]">
+            {searchQuery
+              ? 'No appointments match your search query.'
+              : activeTab === 'pending' 
+                ? "You don't have any pending appointment requests."
+                : "You don't have any appointments yet."}
           </p>
         </div>
       ) : (
-        <div className="bg-white shadow rounded-lg overflow-hidden">
+        <div className="card overflow-hidden">
           <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
+            <table className="min-w-full divide-y divide-[rgb(var(--border-color))]">
+              <thead className="bg-[rgb(var(--bg-secondary))]">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-[rgb(var(--text-secondary))] uppercase tracking-wider">
                     Patient
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Date & Time
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-[rgb(var(--text-secondary))] uppercase tracking-wider">
                     Status
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-[rgb(var(--text-secondary))] uppercase tracking-wider">
                     Message
                   </th>
                   {activeTab === 'pending' && (
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-[rgb(var(--text-secondary))] uppercase tracking-wider">
                       Actions
                     </th>
                   )}
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
+              <tbody className="divide-y divide-[rgb(var(--border-color))]">
                 {currentAppointments.map((appointment) => (
-                  <tr key={appointment._id} className="hover:bg-gray-50">
+                  <tr key={appointment._id} className="hover:bg-[rgb(var(--bg-tertiary))] transition-colors">
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
                         <div className="flex-shrink-0 h-10 w-10">
@@ -223,27 +273,27 @@ const DoctorAppointmentRequests = () => {
                           </div>
                         </div>
                         <div className="ml-4">
-                          <div className="text-sm font-medium text-gray-900">
+                          <div className="text-sm font-medium text-[rgb(var(--text-primary))]">
                             {appointment.patient.name}
                           </div>
-                          <div className="text-sm text-gray-500">
+                          <div className="text-sm text-[rgb(var(--text-secondary))]">
                             {appointment.patient.email}
                           </div>
                           {appointment.patient.phone && (
-                            <div className="text-sm text-gray-500">
+                            <div className="text-sm text-[rgb(var(--text-secondary))]">
                               {appointment.patient.phone}
                             </div>
                           )}
                         </div>
                       </div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-[rgb(var(--text-primary))]">
                       {formatDateTime(appointment.appointmentDate, appointment.startTime)}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       {getStatusBadge(appointment.status)}
                     </td>
-                    <td className="px-6 py-4 text-sm text-gray-900">
+                    <td className="px-6 py-4 text-sm text-[rgb(var(--text-primary))]">
                       <div className="max-w-xs">
                         {appointment.requestMessage || 'No message provided'}
                       </div>

@@ -92,8 +92,8 @@ const ProfileSettings = () => {
   const isPatient = user?.role === 'patient';
 
   return (
-    <div className="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-lg">
-      <h1 className="text-3xl font-bold text-gray-900 mb-6">Profile Settings</h1>
+    <div className="max-w-4xl mx-auto p-6 card">
+      <h1 className="text-3xl font-bold mb-6 text-[rgb(var(--text-heading))]">Profile Settings</h1>
       
       {error && <ErrorMessage message={error} />}
       
@@ -105,11 +105,11 @@ const ProfileSettings = () => {
 
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Basic Information */}
-        <div className="bg-gray-50 p-6 rounded-lg">
-          <h2 className="text-xl font-semibold text-gray-800 mb-4">Basic Information</h2>
+        <div className="bg-[rgb(var(--bg-secondary))] p-6 rounded-lg">
+          <h2 className="text-xl font-semibold text-[rgb(var(--text-heading))] mb-4">Basic Information</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="label">
                 Full Name
               </label>
               <input
@@ -117,13 +117,13 @@ const ProfileSettings = () => {
                 name="name"
                 value={profileData.name || ''}
                 onChange={handleInputChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="input-field"
                 required
               />
             </div>
             
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="label">
                 Email
               </label>
               <input
@@ -131,13 +131,13 @@ const ProfileSettings = () => {
                 name="email"
                 value={profileData.email || ''}
                 onChange={handleInputChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="input-field"
                 required
               />
             </div>
             
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="label">
                 Phone Number
               </label>
               <input
@@ -145,19 +145,19 @@ const ProfileSettings = () => {
                 name="phone"
                 value={profileData.phone || ''}
                 onChange={handleInputChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="input-field"
               />
             </div>
             
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="label">
                 Gender
               </label>
               <select
                 name="gender"
                 value={profileData.gender || ''}
                 onChange={handleInputChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="input-field"
               >
                 <option value="">Select Gender</option>
                 <option value="male">Male</option>
@@ -167,7 +167,7 @@ const ProfileSettings = () => {
             </div>
             
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="label">
                 Date of Birth
               </label>
               <input
@@ -175,18 +175,18 @@ const ProfileSettings = () => {
                 name="dateOfBirth"
                 value={profileData.dateOfBirth ? profileData.dateOfBirth.split('T')[0] : ''}
                 onChange={handleInputChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="input-field"
               />
             </div>
           </div>
         </div>
 
         {/* Address Information */}
-        <div className="bg-gray-50 p-6 rounded-lg">
-          <h2 className="text-xl font-semibold text-gray-800 mb-4">Address</h2>
+        <div className="bg-[rgb(var(--bg-secondary))] p-6 rounded-lg">
+          <h2 className="text-xl font-semibold text-[rgb(var(--text-heading))] mb-4">Address</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="label">
                 Street Address
               </label>
               <input
@@ -194,12 +194,12 @@ const ProfileSettings = () => {
                 name="address.street"
                 value={profileData.address?.street || ''}
                 onChange={handleInputChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="input-field"
               />
             </div>
             
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="label">
                 City
               </label>
               <input
@@ -207,12 +207,12 @@ const ProfileSettings = () => {
                 name="address.city"
                 value={profileData.address?.city || ''}
                 onChange={handleInputChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="input-field"
               />
             </div>
             
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="label">
                 State
               </label>
               <input
@@ -220,12 +220,12 @@ const ProfileSettings = () => {
                 name="address.state"
                 value={profileData.address?.state || ''}
                 onChange={handleInputChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="input-field"
               />
             </div>
             
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="label">
                 ZIP Code
               </label>
               <input
@@ -233,12 +233,12 @@ const ProfileSettings = () => {
                 name="address.zipCode"
                 value={profileData.address?.zipCode || ''}
                 onChange={handleInputChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="input-field"
               />
             </div>
             
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="label">
                 Country
               </label>
               <input
@@ -246,7 +246,7 @@ const ProfileSettings = () => {
                 name="address.country"
                 value={profileData.address?.country || ''}
                 onChange={handleInputChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="input-field"
               />
             </div>
           </div>
@@ -254,11 +254,11 @@ const ProfileSettings = () => {
 
         {/* Doctor-specific fields */}
         {isDoctor && (
-          <div className="bg-blue-50 p-6 rounded-lg">
-            <h2 className="text-xl font-semibold text-gray-800 mb-4">Professional Information</h2>
+          <div className="bg-[rgb(var(--bg-tertiary))] p-6 rounded-lg">
+            <h2 className="text-xl font-semibold text-[rgb(var(--text-heading))] mb-4">Professional Information</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="label">
                   Specialization
                 </label>
                 <input
@@ -266,12 +266,12 @@ const ProfileSettings = () => {
                   name="specialization"
                   value={profileData.specialization || ''}
                   onChange={handleInputChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="input-field"
                 />
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="label">
                   Experience (Years)
                 </label>
                 <input
@@ -280,12 +280,12 @@ const ProfileSettings = () => {
                   value={profileData.experience || ''}
                   onChange={handleInputChange}
                   min="0"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="input-field"
                 />
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="label">
                   Consultation Fee
                 </label>
                 <input
@@ -294,12 +294,12 @@ const ProfileSettings = () => {
                   value={profileData.consultationFee || ''}
                   onChange={handleInputChange}
                   min="0"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="input-field"
                 />
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="label">
                   Qualification
                 </label>
                 <input
@@ -307,7 +307,7 @@ const ProfileSettings = () => {
                   name="qualification"
                   value={profileData.qualification || ''}
                   onChange={handleInputChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="input-field"
                 />
               </div>
             </div>
@@ -317,18 +317,18 @@ const ProfileSettings = () => {
         {/* Patient-specific fields */}
         {isPatient && (
           <>
-            <div className="bg-green-50 p-6 rounded-lg">
-              <h2 className="text-xl font-semibold text-gray-800 mb-4">Medical Information</h2>
+            <div className="bg-[rgb(var(--bg-tertiary))] p-6 rounded-lg">
+              <h2 className="text-xl font-semibold text-[rgb(var(--text-heading))] mb-4">Medical Information</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="label">
                     Blood Group
                   </label>
                   <select
                     name="bloodGroup"
                     value={profileData.bloodGroup || ''}
                     onChange={handleInputChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="input-field"
                   >
                     <option value="">Select Blood Group</option>
                     <option value="A+">A+</option>
@@ -344,11 +344,11 @@ const ProfileSettings = () => {
               </div>
             </div>
 
-            <div className="bg-red-50 p-6 rounded-lg">
-              <h2 className="text-xl font-semibold text-gray-800 mb-4">Emergency Contact</h2>
+            <div className="bg-[rgb(var(--bg-tertiary))] p-6 rounded-lg">
+              <h2 className="text-xl font-semibold text-[rgb(var(--text-heading))] mb-4">Emergency Contact</h2>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="label">
                     Name
                   </label>
                   <input
@@ -356,12 +356,12 @@ const ProfileSettings = () => {
                     name="emergencyContact.name"
                     value={profileData.emergencyContact?.name || ''}
                     onChange={handleInputChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="input-field"
                   />
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="label">
                     Phone
                   </label>
                   <input
@@ -369,12 +369,12 @@ const ProfileSettings = () => {
                     name="emergencyContact.phone"
                     value={profileData.emergencyContact?.phone || ''}
                     onChange={handleInputChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="input-field"
                   />
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="label">
                     Relationship
                   </label>
                   <input
@@ -382,7 +382,7 @@ const ProfileSettings = () => {
                     name="emergencyContact.relationship"
                     value={profileData.emergencyContact?.relationship || ''}
                     onChange={handleInputChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="input-field"
                   />
                 </div>
               </div>
@@ -395,7 +395,7 @@ const ProfileSettings = () => {
           <Button
             type="submit"
             disabled={updating}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-md"
+            className="btn-primary"
           >
             {updating ? 'Updating...' : 'Update Profile'}
           </Button>

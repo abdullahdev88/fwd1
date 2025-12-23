@@ -7,10 +7,10 @@ import PrescriptionView from '../../components/doctor/PrescriptionView';
 const TabButton = ({ id, label, isActive, onClick }) => (
   <button
     onClick={() => onClick(id)}
-    className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
+    className={`px-4 py-2 text-sm font-medium rounded-lg transition-all ${
       isActive
-        ? 'bg-blue-600 text-white shadow-sm'
-        : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+        ? 'bg-[rgb(var(--accent))] text-white shadow-sm'
+        : 'text-[rgb(var(--text-secondary))] hover:text-[rgb(var(--text-primary))] hover:bg-[rgb(var(--bg-tertiary))]'
     }`}
   >
     {label}
@@ -41,9 +41,10 @@ const PatientDashboard = () => {
     fetchDoctors();
     fetchAppointments();
     
-    // Refresh doctors every 30 seconds to show latest availability
+    // Refresh doctors and appointments every 30 seconds to show latest data
     const interval = setInterval(() => {
       fetchDoctors();
+      fetchAppointments();
     }, 30000);
     
     return () => clearInterval(interval);
@@ -76,8 +77,12 @@ const PatientDashboard = () => {
         }
       });
       
+      console.log('Appointments response:', response.data);
+      
       if (response.data && response.data.data) {
-        setAppointments(response.data.data.appointments || []);
+        const appointmentsData = response.data.data.appointments || response.data.data || [];
+        console.log('Setting appointments:', appointmentsData);
+        setAppointments(appointmentsData);
       }
     } catch (error) {
       console.error('Error fetching appointments:', error);
@@ -111,9 +116,10 @@ const PatientDashboard = () => {
         setSelectedDoctor(null);
         setSelectedSlot(null);
         setBookingNotes('');
-        
-        // Refresh data
-        await Promise.all([fetchDoctors(), fetchAppointments()]);
+      
+        // Refresh appointments to show updated count
+        fetchAppointments();
+        fetchDoctors();
       }
     } catch (error) {
       console.error('Error booking appointment:', error);
@@ -144,24 +150,40 @@ const PatientDashboard = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="min-h-screen flex items-center justify-center bg-[rgb(var(--bg-primary))]">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-2 text-gray-600">Loading dashboard...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[rgb(var(--accent))] mx-auto"></div>
+          <p className="mt-2 text-[rgb(var(--text-secondary))]">Loading dashboard...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-[rgb(var(--bg-primary))]">
       <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
         {/* Header with Tab Navigation */}
         <div className="px-4 py-6 sm:px-0">
-          <h1 className="text-3xl font-bold text-gray-900">Patient Dashboard</h1>
-          <p className="mt-2 text-gray-600">Welcome back, {user?.name}!</p>
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-3xl font-bold text-[rgb(var(--text-heading))]">Patient Dashboard</h1>
+              <p className="mt-2 text-[rgb(var(--text-secondary))]">Welcome back, {user?.name}!</p>
+            </div>
+            <button
+              onClick={() => {
+                fetchAppointments();
+                fetchDoctors();
+              }}
+              className="btn-secondary flex items-center space-x-2"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+              </svg>
+              <span>Refresh</span>
+            </button>
+          </div>
           
-          <div className="mt-6 border-b border-gray-200">
+          <div className="mt-6 border-b-2 border-[rgb(var(--border-color))]">
             <nav className="-mb-px flex space-x-8">
               <TabButton
                 id="dashboard"
@@ -185,98 +207,108 @@ const PatientDashboard = () => {
             <div>
               {/* Show real-time status */}
               {doctors.length > 0 && (
-                <div className="mt-2 text-sm text-green-600">
-                  🟢 {doctors.length} doctor(s) currently available for appointments
+                <div className="mt-2 px-4 py-2 bg-emerald-500/10 border border-emerald-500/20 rounded-lg">
+                  <p className="text-sm text-emerald-400 flex items-center">
+                    <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                      <circle cx="10" cy="10" r="5" />
+                    </svg>
+                    {doctors.length} doctor(s) currently available for appointments
+                  </p>
                 </div>
               )}
 
               {/* Stats Cards */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                <div className="bg-white overflow-hidden shadow rounded-lg">
-                  <div className="p-5">
-                    <div className="flex items-center">
-                      <div className="flex-shrink-0">
-                        <span className="text-2xl">📅</span>
-                      </div>
-                      <div className="ml-3">
-                        <p className="text-sm font-medium text-gray-500">Total Appointments</p>
-                        <p className="text-2xl font-semibold text-gray-900">{appointments.length}</p>
-                      </div>
+                <div className="stat-card">
+                  <div className="flex items-center">
+                    <div className="flex-shrink-0">
+                      <svg className="w-8 h-8 text-[rgb(var(--accent))]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                      </svg>
+                    </div>
+                    <div className="ml-3">
+                      <p className="text-sm font-medium text-[rgb(var(--text-secondary))]">Total Appointments</p>
+                      <p className="text-2xl font-semibold text-[rgb(var(--text-heading))]">{appointments.length}</p>
                     </div>
                   </div>
                 </div>
 
-                <div className="bg-white overflow-hidden shadow rounded-lg">
-                  <div className="p-5">
-                    <div className="flex items-center">
-                      <div className="flex-shrink-0">
-                        <span className="text-2xl">⏰</span>
-                      </div>
-                      <div className="ml-3">
-                        <p className="text-sm font-medium text-gray-500">Upcoming</p>
-                        <p className="text-2xl font-semibold text-green-600">{upcomingAppointments.length}</p>
-                      </div>
+                <div className="stat-card">
+                  <div className="flex items-center">
+                    <div className="flex-shrink-0">
+                      <svg className="w-8 h-8 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                    </div>
+                    <div className="ml-3">
+                      <p className="text-sm font-medium text-[rgb(var(--text-secondary))]">Upcoming</p>
+                      <p className="text-2xl font-semibold text-emerald-400">{upcomingAppointments.length}</p>
                     </div>
                   </div>
                 </div>
 
-                <div className="bg-white overflow-hidden shadow rounded-lg">
-                  <div className="p-5">
-                    <div className="flex items-center">
-                      <div className="flex-shrink-0">
-                        <span className="text-2xl">👨‍⚕️</span>
-                      </div>
-                      <div className="ml-3">
-                        <p className="text-sm font-medium text-gray-500">Available Doctors</p>
-                        <p className="text-2xl font-semibold text-blue-600">{doctors.length}</p>
-                      </div>
+                <div className="stat-card">
+                  <div className="flex items-center">
+                    <div className="flex-shrink-0">
+                      <svg className="w-8 h-8 text-[rgb(var(--accent))]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                    </div>
+                    <div className="ml-3">
+                      <p className="text-sm font-medium text-[rgb(var(--text-secondary))]">Available Doctors</p>
+                      <p className="text-2xl font-semibold text-[rgb(var(--accent))]">{doctors.length}</p>
                     </div>
                   </div>
                 </div>
               </div>
 
               {/* Available Doctors */}
-              <div className="bg-white shadow overflow-hidden sm:rounded-md mb-8">
-                <div className="px-4 py-5 sm:px-6 flex justify-between items-center">
+              <div className="card mb-8">
+                <div className="flex justify-between items-center mb-6">
                   <div>
-                    <h3 className="text-lg leading-6 font-medium text-gray-900">Available Doctors</h3>
-                    <p className="mt-1 max-w-2xl text-sm text-gray-500">
+                    <h3 className="text-lg leading-6 font-medium text-[rgb(var(--text-heading))]">Available Doctors</h3>
+                    <p className="mt-1 text-sm text-[rgb(var(--text-secondary))]">
                       Book appointments with approved doctors (Updates every 30 seconds)
                     </p>
                   </div>
                   <button
                     onClick={fetchDoctors}
-                    className="text-sm bg-blue-100 text-blue-600 hover:bg-blue-200 px-3 py-1 rounded"
+                    className="btn-secondary flex items-center space-x-2"
                   >
-                    🔄 Refresh
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                    </svg>
+                    <span>Refresh</span>
                   </button>
                 </div>
                 
                 {doctors.length > 0 ? (
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {doctors.map((doctor) => (
-                      <div key={doctor._id} className="border rounded-lg p-4 hover:shadow-lg transition-shadow">
+                      <div key={doctor._id} className="card hover:shadow-lg transition-shadow">
                         <div className="flex items-center mb-3">
-                          <div className="h-12 w-12 rounded-full bg-blue-100 flex items-center justify-center">
-                            <span className="text-lg font-medium text-blue-600">Dr.</span>
+                          <div className="h-12 w-12 rounded-full bg-[rgb(var(--accent))]/10 flex items-center justify-center">
+                            <svg className="w-6 h-6 text-[rgb(var(--accent))]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                            </svg>
                           </div>
                           <div className="ml-3">
-                            <h4 className="text-lg font-medium text-gray-900">{doctor.name}</h4>
-                            <p className="text-sm text-gray-500">{doctor.specialization}</p>
+                            <h4 className="text-lg font-medium text-[rgb(var(--text-heading))]">{doctor.name}</h4>
+                            <p className="text-sm text-[rgb(var(--text-secondary))]">{doctor.specialization}</p>
                           </div>
                         </div>
 
-                        <div className="text-sm text-gray-600 mb-3">
+                        <div className="text-sm text-[rgb(var(--text-primary))] mb-3 space-y-1">
                           <p>Experience: {doctor.experience} years</p>
                           <p>Education: {doctor.education}</p>
                         </div>
 
                         <div className="space-y-2">
-                          <h5 className="font-medium text-gray-900">Available Slots:</h5>
+                          <h5 className="font-medium text-[rgb(var(--text-heading))]">Available Slots:</h5>
                           {doctor.availability && doctor.availability.length > 0 ? (
                             doctor.availability.map((date) => (
-                              <div key={date._id} className="border-l-4 border-blue-500 pl-3">
-                                <p className="font-medium text-sm">
+                              <div key={date._id} className="border-l-4 border-[rgb(var(--accent))] pl-3 py-1">
+                                <p className="font-medium text-sm text-[rgb(var(--text-primary))]">
                                   {new Date(date.date).toLocaleDateString()}
                                 </p>
                                 <div className="flex flex-wrap gap-1 mt-1">
@@ -284,7 +316,7 @@ const PatientDashboard = () => {
                                     <button
                                       key={slotIndex}
                                       onClick={() => openBookingModal(doctor, date, slotIndex, slot)}
-                                      className="px-2 py-1 text-xs bg-green-100 text-green-800 rounded hover:bg-green-200 transition-colors"
+                                      className="px-2 py-1 text-xs bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 rounded hover:bg-emerald-500/20 transition-colors"
                                     >
                                       {slot.startTime}-{slot.endTime}
                                     </button>
@@ -293,51 +325,49 @@ const PatientDashboard = () => {
                               </div>
                             ))
                           ) : (
-                            <p className="text-sm text-gray-500">No available slots</p>
+                            <p className="text-sm text-[rgb(var(--text-secondary))]">No available slots</p>
                           )}
                         </div>
                       </div>
                     ))}
                   </div>
                 ) : (
-                  <div className="p-6 text-center text-gray-500">
+                  <div className="p-6 text-center text-[rgb(var(--text-secondary))]">
                     {error ? 'Failed to load doctors' : 'No approved doctors available at the moment'}
                   </div>
                 )}
               </div>
 
               {/* Your Appointments */}
-              <div className="bg-white shadow overflow-hidden sm:rounded-md">
-                <div className="px-4 py-5 sm:px-6">
-                  <h3 className="text-lg leading-6 font-medium text-gray-900">Your Appointments</h3>
-                </div>
-                <ul className="divide-y divide-gray-200">
+              <div className="card">
+                <h3 className="text-lg leading-6 font-medium text-[rgb(var(--text-heading))] mb-4">Your Appointments</h3>
+                <ul className="divide-y divide-[rgb(var(--border-color))]">
                   {appointments.length > 0 ? (
                     appointments.map((appointment) => (
-                      <li key={appointment._id} className="px-4 py-4 sm:px-6">
+                      <li key={appointment._id} className="py-4 hover:bg-[rgb(var(--bg-tertiary))] -mx-6 px-6 transition-colors">
                         <div className="flex items-center justify-between">
                           <div>
-                            <p className="text-sm font-medium text-gray-900">
+                            <p className="text-sm font-medium text-[rgb(var(--text-heading))]">
                               {appointment.doctor.name}
                             </p>
-                            <p className="text-sm text-gray-500">
+                            <p className="text-sm text-[rgb(var(--text-secondary))]">
                               {appointment.doctor.specialization}
                             </p>
-                            <p className="text-sm text-gray-500">
+                            <p className="text-sm text-[rgb(var(--text-secondary))]">
                               {new Date(appointment.appointmentDate).toLocaleDateString()} at {appointment.startTime}
                             </p>
                             {appointment.notes && (
-                              <p className="text-sm text-gray-400 mt-1">
+                              <p className="text-sm text-[rgb(var(--text-secondary))] mt-1">
                                 Notes: {appointment.notes}
                               </p>
                             )}
                           </div>
-                          <span className={`px-2 py-1 text-xs font-medium rounded-full ${
+                          <span className={`px-3 py-1 text-xs font-medium rounded-full ${
                             appointment.status === 'scheduled' 
-                              ? 'bg-blue-100 text-blue-800'
+                              ? 'badge badge-info'
                               : appointment.status === 'completed'
-                              ? 'bg-green-100 text-green-800'
-                              : 'bg-red-100 text-red-800'
+                              ? 'badge-success'
+                              : 'badge-error'
                           }`}>
                             {appointment.status}
                           </span>
@@ -345,7 +375,7 @@ const PatientDashboard = () => {
                       </li>
                     ))
                   ) : (
-                    <li className="px-4 py-6 text-center text-gray-500">
+                    <li className="py-6 text-center text-[rgb(var(--text-secondary))]">
                       No appointments booked yet
                     </li>
                   )}
@@ -372,63 +402,61 @@ const PatientDashboard = () => {
 
         {/* Booking Modal */}
         {bookingModal && selectedDoctor && selectedSlot && (
-          <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-            <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
-              <div className="mt-3">
-                <h3 className="text-lg font-medium text-gray-900 mb-4">
-                  Book Appointment
-                </h3>
-                
-                <div className="mb-4">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Doctor
-                  </label>
-                  <p className="text-sm text-gray-900">Dr. {selectedDoctor.name}</p>
-                  <p className="text-sm text-gray-500">{selectedDoctor.specialization}</p>
-                </div>
+          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm overflow-y-auto h-full w-full z-50 flex items-center justify-center">
+            <div className="relative mx-auto p-6 border-2 border-[rgb(var(--border-color))] w-96 shadow-2xl rounded-lg bg-[rgb(var(--bg-secondary))]">
+              <h3 className="text-lg font-medium text-[rgb(var(--text-heading))] mb-6">
+                Book Appointment
+              </h3>
+              
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-2">
+                  Doctor
+                </label>
+                <p className="text-sm text-[rgb(var(--text-primary))]">Dr. {selectedDoctor.name}</p>
+                <p className="text-sm text-[rgb(var(--text-secondary))]">{selectedDoctor.specialization}</p>
+              </div>
 
-                <div className="mb-4">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Date & Time
-                  </label>
-                  <p className="text-sm text-gray-900">
-                    {new Date(selectedSlot.date).toLocaleDateString()} at {selectedSlot.time}
-                  </p>
-                </div>
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-2">
+                  Date & Time
+                </label>
+                <p className="text-sm text-[rgb(var(--text-primary))]">
+                  {new Date(selectedSlot.date).toLocaleDateString()} at {selectedSlot.time}
+                </p>
+              </div>
 
-                <div className="mb-4">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Additional Notes (Optional)
-                  </label>
-                  <textarea
-                    value={bookingNotes}
-                    onChange={(e) => setBookingNotes(e.target.value)}
-                    placeholder="Any specific symptoms or concerns..."
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    rows="3"
-                  />
-                </div>
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-2">
+                  Additional Notes (Optional)
+                </label>
+                <textarea
+                  value={bookingNotes}
+                  onChange={(e) => setBookingNotes(e.target.value)}
+                  placeholder="Any specific symptoms or concerns..."
+                  className="input-field"
+                  rows="3"
+                />
+              </div>
 
-                <div className="flex gap-3">
-                  <button
-                    onClick={handleBooking}
-                    disabled={bookingLoading}
-                    className="flex-1 bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 disabled:opacity-50"
-                  >
-                    {bookingLoading ? 'Booking...' : 'Confirm Booking'}
-                  </button>
-                  <button
-                    onClick={() => {
-                      setBookingModal(false);
-                      setSelectedDoctor(null);
-                      setSelectedSlot(null);
-                      setBookingNotes('');
-                    }}
-                    className="flex-1 bg-gray-300 text-gray-700 py-2 px-4 rounded hover:bg-gray-400"
-                  >
-                    Cancel
-                  </button>
-                </div>
+              <div className="flex gap-3">
+                <button
+                  onClick={handleBooking}
+                  disabled={bookingLoading}
+                  className="btn-primary flex-1"
+                >
+                  {bookingLoading ? 'Booking...' : 'Confirm Booking'}
+                </button>
+                <button
+                  onClick={() => {
+                    setBookingModal(false);
+                    setSelectedDoctor(null);
+                    setSelectedSlot(null);
+                    setBookingNotes('');
+                  }}
+                  className="btn-secondary flex-1"
+                >
+                  Cancel
+                </button>
               </div>
             </div>
           </div>

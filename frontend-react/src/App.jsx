@@ -26,7 +26,7 @@ function App() {
   return (
     <AuthProvider>
       <Router>
-        <div className="min-h-screen bg-gray-50">
+        <div className="min-h-screen bg-[rgb(var(--bg-primary))]">
           <Navbar />
           <Routes>
             {/* Public Routes */}

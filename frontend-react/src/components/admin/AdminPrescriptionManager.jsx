@@ -17,6 +17,11 @@ const AdminPrescriptionManager = ({ onViewPrescription, onDeletePrescription }) 
     patientName: '',
     limit: 20
   });
+  const [inputValues, setInputValues] = useState({
+    doctorName: '',
+    patientName: ''
+  });
+  const [searchDebounce, setSearchDebounce] = useState(null);
   const [deleteConfirm, setDeleteConfirm] = useState(null);
   const [deleting, setDeleting] = useState(false);
 
@@ -54,7 +59,22 @@ const AdminPrescriptionManager = ({ onViewPrescription, onDeletePrescription }) 
   };
 
   const handleFilterChange = (field, value) => {
-    setFilters(prev => ({ ...prev, [field]: value }));
+    // For text inputs (doctorName, patientName), only update input values
+    if (field === 'doctorName' || field === 'patientName') {
+      setInputValues(prev => ({ ...prev, [field]: value }));
+    } else {
+      // For non-text inputs (status, limit), update filters immediately
+      setFilters(prev => ({ ...prev, [field]: value }));
+      setCurrentPage(1);
+    }
+  };
+
+  const handleSearch = () => {
+    setFilters(prev => ({ 
+      ...prev, 
+      doctorName: inputValues.doctorName,
+      patientName: inputValues.patientName
+    }));
     setCurrentPage(1);
   };
 
@@ -64,6 +84,10 @@ const AdminPrescriptionManager = ({ onViewPrescription, onDeletePrescription }) 
       doctorName: '',
       patientName: '',
       limit: 20
+    });
+    setInputValues({
+      doctorName: '',
+      patientName: ''
     });
     setCurrentPage(1);
   };
@@ -204,25 +228,25 @@ const AdminPrescriptionManager = ({ onViewPrescription, onDeletePrescription }) 
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">Prescription Management</h2>
-          <p className="text-gray-600">Manage all system prescriptions and monitor doctor activities</p>
+          <h2 className="text-2xl font-bold text-[rgb(var(--text-heading))]">Prescription Management</h2>
+          <p className="text-[rgb(var(--text-secondary))]">Manage all system prescriptions and monitor doctor activities</p>
         </div>
-        <div className="text-sm text-gray-500 bg-gray-100 px-3 py-2 rounded-lg">
+        <div className="text-sm text-[rgb(var(--text-secondary))] bg-[rgb(var(--bg-tertiary))] px-3 py-2 rounded-lg">
           Total: {totalPrescriptions} prescriptions
         </div>
       </div>
 
       {/* Advanced Filters */}
-      <div className="bg-white rounded-lg shadow p-6">
+      <div className="card">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="label">
               Status
             </label>
             <select
               value={filters.status}
               onChange={(e) => handleFilterChange('status', e.target.value)}
-              className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="input-field"
             >
               <option value="">All Statuses</option>
               <option value="active">Active</option>
@@ -232,39 +256,41 @@ const AdminPrescriptionManager = ({ onViewPrescription, onDeletePrescription }) 
           </div>
           
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="label">
               Doctor Name
             </label>
             <input
               type="text"
-              value={filters.doctorName}
+              value={inputValues.doctorName}
               onChange={(e) => handleFilterChange('doctorName', e.target.value)}
+              onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
               placeholder="Search by doctor name..."
-              className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="input-field"
             />
           </div>
           
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="label">
               Patient Name
             </label>
             <input
               type="text"
-              value={filters.patientName}
+              value={inputValues.patientName}
               onChange={(e) => handleFilterChange('patientName', e.target.value)}
+              onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
               placeholder="Search by patient name..."
-              className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="input-field"
             />
           </div>
           
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="label">
               Results per page
             </label>
             <select
               value={filters.limit}
               onChange={(e) => handleFilterChange('limit', parseInt(e.target.value))}
-              className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="input-field"
             >
               <option value={10}>10</option>
               <option value={20}>20</option>
@@ -273,13 +299,20 @@ const AdminPrescriptionManager = ({ onViewPrescription, onDeletePrescription }) 
             </select>
           </div>
           
-          <div className="flex items-end">
+          <div className="flex items-end gap-2">
+            <Button
+              onClick={handleSearch}
+              variant="primary"
+              className="flex-1 bg-blue-600 hover:bg-blue-700 text-white"
+            >
+              Search
+            </Button>
             <Button
               onClick={clearFilters}
               variant="secondary"
-              className="w-full"
+              className="flex-1"
             >
-              Clear Filters
+              Clear
             </Button>
           </div>
         </div>
@@ -290,7 +323,7 @@ const AdminPrescriptionManager = ({ onViewPrescription, onDeletePrescription }) 
       {/* Delete Confirmation Modal */}
       {deleteConfirm && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
+          <div className="card max-w-md w-full p-6">
             <div className="flex items-center mb-4">
               <div className="flex-shrink-0">
                 <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -298,11 +331,11 @@ const AdminPrescriptionManager = ({ onViewPrescription, onDeletePrescription }) 
                 </svg>
               </div>
               <div className="ml-3">
-                <h3 className="text-lg font-medium text-gray-900">Delete Prescription</h3>
+                <h3 className="text-lg font-medium text-[rgb(var(--text-heading))]">Delete Prescription</h3>
               </div>
             </div>
             <div className="mb-4">
-              <p className="text-sm text-gray-500">
+              <p className="text-sm text-[rgb(var(--text-secondary))]">
                 Are you sure you want to delete prescription #{deleteConfirm.prescriptionNumber} for {deleteConfirm.patient?.name}? 
                 This action cannot be undone.
               </p>
@@ -330,14 +363,14 @@ const AdminPrescriptionManager = ({ onViewPrescription, onDeletePrescription }) 
 
       {/* Prescriptions Table */}
       {prescriptions.length === 0 ? (
-        <div className="bg-white rounded-lg shadow p-12 text-center">
-          <div className="text-gray-400 mb-4">
+        <div className="card p-12 text-center">
+          <div className="text-[rgb(var(--text-secondary))] mb-4">
             <svg className="mx-auto h-16 w-16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
             </svg>
           </div>
-          <h3 className="text-lg font-medium text-gray-900 mb-2">No prescriptions found</h3>
-          <p className="text-gray-500">
+          <h3 className="text-lg font-medium text-[rgb(var(--text-heading))] mb-2">No prescriptions found</h3>
+          <p className="text-[rgb(var(--text-secondary))]">
             {filters.status || filters.doctorName || filters.patientName ? 
               'No prescriptions match your current filters.' : 
               'No prescriptions have been created yet.'
@@ -345,72 +378,72 @@ const AdminPrescriptionManager = ({ onViewPrescription, onDeletePrescription }) 
           </p>
         </div>
       ) : (
-        <div className="bg-white rounded-lg shadow overflow-hidden">
+        <div className="card overflow-hidden">
           <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
+            <table className="min-w-full divide-y divide-[rgb(var(--border-color))]">
+              <thead className="bg-[rgb(var(--bg-secondary))]">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-[rgb(var(--text-secondary))] uppercase tracking-wider">
                     Prescription Info
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-[rgb(var(--text-secondary))] uppercase tracking-wider">
                     Patient
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-[rgb(var(--text-secondary))] uppercase tracking-wider">
                     Doctor
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-[rgb(var(--text-secondary))] uppercase tracking-wider">
                     Diagnosis
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-[rgb(var(--text-secondary))] uppercase tracking-wider">
                     Medicines
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-[rgb(var(--text-secondary))] uppercase tracking-wider">
                     Status
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-[rgb(var(--text-secondary))] uppercase tracking-wider">
                     Actions
                   </th>
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
+              <tbody className="divide-y divide-[rgb(var(--border-color))]">
                 {prescriptions.map((prescription) => (
-                  <tr key={prescription._id} className="hover:bg-gray-50">
+                  <tr key={prescription._id} className="hover:bg-[rgb(var(--bg-tertiary))] transition-colors">
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm font-medium text-gray-900">
+                      <div className="text-sm font-medium text-[rgb(var(--text-primary))]">
                         #{prescription.prescriptionNumber}
                       </div>
-                      <div className="text-sm text-gray-500">
+                      <div className="text-sm text-[rgb(var(--text-secondary))]">
                         {getPrescriptionAge(prescription.createdAt)}
                       </div>
-                      <div className="text-xs text-gray-400">
+                      <div className="text-xs text-[rgb(var(--text-secondary))]">
                         {formatDate(prescription.createdAt)} {formatTime(prescription.createdAt)}
                       </div>
                     </td>
                     
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm font-medium text-gray-900">
+                      <div className="text-sm font-medium text-[rgb(var(--text-primary))]">
                         {prescription.patient?.name || 'Unknown'}
                       </div>
-                      <div className="text-sm text-gray-500">
+                      <div className="text-sm text-[rgb(var(--text-secondary))]">
                         {prescription.patient?.email}
                       </div>
-                      <div className="text-xs text-gray-400">
+                      <div className="text-xs text-[rgb(var(--text-secondary))]">
                         {prescription.patient?.phone}
                       </div>
                     </td>
                     
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm font-medium text-gray-900">
+                      <div className="text-sm font-medium text-[rgb(var(--text-primary))]">
                         {prescription.doctor?.name || 'Unknown'}
                       </div>
-                      <div className="text-sm text-gray-500">
+                      <div className="text-sm text-[rgb(var(--text-secondary))]">
                         {prescription.doctor?.specialization}
                       </div>
                     </td>
                     
                     <td className="px-6 py-4">
-                      <div className="text-sm text-gray-900 max-w-xs">
+                      <div className="text-sm text-[rgb(var(--text-primary))] max-w-xs">
                         <p className="truncate" title={prescription.diagnosis}>
                           {prescription.diagnosis}
                         </p>
@@ -418,11 +451,11 @@ const AdminPrescriptionManager = ({ onViewPrescription, onDeletePrescription }) 
                     </td>
                     
                     <td className="px-6 py-4">
-                      <div className="text-sm text-gray-900">
+                      <div className="text-sm text-[rgb(var(--text-primary))]">
                         {prescription.medicines?.length || 0} medicine(s)
                       </div>
                       {prescription.medicines?.length > 0 && (
-                        <div className="text-xs text-gray-500 max-w-xs truncate">
+                        <div className="text-xs text-[rgb(var(--text-secondary))] max-w-xs truncate">
                           {prescription.medicines[0].name}
                           {prescription.medicines.length > 1 && ` +${prescription.medicines.length - 1} more`}
                         </div>

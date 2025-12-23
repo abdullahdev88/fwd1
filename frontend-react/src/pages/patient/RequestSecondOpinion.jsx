@@ -100,9 +100,9 @@ const RequestSecondOpinion = () => {
 
   return (
     <div className="max-w-3xl mx-auto p-6">
-      <div className="bg-white rounded-lg shadow-lg p-6">
-        <h1 className="text-3xl font-bold mb-2 text-gray-800">Request Second Opinion</h1>
-        <p className="text-gray-600 mb-6">
+      <div className="card">
+        <h1 className="text-3xl font-bold mb-2 text-[rgb(var(--text-heading))]">Request Second Opinion</h1>
+        <p className="text-[rgb(var(--text-secondary))] mb-6">
           Get an expert medical opinion from our qualified doctors. Upload your medical reports and describe your condition.
         </p>
 
@@ -119,7 +119,7 @@ const RequestSecondOpinion = () => {
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Doctor Selection */}
             <div>
-              <label className="block font-semibold mb-2 text-gray-700">
+              <label className="label">
                 Select Doctor for Second Opinion *
               </label>
               <select
@@ -127,7 +127,7 @@ const RequestSecondOpinion = () => {
                 value={formData.doctorId}
                 onChange={handleInputChange}
                 required
-                className="w-full border border-gray-300 px-4 py-3 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="input-field"
               >
                 <option value="">Choose a doctor...</option>
                 {doctors.map(doctor => (
@@ -143,7 +143,7 @@ const RequestSecondOpinion = () => {
 
             {/* Chief Complaint */}
             <div>
-              <label className="block font-semibold mb-2 text-gray-700">
+              <label className="label">
                 Chief Complaint / Main Concern *
               </label>
               <textarea
@@ -153,13 +153,13 @@ const RequestSecondOpinion = () => {
                 required
                 rows="3"
                 placeholder="Describe your main medical concern or symptoms..."
-                className="w-full border border-gray-300 px-4 py-3 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="input-field"
               />
             </div>
 
           {/* Medical History */}
           <div>
-            <label className="block font-semibold mb-2 text-gray-700">
+            <label className="label">
               Medical History (Optional)
             </label>
             <textarea
@@ -168,13 +168,13 @@ const RequestSecondOpinion = () => {
               onChange={handleInputChange}
               rows="3"
               placeholder="Previous diagnoses, surgeries, chronic conditions..."
-              className="w-full border border-gray-300 px-4 py-3 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="input-field"
             />
           </div>
 
           {/* Current Medications */}
           <div>
-            <label className="block font-semibold mb-2 text-gray-700">
+            <label className="label">
               Current Medications (Optional)
             </label>
             <textarea
@@ -183,13 +183,13 @@ const RequestSecondOpinion = () => {
               onChange={handleInputChange}
               rows="2"
               placeholder="List all medications you're currently taking..."
-              className="w-full border border-gray-300 px-4 py-3 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="input-field"
             />
           </div>
 
           {/* Allergies */}
           <div>
-            <label className="block font-semibold mb-2 text-gray-700">
+            <label className="label">
               Known Allergies (Optional)
             </label>
             <input
@@ -198,13 +198,13 @@ const RequestSecondOpinion = () => {
               value={formData.allergies}
               onChange={handleInputChange}
               placeholder="Drug allergies, food allergies, etc..."
-              className="w-full border border-gray-300 px-4 py-3 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="input-field"
             />
           </div>
 
           {/* Priority */}
           <div>
-            <label className="block font-semibold mb-2 text-gray-700">
+            <label className="label">
               Priority Level *
             </label>
             <select
@@ -212,7 +212,7 @@ const RequestSecondOpinion = () => {
               value={formData.priority}
               onChange={handleInputChange}
               required
-              className="w-full border border-gray-300 px-4 py-3 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="input-field"
             >
               <option value="normal">Normal (24-48 hours)</option>
               <option value="urgent">Urgent (12-24 hours)</option>
@@ -221,20 +221,20 @@ const RequestSecondOpinion = () => {
           </div>
 
           {/* Medical Reports Upload */}
-          <div className="bg-blue-50 p-5 rounded-lg border-2 border-blue-200">
-            <h3 className="font-bold text-lg mb-3 text-blue-800">📄 Upload Medical Reports *</h3>
-            <p className="text-sm text-gray-700 mb-4">
+          <div className="bg-[rgb(var(--bg-tertiary))] p-5 rounded-lg border-2 border-[rgb(var(--border-color))]">
+            <h3 className="font-bold text-lg mb-3 text-[rgb(var(--text-heading))]">📄 Upload Medical Reports *</h3>
+            <p className="text-sm text-[rgb(var(--text-secondary))] mb-4">
               Please upload all relevant medical documents including lab results, imaging reports, prescriptions, etc.
             </p>
 
             <div className="space-y-4">
               <div>
-                <label className="block font-medium mb-2">Report Type</label>
+                <label className="label">Report Type</label>
                 <select
                   name="reportType"
                   value={formData.reportType}
                   onChange={handleInputChange}
-                  className="w-full border border-gray-300 px-4 py-2 rounded-lg"
+                  className="input-field"
                 >
                   <option value="lab_test">Lab Test Results</option>
                   <option value="x_ray">X-Ray</option>
@@ -249,26 +249,26 @@ const RequestSecondOpinion = () => {
               </div>
 
               <div>
-                <label className="block font-medium mb-2">Report Description</label>
+                <label className="label">Report Description</label>
                 <input
                   type="text"
                   name="description"
                   value={formData.description}
                   onChange={handleInputChange}
                   placeholder="Brief description of the reports..."
-                  className="w-full border border-gray-300 px-4 py-2 rounded-lg"
+                  className="input-field"
                 />
               </div>
 
               <div>
-                <label className="block font-medium mb-2">Select Files (Max 10) *</label>
+                <label className="label">Select Files (Max 10) *</label>
                 <input
                   type="file"
                   multiple
                   required
                   accept="image/*,.pdf,.doc,.docx"
                   onChange={handleFileChange}
-                  className="w-full border border-gray-300 px-4 py-2 rounded-lg"
+                  className="input-field"
                 />
                 <p className="text-xs text-gray-600 mt-1">
                   Accepted formats: Images, PDF, Word documents (Max 10MB per file)
@@ -276,8 +276,8 @@ const RequestSecondOpinion = () => {
               </div>
 
               {medicalReports.length > 0 && (
-                <div className="bg-white p-4 rounded-lg border border-gray-200">
-                  <p className="font-semibold mb-2">Selected Files ({medicalReports.length}):</p>
+                <div className="bg-[rgb(var(--bg-secondary))] p-4 rounded-lg border border-[rgb(var(--border-color))]">
+                  <p className="font-semibold mb-2 text-[rgb(var(--text-primary))]">Selected Files ({medicalReports.length}):</p>
                   <ul className="space-y-1">
                     {medicalReports.map((file, index) => (
                       <li key={index} className="flex items-center gap-2 text-sm">
@@ -297,14 +297,14 @@ const RequestSecondOpinion = () => {
             <Button
               type="button"
               onClick={() => navigate('/patient/second-opinions')}
-              className="flex-1 bg-gray-500 hover:bg-gray-600 text-white px-6 py-3 rounded-lg font-semibold"
+              className="flex-1 btn-secondary"
             >
               Cancel
             </Button>
             <Button
               type="submit"
               disabled={loading}
-              className="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold disabled:bg-gray-400"
+              className="flex-1 btn-primary"
             >
               {loading ? '⏳ Submitting...' : '✅ Submit Request'}
             </Button>

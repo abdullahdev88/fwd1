@@ -55,19 +55,19 @@ const ReportsSection = () => {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-        <span className="ml-2 text-gray-600">Loading reports...</span>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[rgb(var(--accent))]"></div>
+        <span className="ml-2 text-[rgb(var(--text-secondary))]">Loading reports...</span>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="bg-red-50 border border-red-200 rounded-md p-4">
-        <div className="text-red-800">{error}</div>
+      <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-4">
+        <div className="text-red-400">{error}</div>
         <button 
           onClick={fetchReportsData}
-          className="mt-2 bg-red-100 hover:bg-red-200 text-red-800 px-3 py-1 rounded text-sm"
+          className="mt-2 bg-red-500/20 hover:bg-red-500/30 text-red-400 px-3 py-1 rounded text-sm transition-colors"
         >
           Retry
         </button>
@@ -80,10 +80,10 @@ const ReportsSection = () => {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold text-gray-900">Performance & Reports Dashboard</h2>
+        <h2 className="text-2xl font-bold text-[rgb(var(--text-heading))]">Performance & Reports Dashboard</h2>
         <button
           onClick={fetchReportsData}
-          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm"
+          className="btn-primary"
         >
           Refresh Data
         </button>
@@ -91,66 +91,66 @@ const ReportsSection = () => {
 
       {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <div className="bg-white overflow-hidden shadow rounded-lg">
-          <div className="p-5">
-            <div className="flex items-center">
-              <div className="flex-shrink-0">
-                <span className="text-2xl">👨‍⚕️</span>
-              </div>
-              <div className="ml-3">
-                <p className="text-sm font-medium text-gray-500">Total Doctors</p>
-                <p className="text-2xl font-semibold text-gray-900">
-                  {reportsData.overview.overview?.totalDoctors || 0}
-                </p>
-              </div>
+        <div className="stat-card">
+          <div className="flex items-center">
+            <div className="flex-shrink-0">
+              <svg className="w-8 h-8 text-[rgb(var(--accent))]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <div className="ml-3">
+              <p className="text-sm font-medium text-[rgb(var(--text-secondary))]">Total Doctors</p>
+              <p className="text-2xl font-semibold text-[rgb(var(--text-heading))]">
+                {reportsData.overview.overview?.totalDoctors || 0}
+              </p>
             </div>
           </div>
         </div>
 
-        <div className="bg-white overflow-hidden shadow rounded-lg">
-          <div className="p-5">
-            <div className="flex items-center">
-              <div className="flex-shrink-0">
-                <span className="text-2xl">👥</span>
-              </div>
-              <div className="ml-3">
-                <p className="text-sm font-medium text-gray-500">Total Patients</p>
-                <p className="text-2xl font-semibold text-gray-900">
-                  {reportsData.overview.overview?.totalPatients || 0}
-                </p>
-              </div>
+        <div className="stat-card">
+          <div className="flex items-center">
+            <div className="flex-shrink-0">
+              <svg className="w-8 h-8 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+              </svg>
+            </div>
+            <div className="ml-3">
+              <p className="text-sm font-medium text-[rgb(var(--text-secondary))]">Total Patients</p>
+              <p className="text-2xl font-semibold text-emerald-400">
+                {reportsData.overview.overview?.totalPatients || 0}
+              </p>
             </div>
           </div>
         </div>
 
-        <div className="bg-white overflow-hidden shadow rounded-lg">
-          <div className="p-5">
-            <div className="flex items-center">
-              <div className="flex-shrink-0">
-                <span className="text-2xl">📅</span>
-              </div>
-              <div className="ml-3">
-                <p className="text-sm font-medium text-gray-500">Today's Appointments</p>
-                <p className="text-2xl font-semibold text-gray-900">
-                  {reportsData.overview.overview?.todayAppointments || 0}
-                </p>
-              </div>
+        <div className="stat-card">
+          <div className="flex items-center">
+            <div className="flex-shrink-0">
+              <svg className="w-8 h-8 text-[rgb(var(--accent))]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+            </div>
+            <div className="ml-3">
+              <p className="text-sm font-medium text-[rgb(var(--text-secondary))]">Today's Appointments</p>
+              <p className="text-2xl font-semibold text-[rgb(var(--text-heading))]">
+                {reportsData.overview.overview?.todayAppointments || 0}
+              </p>
             </div>
           </div>
         </div>
 
-        <div className="bg-white overflow-hidden shadow rounded-lg">
-          <div className="p-5">
-            <div className="flex items-center">
-              <div className="flex-shrink-0">
-                <span className="text-2xl">💊</span>
-              </div>
-              <div className="ml-3">
-                <p className="text-sm font-medium text-gray-500">Today's Prescriptions</p>
-                <p className="text-2xl font-semibold text-gray-900">
-                  {reportsData.overview.overview?.todayPrescriptions || 0}
-                </p>
-              </div>
+        <div className="stat-card">
+          <div className="flex items-center">
+            <div className="flex-shrink-0">
+              <svg className="w-8 h-8 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+            </div>
+            <div className="ml-3">
+              <p className="text-sm font-medium text-[rgb(var(--text-secondary))]">Today's Prescriptions</p>
+              <p className="text-2xl font-semibold text-purple-400">
+                {reportsData.overview.overview?.todayPrescriptions || 0}
+              </p>
             </div>
           </div>
         </div>
@@ -159,8 +159,8 @@ const ReportsSection = () => {
       {/* Charts Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Doctor Performance Chart */}
-        <div className="bg-white p-6 rounded-lg shadow">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Doctor Performance</h3>
+        <div className="card">
+          <h3 className="text-lg font-semibold text-[rgb(var(--text-heading))] mb-4">Doctor Performance</h3>
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={reportsData.doctors.topPerformers || []}>
               <CartesianGrid strokeDasharray="3 3" />
@@ -175,8 +175,8 @@ const ReportsSection = () => {
         </div>
 
         {/* Appointment Trends */}
-        <div className="bg-white p-6 rounded-lg shadow">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Monthly Appointment Trends</h3>
+        <div className="card">
+          <h3 className="text-lg font-semibold text-[rgb(var(--text-heading))] mb-4">Monthly Appointment Trends</h3>
           <ResponsiveContainer width="100%" height={300}>
             <LineChart data={reportsData.appointments.monthlyTrends || []}>
               <CartesianGrid strokeDasharray="3 3" />
@@ -190,8 +190,8 @@ const ReportsSection = () => {
         </div>
 
         {/* Appointment Status Distribution */}
-        <div className="bg-white p-6 rounded-lg shadow">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Appointment Status Distribution</h3>
+        <div className="card">
+          <h3 className="text-lg font-semibold text-[rgb(var(--text-heading))] mb-4">Appointment Status Distribution</h3>
           <ResponsiveContainer width="100%" height={300}>
             <PieChart>
               <Pie
@@ -214,8 +214,8 @@ const ReportsSection = () => {
         </div>
 
         {/* Top Medications */}
-        <div className="bg-white p-6 rounded-lg shadow">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Most Prescribed Medications</h3>
+        <div className="card">
+          <h3 className="text-lg font-semibold text-[rgb(var(--text-heading))] mb-4">Most Prescribed Medications</h3>
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={(reportsData.prescriptions.medicationFrequency || []).slice(0, 10)}>
               <CartesianGrid strokeDasharray="3 3" />
@@ -231,42 +231,42 @@ const ReportsSection = () => {
       {/* Tables */}
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
         {/* Top Performing Doctors Table */}
-        <div className="bg-white shadow rounded-lg">
-          <div className="px-6 py-4 border-b border-gray-200">
-            <h3 className="text-lg font-semibold text-gray-900">Top Performing Doctors</h3>
+        <div className="card">
+          <div className="border-b-2 border-[rgb(var(--border-color))] pb-4 mb-4">
+            <h3 className="text-lg font-semibold text-[rgb(var(--text-heading))]">Top Performing Doctors</h3>
           </div>
           <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
+            <table className="min-w-full divide-y divide-[rgb(var(--border-color))]">
+              <thead className="table-header">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
                     Doctor
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
                     Appointments
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
                     Completion Rate
                   </th>
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
+              <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
                 {(reportsData.doctors.topPerformers || []).map((doctor, index) => (
                   <tr key={index}>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div>
-                        <div className="text-sm font-medium text-gray-900">
+                        <div className="text-sm font-medium text-gray-900 dark:text-gray-50">
                           {doctor.doctorName}
                         </div>
-                        <div className="text-sm text-gray-500">
+                        <div className="text-sm text-gray-500 dark:text-gray-400">
                           {doctor.specialization}
                         </div>
                       </div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-50">
                       {doctor.totalAppointments}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-50">
                       {doctor.completionRate?.toFixed(1)}%
                     </td>
                   </tr>
@@ -277,12 +277,12 @@ const ReportsSection = () => {
         </div>
 
         {/* Recent Appointments */}
-        <div className="bg-white shadow rounded-lg">
-          <div className="px-6 py-4 border-b border-gray-200">
-            <h3 className="text-lg font-semibold text-gray-900">Recent Appointments</h3>
+        <div className="bg-white dark:bg-gray-800 shadow rounded-lg">
+          <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-50">Recent Appointments</h3>
           </div>
           <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
+            <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
               <thead className="bg-gray-50">
                 <tr>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -296,13 +296,13 @@ const ReportsSection = () => {
                   </th>
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
+              <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
                 {(reportsData.overview.recentAppointments || []).slice(0, 10).map((appointment, index) => (
                   <tr key={index}>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-50">
                       {appointment.patient?.name}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-50">
                       {appointment.doctor?.name}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
@@ -339,6 +339,14 @@ const AdminDashboard = () => {
   // Prescription state
   const [selectedPrescription, setSelectedPrescription] = useState(null);
   const [deleteMessage, setDeleteMessage] = useState('');
+  
+  // Appointments search state
+  const [appointmentSearchQuery, setAppointmentSearchQuery] = useState('');
+  const [filteredAppointments, setFilteredAppointments] = useState([]);
+  
+  // Users search state
+  const [userSearchQuery, setUserSearchQuery] = useState('');
+  const [filteredUsers, setFilteredUsers] = useState([]);
 
   useEffect(() => {
     fetchDashboardData();
@@ -346,6 +354,44 @@ const AdminDashboard = () => {
     fetchAppointmentLogs();
     fetchAllUsers();
   }, []);
+
+  // Filter appointments based on search query
+  useEffect(() => {
+    if (!appointmentSearchQuery.trim()) {
+      setFilteredAppointments(appointments);
+    } else {
+      const query = appointmentSearchQuery.toLowerCase();
+      const filtered = appointments.filter(appointment => {
+        const patientName = appointment.patient?.name?.toLowerCase() || '';
+        const doctorName = appointment.doctor?.name?.toLowerCase() || '';
+        const status = appointment.status?.toLowerCase() || '';
+        
+        return patientName.includes(query) || 
+               doctorName.includes(query) || 
+               status.includes(query);
+      });
+      setFilteredAppointments(filtered);
+    }
+  }, [appointmentSearchQuery, appointments]);
+  
+  // Filter users based on search query
+  useEffect(() => {
+    if (!userSearchQuery.trim()) {
+      setFilteredUsers(allUsers);
+    } else {
+      const query = userSearchQuery.toLowerCase();
+      const filtered = allUsers.filter(userItem => {
+        const name = userItem.name?.toLowerCase() || '';
+        const email = userItem.email?.toLowerCase() || '';
+        const role = userItem.role?.toLowerCase() || '';
+        
+        return name.includes(query) || 
+               email.includes(query) || 
+               role.includes(query);
+      });
+      setFilteredUsers(filtered);
+    }
+  }, [userSearchQuery, allUsers]);
 
   const fetchDashboardData = async () => {
     try {
@@ -465,32 +511,35 @@ const AdminDashboard = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      <div className="min-h-screen flex items-center justify-center bg-[rgb(var(--bg-primary))]">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[rgb(var(--accent))] mx-auto"></div>
+          <p className="mt-2 text-[rgb(var(--text-secondary))]">Loading dashboard...</p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-[rgb(var(--bg-primary))]">
       <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
         <div className="px-4 py-6 sm:px-0">
-          <h1 className="text-3xl font-bold text-gray-900">Admin Dashboard</h1>
-          <p className="mt-2 text-gray-600">System overview and management</p>
+          <h1 className="text-3xl font-bold text-[rgb(var(--text-heading))]">Admin Dashboard</h1>
+          <p className="mt-2 text-[rgb(var(--text-secondary))]">System overview and management</p>
         </div>
 
         {/* Tabs */}
         <div className="mb-8">
-          <div className="border-b border-gray-200">
+          <div className="border-b-2 border-[rgb(var(--border-color))]">
             <nav className="-mb-px flex space-x-8">
               {['overview', 'doctors', 'users', 'appointments', 'prescriptions', 'reports'].map((tab) => (
                 <button
                   key={tab}
                   onClick={() => setActiveTab(tab)}
-                  className={`py-2 px-1 border-b-2 font-medium text-sm capitalize ${
+                  className={`py-2 px-1 border-b-2 font-medium text-sm capitalize transition-all ${
                     activeTab === tab
-                      ? 'border-blue-500 text-blue-600'
-                      : 'border-transparent text-gray-500 hover:text-gray-700'
+                      ? 'border-[rgb(var(--accent))] text-[rgb(var(--accent))]'
+                      : 'border-transparent text-[rgb(var(--text-secondary))] hover:text-[rgb(var(--text-primary))] hover:border-[rgb(var(--border-color))]'
                   }`}
                 >
                   {tab === 'doctors' ? `Doctor Approvals (${pendingDoctors.length})` : 
@@ -506,58 +555,58 @@ const AdminDashboard = () => {
           <>
             {/* Stats Cards */}
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-              <div className="bg-white overflow-hidden shadow rounded-lg">
-                <div className="p-5">
-                  <div className="flex items-center">
-                    <div className="flex-shrink-0">
-                      <span className="text-2xl">👥</span>
-                    </div>
-                    <div className="ml-3">
-                      <p className="text-sm font-medium text-gray-500">Total Users</p>
-                      <p className="text-2xl font-semibold text-gray-900">{stats.totalUsers || 0}</p>
-                    </div>
+              <div className="stat-card">
+                <div className="flex items-center">
+                  <div className="flex-shrink-0">
+                    <svg className="w-8 h-8 text-[rgb(var(--accent))]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                    </svg>
+                  </div>
+                  <div className="ml-3">
+                    <p className="text-sm font-medium text-[rgb(var(--text-secondary))]">Total Users</p>
+                    <p className="text-2xl font-semibold text-[rgb(var(--text-heading))]">{stats.totalUsers || 0}</p>
                   </div>
                 </div>
               </div>
 
-              <div className="bg-white overflow-hidden shadow rounded-lg">
-                <div className="p-5">
-                  <div className="flex items-center">
-                    <div className="flex-shrink-0">
-                      <span className="text-2xl">🏥</span>
-                    </div>
-                    <div className="ml-3">
-                      <p className="text-sm font-medium text-gray-500">Patients</p>
-                      <p className="text-2xl font-semibold text-blue-600">{stats.totalPatients || 0}</p>
-                    </div>
+              <div className="stat-card">
+                <div className="flex items-center">
+                  <div className="flex-shrink-0">
+                    <svg className="w-8 h-8 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                    </svg>
+                  </div>
+                  <div className="ml-3">
+                    <p className="text-sm font-medium text-[rgb(var(--text-secondary))]">Patients</p>
+                    <p className="text-2xl font-semibold text-emerald-400">{stats.totalPatients || 0}</p>
                   </div>
                 </div>
               </div>
 
-              <div className="bg-white overflow-hidden shadow rounded-lg">
-                <div className="p-5">
-                  <div className="flex items-center">
-                    <div className="flex-shrink-0">
-                      <span className="text-2xl">👨‍⚕️</span>
-                    </div>
-                    <div className="ml-3">
-                      <p className="text-sm font-medium text-gray-500">Approved Doctors</p>
-                      <p className="text-2xl font-semibold text-green-600">{stats.approvedDoctors || 0}</p>
-                    </div>
+              <div className="stat-card">
+                <div className="flex items-center">
+                  <div className="flex-shrink-0">
+                    <svg className="w-8 h-8 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                    </svg>
+                  </div>
+                  <div className="ml-3">
+                    <p className="text-sm font-medium text-[rgb(var(--text-secondary))]">Approved Doctors</p>
+                    <p className="text-2xl font-semibold text-emerald-400">{stats.approvedDoctors || 0}</p>
                   </div>
                 </div>
               </div>
 
-              <div className="bg-white overflow-hidden shadow rounded-lg">
-                <div className="p-5">
-                  <div className="flex items-center">
-                    <div className="flex-shrink-0">
-                      <span className="text-2xl">📅</span>
-                    </div>
-                    <div className="ml-3">
-                      <p className="text-sm font-medium text-gray-500">Total Appointments</p>
-                      <p className="text-2xl font-semibold text-purple-600">{stats.totalAppointments || 0}</p>
-                    </div>
+              <div className="stat-card">
+                <div className="flex items-center">
+                  <div className="flex-shrink-0">
+                    <svg className="w-8 h-8 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                  </div>
+                  <div className="ml-3">
+                    <p className="text-sm font-medium text-[rgb(var(--text-secondary))]">Total Appointments</p>
+                    <p className="text-2xl font-semibold text-purple-400">{stats.totalAppointments || 0}</p>
                   </div>
                 </div>
               </div>
@@ -565,22 +614,24 @@ const AdminDashboard = () => {
 
             {/* Pending Doctors Alert */}
             {pendingDoctors.length > 0 && (
-              <div className="bg-yellow-50 border border-yellow-200 rounded-md p-4 mb-6">
+              <div className="bg-amber-500/10 border border-amber-500/20 rounded-lg p-4 mb-6">
                 <div className="flex">
                   <div className="flex-shrink-0">
-                    <span className="text-yellow-400 text-xl">⚠️</span>
+                    <svg className="w-6 h-6 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
                   </div>
                   <div className="ml-3">
-                    <h3 className="text-sm font-medium text-yellow-800">
+                    <h3 className="text-sm font-medium text-amber-400">
                       Pending Doctor Approvals
                     </h3>
-                    <div className="mt-2 text-sm text-yellow-700">
+                    <div className="mt-2 text-sm text-amber-300">
                       <p>You have {pendingDoctors.length} doctor(s) waiting for approval.</p>
                     </div>
                     <div className="mt-4">
                       <button
                         onClick={() => setActiveTab('doctors')}
-                        className="text-sm bg-yellow-100 text-yellow-800 hover:bg-yellow-200 px-3 py-1 rounded"
+                        className="text-sm bg-amber-500/20 text-amber-400 hover:bg-amber-500/30 px-3 py-1 rounded transition-colors"
                       >
                         Review Applications
                       </button>
@@ -592,49 +643,55 @@ const AdminDashboard = () => {
 
             {/* Quick Actions */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-              <div className="bg-white shadow rounded-lg p-6 hover:shadow-lg transition-shadow">
+              <div className="card hover:shadow-lg transition-shadow">
                 <div className="flex items-center mb-4">
-                  <span className="text-3xl mr-3">💰</span>
-                  <h3 className="text-lg font-semibold text-gray-900">Payment Management</h3>
+                  <svg className="w-8 h-8 mr-3 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <h3 className="text-lg font-semibold text-[rgb(var(--text-heading))]">Payment Management</h3>
                 </div>
-                <p className="text-sm text-gray-600 mb-4">
+                <p className="text-sm text-[rgb(var(--text-secondary))] mb-4">
                   Monitor patient payments, process refunds, and view transaction history
                 </p>
                 <button
                   onClick={() => navigate('/admin/payments')}
-                  className="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium"
+                  className="btn-primary w-full"
                 >
                   Manage Payments
                 </button>
               </div>
 
-              <div className="bg-white shadow rounded-lg p-6 hover:shadow-lg transition-shadow">
+              <div className="card hover:shadow-lg transition-shadow">
                 <div className="flex items-center mb-4">
-                  <span className="text-3xl mr-3">👨‍⚕️</span>
-                  <h3 className="text-lg font-semibold text-gray-900">Doctor Approvals</h3>
+                  <svg className="w-8 h-8 mr-3 text-[rgb(var(--accent))]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                  </svg>
+                  <h3 className="text-lg font-semibold text-[rgb(var(--text-heading))]">Doctor Approvals</h3>
                 </div>
-                <p className="text-sm text-gray-600 mb-4">
+                <p className="text-sm text-[rgb(var(--text-secondary))] mb-4">
                   Review and approve pending doctor registration requests
                 </p>
                 <button
                   onClick={() => setActiveTab('doctors')}
-                  className="w-full bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md text-sm font-medium"
+                  className="w-full bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg font-medium transition-colors"
                 >
                   Review Applications
                 </button>
               </div>
 
-              <div className="bg-white shadow rounded-lg p-6 hover:shadow-lg transition-shadow">
+              <div className="card hover:shadow-lg transition-shadow">
                 <div className="flex items-center mb-4">
-                  <span className="text-3xl mr-3">📊</span>
-                  <h3 className="text-lg font-semibold text-gray-900">System Reports</h3>
+                  <svg className="w-8 h-8 mr-3 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                  </svg>
+                  <h3 className="text-lg font-semibold text-[rgb(var(--text-heading))]">System Reports</h3>
                 </div>
-                <p className="text-sm text-gray-600 mb-4">
+                <p className="text-sm text-[rgb(var(--text-secondary))] mb-4">
                   View detailed analytics and performance metrics
                 </p>
                 <button
                   onClick={() => setActiveTab('reports')}
-                  className="w-full bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-md text-sm font-medium"
+                  className="w-full bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg font-medium transition-colors"
                 >
                   View Reports
                 </button>
@@ -645,63 +702,94 @@ const AdminDashboard = () => {
 
         {/* Users Tab */}
         {activeTab === 'users' && (
-          <div className="bg-white shadow overflow-hidden sm:rounded-md">
-            <div className="px-4 py-5 sm:px-6">
-              <h3 className="text-lg leading-6 font-medium text-gray-900">
+          <div className="card">
+            <div className="mb-6">
+              <h3 className="text-lg leading-6 font-medium text-[rgb(var(--text-heading))]">
                 All Users
               </h3>
-              <p className="mt-1 text-sm text-gray-500">
+              <p className="mt-1 text-sm text-[rgb(var(--text-secondary))]">
                 Complete list of all registered users
               </p>
+              
+              {/* Search Bar */}
+              <div className="mt-4">
+                <div className="relative">
+                  <input
+                    type="text"
+                    placeholder="Search by name, email, or role..."
+                    value={userSearchQuery}
+                    onChange={(e) => setUserSearchQuery(e.target.value)}
+                    className="search-input"
+                  />
+                  <svg
+                    className="absolute left-3 top-2.5 h-5 w-5 text-[rgb(var(--text-secondary))]"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                    />
+                  </svg>
+                </div>
+                {userSearchQuery && (
+                  <p className="mt-2 text-sm text-[rgb(var(--text-secondary))]">
+                    Found {filteredUsers.length} result(s)
+                  </p>
+                )}
+              </div>
             </div>
             <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
+              <table className="min-w-full divide-y divide-[rgb(var(--border-color))]">
+                <thead className="bg-[rgb(var(--bg-secondary))]">
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-[rgb(var(--text-secondary))] uppercase tracking-wider">
                       Name
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-[rgb(var(--text-secondary))] uppercase tracking-wider">
                       Email
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-[rgb(var(--text-secondary))] uppercase tracking-wider">
                       Role
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-[rgb(var(--text-secondary))] uppercase tracking-wider">
                       PMDC ID
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-[rgb(var(--text-secondary))] uppercase tracking-wider">
                       Status
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-[rgb(var(--text-secondary))] uppercase tracking-wider">
                       Joined
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-[rgb(var(--text-secondary))] uppercase tracking-wider">
                       Actions
                     </th>
                   </tr>
                 </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
-                  {allUsers.map((userItem) => (
-                    <tr key={userItem._id}>
+                <tbody className="divide-y divide-[rgb(var(--border-color))]">
+                  {filteredUsers.map((userItem) => (
+                    <tr key={userItem._id} className="hover:bg-[rgb(var(--bg-tertiary))] transition-colors">
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center">
                           <div className="flex-shrink-0 h-10 w-10">
                             <div className="h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center">
-                              <span className="text-sm font-medium text-gray-700">
+                              <span className="text-sm font-medium text-gray-700 dark:text-gray-200">
                                 {userItem.name?.charAt(0)?.toUpperCase()}
                               </span>
                             </div>
                           </div>
                           <div className="ml-4">
-                            <div className="text-sm font-medium text-gray-900">{userItem.name}</div>
+                            <div className="text-sm font-medium text-gray-900 dark:text-gray-50">{userItem.name}</div>
                             {userItem.specialization && (
-                              <div className="text-sm text-gray-500">{userItem.specialization}</div>
+                              <div className="text-sm text-gray-500 dark:text-gray-400">{userItem.specialization}</div>
                             )}
                           </div>
                         </div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-50">
                         {userItem.email}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
@@ -713,7 +801,7 @@ const AdminDashboard = () => {
                           {userItem.role}
                         </span>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-50">
                         {userItem.role === 'doctor' && userItem.pmdcId ? userItem.pmdcId : '-'}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
@@ -725,7 +813,7 @@ const AdminDashboard = () => {
                           {userItem.status || 'approved'}
                         </span>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                         {new Date(userItem.createdAt).toLocaleDateString()}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
@@ -746,7 +834,7 @@ const AdminDashboard = () => {
               </table>
             </div>
             {allUsers.length === 0 && (
-              <div className="px-4 py-6 text-center text-gray-500">
+              <div className="px-4 py-6 text-center text-gray-500 dark:text-gray-400">
                 No users found
               </div>
             )}
@@ -755,17 +843,17 @@ const AdminDashboard = () => {
 
         {/* Doctor Approvals Tab */}
         {activeTab === 'doctors' && (
-          <div className="bg-white shadow overflow-hidden sm:rounded-md">
+          <div className="bg-white dark:bg-gray-800 shadow overflow-hidden sm:rounded-md">
             <div className="px-4 py-5 sm:px-6">
-              <h3 className="text-lg leading-6 font-medium text-gray-900">
+              <h3 className="text-lg leading-6 font-medium text-gray-900 dark:text-gray-50">
                 Pending Doctor Approvals
               </h3>
-              <p className="mt-1 text-sm text-gray-500">
+              <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
                 Review and approve or reject doctor applications
               </p>
             </div>
             {pendingDoctors.length > 0 ? (
-              <ul className="divide-y divide-gray-200">
+              <ul className="divide-y divide-gray-200 dark:divide-gray-700">
                 {pendingDoctors.map((doctor) => (
                   <li key={doctor._id} className="px-4 py-6">
                     <div className="flex items-center justify-between">
@@ -774,9 +862,9 @@ const AdminDashboard = () => {
                           <span className="text-blue-600 font-medium">Dr.</span>
                         </div>
                         <div className="flex-1">
-                          <h4 className="text-lg font-medium text-gray-900">{doctor.name}</h4>
-                          <p className="text-sm text-gray-500">{doctor.email}</p>
-                          <p className="text-sm text-gray-600">Phone: {doctor.phone}</p>
+                          <h4 className="text-lg font-medium text-gray-900 dark:text-gray-50">{doctor.name}</h4>
+                          <p className="text-sm text-gray-500 dark:text-gray-400">{doctor.email}</p>
+                          <p className="text-sm text-gray-600 dark:text-gray-300">Phone: {doctor.phone}</p>
                           <div className="mt-2 space-y-1">
                             <p className="text-sm"><strong>PMDC ID:</strong> {doctor.pmdcId}</p>
                             <p className="text-sm"><strong>Specialization:</strong> {doctor.specialization}</p>
@@ -813,7 +901,7 @@ const AdminDashboard = () => {
                 ))}
               </ul>
             ) : (
-              <div className="px-4 py-6 text-center text-gray-500">
+              <div className="px-4 py-6 text-center text-gray-500 dark:text-gray-400">
                 No pending doctor applications
               </div>
             )}
@@ -822,63 +910,94 @@ const AdminDashboard = () => {
 
         {/* Appointments Tab */}
         {activeTab === 'appointments' && (
-          <div className="bg-white shadow overflow-hidden sm:rounded-md">
+          <div className="card">
             <div className="px-4 py-5 sm:px-6">
-              <h3 className="text-lg leading-6 font-medium text-gray-900">
+              <h3 className="text-lg leading-6 font-medium text-[rgb(var(--text-heading))]">
                 Appointment Logs
               </h3>
-              <p className="mt-1 text-sm text-gray-500">
+              <p className="mt-1 text-sm text-[rgb(var(--text-secondary))]">
                 All appointment records in the system
               </p>
+              
+              {/* Search Bar */}
+              <div className="mt-4">
+                <div className="relative">
+                  <input
+                    type="text"
+                    placeholder="Search by patient name, doctor name, or status..."
+                    value={appointmentSearchQuery}
+                    onChange={(e) => setAppointmentSearchQuery(e.target.value)}
+                    className="search-input"
+                  />
+                  <svg
+                    className="absolute left-3 top-2.5 h-5 w-5 text-[rgb(var(--text-secondary))]"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                    />
+                  </svg>
+                </div>
+                {appointmentSearchQuery && (
+                  <p className="mt-2 text-sm text-[rgb(var(--text-secondary))]">
+                    Found {filteredAppointments.length} result(s)
+                  </p>
+                )}
+              </div>
             </div>
             <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
+              <table className="min-w-full divide-y divide-[rgb(var(--border-color))]">
+                <thead className="bg-[rgb(var(--bg-secondary))]">
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-[rgb(var(--text-secondary))] uppercase tracking-wider">
                       Patient
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-[rgb(var(--text-secondary))] uppercase tracking-wider">
                       Doctor
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-[rgb(var(--text-secondary))] uppercase tracking-wider">
                       Date & Time
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-[rgb(var(--text-secondary))] uppercase tracking-wider">
                       Status
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-[rgb(var(--text-secondary))] uppercase tracking-wider">
                       Booked On
                     </th>
                   </tr>
                 </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
-                  {appointments.map((appointment) => (
-                    <tr key={appointment._id}>
+                <tbody className="divide-y divide-[rgb(var(--border-color))]">
+                  {filteredAppointments.map((appointment) => (
+                    <tr key={appointment._id} className="hover:bg-[rgb(var(--bg-tertiary))] transition-colors">
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div>
-                          <p className="text-sm font-medium text-gray-900">
+                          <p className="text-sm font-medium text-gray-900 dark:text-gray-50">
                             {appointment.patient?.name}
                           </p>
-                          <p className="text-sm text-gray-500">
+                          <p className="text-sm text-gray-500 dark:text-gray-400">
                             {appointment.patient?.email}
                           </p>
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div>
-                          <p className="text-sm font-medium text-gray-900">
+                          <p className="text-sm font-medium text-gray-900 dark:text-gray-50">
                             Dr. {appointment.doctor?.name}
                           </p>
-                          <p className="text-sm text-gray-500">
+                          <p className="text-sm text-gray-500 dark:text-gray-400">
                             {appointment.doctor?.specialization}
                           </p>
                         </div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-50">
                         <div>
                           <p>{new Date(appointment.appointmentDate).toLocaleDateString()}</p>
-                          <p className="text-gray-500">{appointment.startTime} - {appointment.endTime}</p>
+                          <p className="text-gray-500 dark:text-gray-400">{appointment.startTime} - {appointment.endTime}</p>
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
@@ -892,7 +1011,7 @@ const AdminDashboard = () => {
                           {appointment.status}
                         </span>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                         {new Date(appointment.createdAt).toLocaleDateString()}
                       </td>
                     </tr>
@@ -901,7 +1020,7 @@ const AdminDashboard = () => {
               </table>
             </div>
             {appointments.length === 0 && (
-              <div className="px-4 py-6 text-center text-gray-500">
+              <div className="px-4 py-6 text-center text-gray-500 dark:text-gray-400">
                 No appointments found
               </div>
             )}

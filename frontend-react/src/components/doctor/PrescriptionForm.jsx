@@ -196,9 +196,9 @@ const PrescriptionForm = ({ appointmentId, patientId, onSuccess, onCancel, editM
   }
 
   return (
-    <div className="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-lg">
+    <div className="max-w-4xl mx-auto p-6 card">
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold text-gray-900">
+        <h2 className="text-2xl font-bold text-[rgb(var(--text-heading))]">
           {editMode ? 'Edit Prescription' : 'Create New Prescription'}
         </h2>
         {onCancel && (
@@ -218,7 +218,7 @@ const PrescriptionForm = ({ appointmentId, patientId, onSuccess, onCancel, editM
         {/* Appointment Selection */}
         {!appointmentId && (
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="label">
               Select Appointment *
             </label>
             <select
@@ -233,7 +233,7 @@ const PrescriptionForm = ({ appointmentId, patientId, onSuccess, onCancel, editM
                 }));
               }}
               required
-              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="input-field"
             >
               <option value="">Select an appointment</option>
               {appointments.map(appointment => (
@@ -247,7 +247,7 @@ const PrescriptionForm = ({ appointmentId, patientId, onSuccess, onCancel, editM
 
         {/* Diagnosis */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="label">
             Diagnosis *
           </label>
           <textarea
@@ -256,14 +256,14 @@ const PrescriptionForm = ({ appointmentId, patientId, onSuccess, onCancel, editM
             onChange={handleInputChange}
             required
             rows={3}
-            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="input-field"
             placeholder="Enter diagnosis..."
           />
         </div>
 
         {/* Symptoms */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="label">
             Symptoms
           </label>
           <div className="flex gap-2 mb-3">
@@ -272,7 +272,7 @@ const PrescriptionForm = ({ appointmentId, patientId, onSuccess, onCancel, editM
               value={symptomInput}
               onChange={(e) => setSymptomInput(e.target.value)}
               onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addSymptom())}
-              className="flex-1 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="flex-1 input-field"
               placeholder="Add a symptom..."
             />
             <Button type="button" onClick={addSymptom} variant="secondary">
@@ -283,13 +283,13 @@ const PrescriptionForm = ({ appointmentId, patientId, onSuccess, onCancel, editM
             {formData.symptoms.map((symptom, index) => (
               <span
                 key={index}
-                className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-blue-100 text-blue-800"
+                className="badge-info"
               >
                 {symptom}
                 <button
                   type="button"
                   onClick={() => removeSymptom(symptom)}
-                  className="ml-2 text-blue-600 hover:text-blue-800"
+                  className="ml-2 hover:opacity-70"
                 >
                   ×
                 </button>
@@ -300,13 +300,13 @@ const PrescriptionForm = ({ appointmentId, patientId, onSuccess, onCancel, editM
 
         {/* Medicines */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="label">
             Medicines *
           </label>
           {formData.medicines.map((medicine, index) => (
-            <div key={index} className="border border-gray-200 rounded-lg p-4 mb-4">
+            <div key={index} className="bg-[rgb(var(--bg-secondary))] border border-[rgb(var(--border-color))] rounded-lg p-4 mb-4">
               <div className="flex justify-between items-center mb-3">
-                <h4 className="font-medium text-gray-900">Medicine {index + 1}</h4>
+                <h4 className="font-medium text-[rgb(var(--text-heading))]">Medicine {index + 1}</h4>
                 {formData.medicines.length > 1 && (
                   <button
                     type="button"
@@ -324,7 +324,7 @@ const PrescriptionForm = ({ appointmentId, patientId, onSuccess, onCancel, editM
                   value={medicine.name}
                   onChange={(e) => handleMedicineChange(index, 'name', e.target.value)}
                   required
-                  className="p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="input-field"
                 />
                 <input
                   type="text"
@@ -332,13 +332,13 @@ const PrescriptionForm = ({ appointmentId, patientId, onSuccess, onCancel, editM
                   value={medicine.dosage}
                   onChange={(e) => handleMedicineChange(index, 'dosage', e.target.value)}
                   required
-                  className="p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="input-field"
                 />
                 <select
                   value={medicine.frequency}
                   onChange={(e) => handleMedicineChange(index, 'frequency', e.target.value)}
                   required
-                  className="p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="input-field"
                 >
                   <option value="">Select frequency *</option>
                   <option value="Once daily">Once daily</option>
@@ -362,7 +362,7 @@ const PrescriptionForm = ({ appointmentId, patientId, onSuccess, onCancel, editM
                   value={medicine.duration}
                   onChange={(e) => handleMedicineChange(index, 'duration', e.target.value)}
                   required
-                  className="p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="input-field"
                 />
               </div>
               <textarea
@@ -370,7 +370,7 @@ const PrescriptionForm = ({ appointmentId, patientId, onSuccess, onCancel, editM
                 value={medicine.instructions}
                 onChange={(e) => handleMedicineChange(index, 'instructions', e.target.value)}
                 rows={2}
-                className="w-full mt-4 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full mt-4 input-field"
               />
             </div>
           ))}
@@ -381,7 +381,7 @@ const PrescriptionForm = ({ appointmentId, patientId, onSuccess, onCancel, editM
 
         {/* Lab Tests */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="label">
             Recommended Lab Tests
           </label>
           <div className="flex gap-2 mb-3">
@@ -390,7 +390,7 @@ const PrescriptionForm = ({ appointmentId, patientId, onSuccess, onCancel, editM
               value={labTestInput}
               onChange={(e) => setLabTestInput(e.target.value)}
               onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addLabTest())}
-              className="flex-1 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="flex-1 input-field"
               placeholder="Add a lab test..."
             />
             <Button type="button" onClick={addLabTest} variant="secondary">
@@ -401,13 +401,13 @@ const PrescriptionForm = ({ appointmentId, patientId, onSuccess, onCancel, editM
             {formData.labTests.map((test, index) => (
               <span
                 key={index}
-                className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-green-100 text-green-800"
+                className="badge-success"
               >
                 {test}
                 <button
                   type="button"
                   onClick={() => removeLabTest(test)}
-                  className="ml-2 text-green-600 hover:text-green-800"
+                  className="ml-2 hover:opacity-70"
                 >
                   ×
                 </button>
@@ -418,7 +418,7 @@ const PrescriptionForm = ({ appointmentId, patientId, onSuccess, onCancel, editM
 
         {/* General Instructions */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="label">
             General Instructions
           </label>
           <textarea
@@ -426,14 +426,14 @@ const PrescriptionForm = ({ appointmentId, patientId, onSuccess, onCancel, editM
             value={formData.instructions}
             onChange={handleInputChange}
             rows={3}
-            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="input-field"
             placeholder="Additional instructions for the patient..."
           />
         </div>
 
         {/* Follow-up Date */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="label">
             Follow-up Date (Optional)
           </label>
           <input
@@ -442,7 +442,7 @@ const PrescriptionForm = ({ appointmentId, patientId, onSuccess, onCancel, editM
             value={formData.followUpDate}
             onChange={handleInputChange}
             min={new Date().toISOString().split('T')[0]}
-            className="p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="input-field"
           />
         </div>
 

@@ -2,31 +2,192 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ========================================
+   PROFESSIONAL DARK THEME COLOR SYSTEM
+   Medical/Hospital Grade Design
+   ======================================== */
+
 @layer base {
+  :root {
+    /* Light Theme */
+    --bg-primary: 249 250 251;      /* #f9fafb */
+    --bg-secondary: 255 255 255;    /* #ffffff */
+    --bg-tertiary: 243 244 246;     /* #f3f4f6 */
+    
+    --text-primary: 17 24 39;       /* #111827 */
+    --text-secondary: 75 85 99;     /* #4b5563 */
+    --text-heading: 17 24 39;       /* #111827 */
+    
+    --border-color: 229 231 235;    /* #e5e7eb */
+    --accent: 59 130 246;           /* #3b82f6 */
+  }
+
+  .dark {
+    /* Dark Theme - Medical/Hospital Grade */
+    --bg-primary: 15 23 42;         /* #0f172a - page background */
+    --bg-secondary: 30 41 59;       /* #1e293b - cards, elevated */
+    --bg-tertiary: 51 65 85;        /* #334155 - sections, tables */
+    
+    --text-primary: 241 245 249;    /* #f1f5f9 - main text */
+    --text-secondary: 148 163 184;  /* #94a3b8 - muted text */
+    --text-heading: 248 250 252;    /* #f8fafc - titles */
+    
+    --border-color: 51 65 85;       /* #334155 - borders */
+    --accent: 59 130 246;           /* #3b82f6 - primary accent */
+    
+    color-scheme: dark;
+  }
+
   body {
-    @apply bg-gray-50 text-gray-900 dark:bg-gray-900 dark:text-gray-100;
+    @apply bg-[rgb(var(--bg-primary))] text-[rgb(var(--text-primary))];
+  }
+  
+  /* Professional Typography */
+  h1, h2, h3, h4, h5, h6 {
+    @apply text-[rgb(var(--text-heading))];
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  
+  p {
+    @apply text-[rgb(var(--text-primary))];
   }
 }
 
 @layer components {
+  /* ========================================
+     PROFESSIONAL COMPONENT SYSTEM
+     ======================================== */
+  
+  /* Cards - Elevated from background */
+  .card {
+    @apply bg-[rgb(var(--bg-secondary))] rounded-lg shadow-md border border-[rgb(var(--border-color))];
+    @apply p-6;
+  }
+  
+  .card-flat {
+    @apply bg-[rgb(var(--bg-secondary))] rounded-lg border border-[rgb(var(--border-color))];
+    @apply p-4;
+  }
+  
+  /* Buttons - Professional & Clear */
   .btn-primary {
-    @apply bg-primary-600 hover:bg-primary-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200;
+    @apply bg-[rgb(var(--accent))] hover:bg-blue-600 text-white font-medium;
+    @apply py-2.5 px-5 rounded-lg transition-all duration-200;
+    @apply shadow-sm hover:shadow-md;
   }
   
   .btn-secondary {
-    @apply bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-2 px-4 rounded-lg transition-colors duration-200;
+    @apply bg-[rgb(var(--bg-tertiary))] hover:bg-slate-600 text-[rgb(var(--text-primary))];
+    @apply font-medium py-2.5 px-5 rounded-lg transition-all duration-200;
+    @apply border border-[rgb(var(--border-color))];
   }
   
-  .card {
-    @apply bg-white dark:bg-gray-800 rounded-lg shadow-md p-6;
+  .btn-danger {
+    @apply bg-red-600 hover:bg-red-700 text-white font-medium;
+    @apply py-2.5 px-5 rounded-lg transition-all duration-200;
+    @apply shadow-sm hover:shadow-md;
   }
   
+  /* Input Fields - Clear & Accessible */
   .input-field {
-    @apply w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all dark:bg-gray-700 dark:text-white;
+    @apply w-full px-4 py-2.5 rounded-lg transition-all;
+    @apply bg-[rgb(var(--bg-tertiary))] border-2 border-[rgb(var(--border-color))];
+    @apply text-[rgb(var(--text-primary))] placeholder-[rgb(var(--text-secondary))];
+    @apply focus:border-[rgb(var(--accent))] focus:ring-2 focus:ring-blue-500/20;
+    @apply outline-none;
   }
   
   .label {
-    @apply block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2;
+    @apply block text-sm font-medium text-[rgb(var(--text-heading))] mb-2;
+  }
+  
+  /* Tables - Professional & Readable */
+  .table-wrapper {
+    @apply bg-[rgb(var(--bg-secondary))] rounded-lg border border-[rgb(var(--border-color))];
+    @apply overflow-hidden;
+  }
+  
+  .table-header {
+    @apply bg-[rgb(var(--bg-tertiary))] border-b-2 border-[rgb(var(--border-color))];
+  }
+  
+  .table-header th {
+    @apply px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider;
+    @apply text-[rgb(var(--text-heading))];
+  }
+  
+  .table-body {
+    @apply divide-y divide-[rgb(var(--border-color))];
+  }
+  
+  .table-row {
+    @apply hover:bg-[rgb(var(--bg-tertiary))]/50 transition-colors;
+  }
+  
+  .table-cell {
+    @apply px-6 py-4 text-sm text-[rgb(var(--text-primary))];
+  }
+  
+  /* Status Badges - Medical Context */
+  .badge {
+    @apply inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium;
+  }
+  
+  .badge-success {
+    @apply bg-emerald-500/10 text-emerald-400 border border-emerald-500/20;
+  }
+  
+  .badge-warning {
+    @apply bg-amber-500/10 text-amber-400 border border-amber-500/20;
+  }
+  
+  .badge-error {
+    @apply bg-red-500/10 text-red-400 border border-red-500/20;
+  }
+  
+  .badge-info {
+    @apply bg-blue-500/10 text-blue-400 border border-blue-500/20;
+  }
+  
+  .badge-neutral {
+    @apply bg-slate-500/10 text-slate-400 border border-slate-500/20;
+  }
+  
+  .badge-pending {
+    @apply bg-amber-500/10 text-amber-400 border border-amber-500/20;
+  }
+  
+  .badge-approved {
+    @apply bg-emerald-500/10 text-emerald-400 border border-emerald-500/20;
+  }
+  
+  /* Search Bars - Prominent */
+  .search-input {
+    @apply w-full px-4 py-3 pl-11 rounded-lg transition-all;
+    @apply bg-[rgb(var(--bg-tertiary))] border-2 border-[rgb(var(--border-color))];
+    @apply text-[rgb(var(--text-primary))] placeholder-[rgb(var(--text-secondary))];
+    @apply focus:border-[rgb(var(--accent))] focus:ring-2 focus:ring-blue-500/20;
+    @apply outline-none;
+  }
+  
+  /* Section Headers */
+  .section-header {
+    @apply text-2xl font-semibold text-[rgb(var(--text-heading))];
+    @apply border-b-2 border-[rgb(var(--border-color))] pb-3 mb-6;
+  }
+  
+  /* Stats Card */
+  .stat-card {
+    @apply card flex items-center justify-between;
+  }
+  
+  .stat-value {
+    @apply text-3xl font-bold text-[rgb(var(--text-heading))];
+  }
+  
+  .stat-label {
+    @apply text-sm font-medium text-[rgb(var(--text-secondary))] uppercase tracking-wide;
   }
 }
 

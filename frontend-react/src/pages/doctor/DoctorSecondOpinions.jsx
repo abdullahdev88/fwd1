@@ -148,7 +148,7 @@ const DoctorSecondOpinions = () => {
               </div>
             ) : (
               pendingRequests.map((request) => (
-                <div key={request._id} className="bg-white rounded-lg shadow-md p-5">
+                <div key={request._id} className="card p-5">
                   <div className="flex justify-between items-start mb-3">
                     <span className={`px-3 py-1 rounded-full text-xs font-semibold ${getPriorityBadge(request.priority)}`}>
                       {request.priority.toUpperCase()}
@@ -181,8 +181,8 @@ const DoctorSecondOpinions = () => {
               myCases.map((caseItem) => (
                 <div
                   key={caseItem._id}
-                  className={`bg-white rounded-lg shadow-md p-5 cursor-pointer border-2 transition-all ${
-                    selectedCase?._id === caseItem._id ? 'border-blue-500' : 'border-transparent hover:border-gray-300'
+                  className={`card p-5 cursor-pointer border-2 transition-all ${
+                    selectedCase?._id === caseItem._id ? 'border-[rgb(var(--accent))]' : 'border-transparent hover:border-[rgb(var(--border-color))]'
                   }`}
                   onClick={() => handleViewCase(caseItem)}
                 >
@@ -207,48 +207,48 @@ const DoctorSecondOpinions = () => {
         <div className="lg:sticky lg:top-6 lg:self-start">
           {selectedCase ? (
             showOpinionForm ? (
-              <div className="bg-white rounded-lg shadow-lg p-6">
-                <h2 className="text-2xl font-bold mb-4">Submit Opinion</h2>
+              <div className="card">
+                <h2 className="text-2xl font-bold mb-4 text-[rgb(var(--text-heading))]">Submit Opinion</h2>
                 <form onSubmit={handleSubmitOpinion} className="space-y-4">
                   <div>
-                    <label className="block font-semibold mb-2">Diagnosis *</label>
+                    <label className="label">Diagnosis *</label>
                     <textarea
                       value={opinionData.diagnosis}
                       onChange={(e) => setOpinionData({ ...opinionData, diagnosis: e.target.value })}
                       required
                       rows="3"
-                      className="w-full border border-gray-300 px-4 py-2 rounded-lg"
+                      className="input-field"
                     />
                   </div>
 
                   <div>
-                    <label className="block font-semibold mb-2">Recommendations *</label>
+                    <label className="label">Recommendations *</label>
                     <textarea
                       value={opinionData.recommendations}
                       onChange={(e) => setOpinionData({ ...opinionData, recommendations: e.target.value })}
                       required
                       rows="3"
-                      className="w-full border border-gray-300 px-4 py-2 rounded-lg"
+                      className="input-field"
                     />
                   </div>
 
                   <div>
-                    <label className="block font-semibold mb-2">Prescribed Treatment</label>
+                    <label className="label">Prescribed Treatment</label>
                     <textarea
                       value={opinionData.prescribedTreatment}
                       onChange={(e) => setOpinionData({ ...opinionData, prescribedTreatment: e.target.value })}
                       rows="2"
-                      className="w-full border border-gray-300 px-4 py-2 rounded-lg"
+                      className="input-field"
                     />
                   </div>
 
                   <div>
-                    <label className="block font-semibold mb-2">Additional Notes</label>
+                    <label className="label">Additional Notes</label>
                     <textarea
                       value={opinionData.additionalNotes}
                       onChange={(e) => setOpinionData({ ...opinionData, additionalNotes: e.target.value })}
                       rows="2"
-                      className="w-full border border-gray-300 px-4 py-2 rounded-lg"
+                      className="input-field"
                     />
                   </div>
 
@@ -256,13 +256,13 @@ const DoctorSecondOpinions = () => {
                     <Button
                       type="button"
                       onClick={() => setShowOpinionForm(false)}
-                      className="flex-1 bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg"
+                      className="flex-1 btn-secondary"
                     >
                       Cancel
                     </Button>
                     <Button
                       type="submit"
-                      className="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg"
+                      className="flex-1 btn-primary"
                     >
                       Submit Opinion
                     </Button>
@@ -270,8 +270,8 @@ const DoctorSecondOpinions = () => {
                 </form>
               </div>
             ) : (
-              <div className="bg-white rounded-lg shadow-lg p-6">
-                <h2 className="text-2xl font-bold mb-4">Case Details</h2>
+              <div className="card p-6">
+                <h2 className="text-2xl font-bold mb-4 text-[rgb(var(--text-heading))]">Case Details</h2>
                 <div className="space-y-4">
                   <div>
                     <label className="font-semibold">Status:</label>
@@ -317,7 +317,7 @@ const DoctorSecondOpinions = () => {
                     <label className="font-semibold mb-2 block">Medical Reports:</label>
                     <div className="space-y-2">
                       {selectedCase.medicalReports?.map((report, idx) => (
-                        <div key={idx} className="flex items-center gap-2 bg-gray-50 p-3 rounded hover:bg-gray-100 transition-colors">
+                        <div key={idx} className="flex items-center gap-2 bg-[rgb(var(--bg-tertiary))] p-3 rounded hover:bg-[rgb(var(--bg-secondary))] transition-colors">
                           <span className="text-2xl">📄</span>
                           <div className="flex-1">
                             <a 

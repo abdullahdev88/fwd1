@@ -127,12 +127,12 @@ const BookAppointment = () => {
   const minDate = tomorrow.toISOString().split('T')[0];
 
   return (
-    <div className="max-w-2xl mx-auto p-6 bg-white rounded-lg shadow-lg">
-      <h1 className="text-3xl font-bold mb-6 text-gray-800">Book Appointment</h1>
+    <div className="max-w-2xl mx-auto p-6 card">
+      <h1 className="text-3xl font-bold mb-6 text-[rgb(var(--text-heading))]">Book Appointment</h1>
 
       {error && <ErrorMessage message={error} />}
       {success && (
-        <div className="p-4 mb-4 bg-green-100 text-green-700 rounded-lg">
+        <div className="p-4 mb-4 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 rounded-lg">
           ✅ Appointment booked successfully! Redirecting to your appointments...
         </div>
       )}
@@ -141,13 +141,13 @@ const BookAppointment = () => {
 
         {/* Doctor Selection */}
         <div>
-          <label className="block font-medium mb-2 text-gray-700">Select Doctor *</label>
+          <label className="label">Select Doctor *</label>
           <select 
             name="doctorId" 
             value={formData.doctorId}
             onChange={handleInputChange} 
             required
-            className="w-full border border-gray-300 px-4 py-2 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+            className="input-field">
             <option value="">Choose a doctor...</option>
             {doctors.map(d => (
               <option key={d._id} value={d._id}>
@@ -159,65 +159,70 @@ const BookAppointment = () => {
 
         {/* Appointment Date */}
         <div>
-          <label className="block font-medium mb-2 text-gray-700">Appointment Date *</label>
+          <label className="label">Appointment Date *</label>
           <input 
             type="date" 
             name="appointmentDate"
             value={formData.appointmentDate}
             min={minDate}
             onChange={handleInputChange}
-            className="w-full border border-gray-300 px-4 py-2 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="input-field"
             required />
         </div>
 
         {/* Time Selection */}
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block font-medium mb-2 text-gray-700">Start Time *</label>
+            <label className="label">Start Time *</label>
             <input 
               type="time" 
               name="startTime"
               value={formData.startTime}
               onChange={handleStartTimeChange}
-              className="w-full border border-gray-300 px-4 py-2 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="input-field"
               required />
           </div>
           <div>
-            <label className="block font-medium mb-2 text-gray-700">End Time</label>
+            <label className="label">End Time</label>
             <input 
               type="time" 
               value={formData.endTime}
               readOnly 
-              className="w-full border border-gray-300 px-4 py-2 bg-gray-100 rounded-lg cursor-not-allowed" />
+              className="input-field opacity-75 cursor-not-allowed" />
           </div>
         </div>
 
         {/* Request Message */}
         <div>
-          <label className="block font-medium mb-2 text-gray-700">Message to Doctor (Optional)</label>
+          <label className="label">Message to Doctor (Optional)</label>
           <textarea 
             name="requestMessage"
             value={formData.requestMessage}
             onChange={handleInputChange}
             rows="3"
             placeholder="Brief description of your symptoms or reason for visit..."
-            className="w-full border border-gray-300 px-4 py-2 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
+            className="input-field" />
         </div>
 
         {/* Medical Reports Upload (Feature 1) */}
-        <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
-          <h3 className="font-semibold text-lg mb-3 text-blue-800">📄 Upload Medical Reports (Optional)</h3>
-          <p className="text-sm text-gray-600 mb-3">
+        <div className="bg-[rgb(var(--bg-tertiary))] p-4 rounded-lg border-2 border-[rgb(var(--border-color))]">
+          <h3 className="font-semibold text-lg mb-3 text-[rgb(var(--text-heading))] flex items-center">
+            <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+            Upload Medical Reports (Optional)
+          </h3>
+          <p className="text-sm text-[rgb(var(--text-secondary))] mb-3">
             Attach previous medical reports, lab results, or relevant documents to help the doctor prepare for your visit.
           </p>
           
           <div className="space-y-3">
             <div>
-              <label className="block font-medium mb-2 text-gray-700">Report Type</label>
+              <label className="label">Report Type</label>
               <select 
                 value={reportType}
                 onChange={(e) => setReportType(e.target.value)}
-                className="w-full border border-gray-300 px-4 py-2 rounded-lg focus:ring-2 focus:ring-blue-500">
+                className="input-field">
                 <option value="lab_test">Lab Test</option>
                 <option value="x_ray">X-Ray</option>
                 <option value="mri">MRI</option>
@@ -231,37 +236,39 @@ const BookAppointment = () => {
             </div>
 
             <div>
-              <label className="block font-medium mb-2 text-gray-700">Description</label>
+              <label className="label">Description</label>
               <input
                 type="text"
                 value={reportDescription}
                 onChange={(e) => setReportDescription(e.target.value)}
                 placeholder="Brief description of the reports..."
-                className="w-full border border-gray-300 px-4 py-2 rounded-lg focus:ring-2 focus:ring-blue-500"
+                className="input-field"
               />
             </div>
 
             <div>
-              <label className="block font-medium mb-2 text-gray-700">Select Files (Max 5)</label>
+              <label className="label">Select Files (Max 5)</label>
               <input
                 type="file"
                 multiple
                 accept="image/*,.pdf,.doc,.docx"
                 onChange={handleFileChange}
-                className="w-full border border-gray-300 px-4 py-2 rounded-lg focus:ring-2 focus:ring-blue-500"
+                className="input-field"
               />
-              <p className="text-xs text-gray-500 mt-1">Accepted: Images, PDF, Word documents (Max 10MB per file)</p>
+              <p className="text-xs text-[rgb(var(--text-secondary))] mt-1">Accepted: Images, PDF, Word documents (Max 10MB per file)</p>
             </div>
 
             {medicalReports.length > 0 && (
-              <div className="bg-white p-3 rounded border border-gray-200">
-                <p className="font-medium text-sm mb-2">Selected files ({medicalReports.length}):</p>
+              <div className="bg-[rgb(var(--bg-secondary))] p-3 rounded border-2 border-[rgb(var(--border-color))]">
+                <p className="font-medium text-sm mb-2 text-[rgb(var(--text-heading))]">Selected files ({medicalReports.length}):</p>
                 <ul className="text-sm space-y-1">
                   {medicalReports.map((f, i) => (
                     <li key={i} className="flex items-center gap-2">
-                      <span className="text-blue-600">📎</span>
-                      <span className="truncate">{f.name}</span>
-                      <span className="text-gray-500 text-xs">({(f.size / 1024).toFixed(1)} KB)</span>
+                      <svg className="w-4 h-4 text-[rgb(var(--accent))]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+                      </svg>
+                      <span className="truncate text-[rgb(var(--text-primary))]">{f.name}</span>
+                      <span className="text-[rgb(var(--text-secondary))] text-xs">({(f.size / 1024).toFixed(1)} KB)</span>
                     </li>
                   ))}
                 </ul>
@@ -273,8 +280,8 @@ const BookAppointment = () => {
         <Button 
           type="submit" 
           disabled={loading}
-          className="w-full bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors disabled:bg-gray-400">
-          {loading ? '⏳ Booking Appointment...' : '✅ Book Appointment'}
+          className="btn-primary w-full">
+          {loading ? 'Booking Appointment...' : 'Book Appointment'}
         </Button>
       </form>
     </div>

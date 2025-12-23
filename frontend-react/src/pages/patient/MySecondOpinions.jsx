@@ -68,10 +68,10 @@ const MySecondOpinions = () => {
   return (
     <div className="max-w-6xl mx-auto p-6">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold text-gray-800">My Second Opinion Requests</h1>
+        <h1 className="text-3xl font-bold text-[rgb(var(--text-heading))]">My Second Opinion Requests</h1>
         <Button
           onClick={() => navigate('/patient/request-second-opinion')}
-          className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-semibold"
+          className="btn-primary"
         >
           + New Request
         </Button>
@@ -80,11 +80,11 @@ const MySecondOpinions = () => {
       {error && <ErrorMessage message={error} />}
 
       {requests.length === 0 ? (
-        <div className="bg-white rounded-lg shadow p-12 text-center">
-          <p className="text-gray-500 text-lg mb-4">No second opinion requests yet</p>
+        <div className="card p-12 text-center">
+          <p className="text-[rgb(var(--text-secondary))] text-lg mb-4">No second opinion requests yet</p>
           <Button
             onClick={() => navigate('/patient/request-second-opinion')}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg"
+            className="btn-primary"
           >
             Request Second Opinion
           </Button>
@@ -96,8 +96,8 @@ const MySecondOpinions = () => {
             {requests.map((request) => (
               <div
                 key={request._id}
-                className={`bg-white rounded-lg shadow-md p-5 cursor-pointer border-2 transition-all ${
-                  selectedRequest?._id === request._id ? 'border-blue-500' : 'border-transparent hover:border-gray-300'
+                className={`card p-5 cursor-pointer border-2 transition-all ${
+                  selectedRequest?._id === request._id ? 'border-[rgb(var(--accent))]' : 'border-transparent hover:border-[rgb(var(--border-color))]'
                 }`}
                 onClick={() => handleViewDetails(request)}
               >
@@ -137,8 +137,8 @@ const MySecondOpinions = () => {
           {/* Details Panel */}
           <div className="lg:sticky lg:top-6 lg:self-start">
             {selectedRequest ? (
-              <div className="bg-white rounded-lg shadow-lg p-6">
-                <h2 className="text-2xl font-bold mb-4">Request Details</h2>
+              <div className="card p-6">
+                <h2 className="text-2xl font-bold mb-4 text-[rgb(var(--text-heading))]">Request Details</h2>
 
                 <div className="space-y-4">
                   <div>
@@ -219,7 +219,7 @@ const MySecondOpinions = () => {
                         const description = report.description || 'No description';
                         
                         return (
-                          <div key={idx} className="bg-gray-50 hover:bg-gray-100 p-3 rounded border border-gray-200 transition-colors">
+                          <div key={idx} className="bg-[rgb(var(--bg-tertiary))] hover:bg-[rgb(var(--bg-secondary))] p-3 rounded border border-[rgb(var(--border-color))] transition-colors">
                             <div className="flex items-start justify-between gap-3">
                               <div className="flex items-start gap-2 flex-1 min-w-0">
                                 <span className="text-lg mt-0.5">📄</span>

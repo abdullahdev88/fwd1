@@ -12,10 +12,31 @@ const MedicalRecordsList = () => {
   const [error, setError] = useState(null);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filteredRecords, setFilteredRecords] = useState([]);
 
   useEffect(() => {
     fetchRecords();
   }, [page]);
+
+  // Filter records based on search query
+  useEffect(() => {
+    if (!searchQuery.trim()) {
+      setFilteredRecords(records);
+    } else {
+      const query = searchQuery.toLowerCase();
+      const filtered = records.filter(record => {
+        const patientName = record.patient?.name?.toLowerCase() || '';
+        const doctorName = record.doctor?.name?.toLowerCase() || '';
+        const diagnosis = record.diagnosis?.toLowerCase() || '';
+        
+        return patientName.includes(query) || 
+               doctorName.includes(query) || 
+               diagnosis.includes(query);
+      });
+      setFilteredRecords(filtered);
+    }
+  }, [searchQuery, records]);
 
   const fetchRecords = async () => {
     try {
@@ -76,12 +97,12 @@ const MedicalRecordsList = () => {
     <div className="max-w-7xl mx-auto p-6">
       <div className="mb-6 flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">
+          <h1 className="text-3xl font-bold text-[rgb(var(--text-heading))]">
             {user.role === 'patient' ? 'My Medical Records' : 
              user.role === 'doctor' ? 'Patient Medical Records' : 
              'All Medical Records'}
           </h1>
-          <p className="text-gray-600 mt-2">
+          <p className="text-[rgb(var(--text-secondary))] mt-2">
             {user.role === 'patient' ? 'View your medical history and records' : 
              user.role === 'doctor' ? 'Medical records you have created' : 
              'Manage all medical records in the system'}
@@ -91,21 +112,56 @@ const MedicalRecordsList = () => {
         {user.role === 'doctor' && (
           <Link
             to="/doctor/medical-records/create"
-            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md font-medium"
+            className="btn-primary"
           >
             Create New Record
           </Link>
         )}
       </div>
 
+      {/* Search Bar */}
+      <div className="mb-6">
+        <div className="relative">
+          <input
+            type="text"
+            placeholder="Search by patient name, doctor name, or diagnosis..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="search-input"
+          />
+          <svg
+            className="absolute left-3 top-3.5 h-5 w-5 text-[rgb(var(--text-secondary))]"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+            />
+          </svg>
+        </div>
+        {searchQuery && (
+          <p className="mt-2 text-sm text-[rgb(var(--text-secondary))]">
+            Found {filteredRecords.length} result(s)
+          </p>
+        )}
+      </div>
+
       {error && <ErrorMessage message={error} />}
 
-      {records.length === 0 && !loading ? (
-        <div className="bg-white shadow rounded-lg p-8 text-center">
-          <div className="text-gray-400 text-6xl mb-4">📋</div>
-          <h3 className="text-lg font-medium text-gray-900 mb-2">No Medical Records Found</h3>
-          <p className="text-gray-500 mb-4">
-            {user.role === 'patient' 
+      {filteredRecords.length === 0 && !loading ? (
+        <div className="card p-8 text-center">
+          <div className="text-[rgb(var(--text-secondary))] text-6xl mb-4">📋</div>
+          <h3 className="text-lg font-medium text-[rgb(var(--text-heading))] mb-2">
+            {searchQuery ? 'No Results Found' : 'No Medical Records Found'}
+          </h3>
+          <p className="text-[rgb(var(--text-secondary))] mb-4">
+            {searchQuery 
+              ? `No medical records match "${searchQuery}"`
+              : user.role === 'patient' 
               ? "You don't have any medical records yet."
               : user.role === 'doctor'
               ? "You haven't created any medical records yet."
@@ -114,19 +170,19 @@ const MedicalRecordsList = () => {
           {user.role === 'doctor' && (
             <Link
               to="/doctor/medical-records/create"
-              className="inline-block bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md"
+              className="btn-primary inline-block"
             >
               Create First Record
             </Link>
           )}
         </div>
       ) : (
-        <div className="bg-white shadow rounded-lg overflow-hidden">
+        <div className="card overflow-hidden">
           <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
+            <table className="min-w-full divide-y divide-[rgb(var(--border-color))]">
+              <thead className="bg-[rgb(var(--bg-secondary))]">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-[rgb(var(--text-secondary))] uppercase tracking-wider">
                     {user.role === 'patient' ? 'Doctor' : 'Patient'}
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -138,14 +194,14 @@ const MedicalRecordsList = () => {
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Status
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-[rgb(var(--text-secondary))] uppercase tracking-wider">
                     Actions
                   </th>
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {records.map((record) => (
-                  <tr key={record._id} className="hover:bg-gray-50">
+              <tbody className="divide-y divide-[rgb(var(--border-color))]">
+                {filteredRecords.map((record) => (
+                  <tr key={record._id} className="hover:bg-[rgb(var(--bg-tertiary))] transition-colors">
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
                         <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
@@ -154,12 +210,12 @@ const MedicalRecordsList = () => {
                           </span>
                         </div>
                         <div className="ml-3">
-                          <div className="text-sm font-medium text-gray-900">
+                          <div className="text-sm font-medium text-[rgb(var(--text-primary))]">
                             {user.role === 'patient' 
                               ? record.doctor?.name || 'Unknown Doctor'
                               : record.patient?.name || 'Unknown Patient'}
                           </div>
-                          <div className="text-sm text-gray-500">
+                          <div className="text-sm text-[rgb(var(--text-secondary))]">
                             {user.role === 'patient' 
                               ? record.doctor?.specialization
                               : record.patient?.email}
@@ -168,10 +224,10 @@ const MedicalRecordsList = () => {
                       </div>
                     </td>
                     <td className="px-6 py-4">
-                      <div className="text-sm font-medium text-gray-900">
+                      <div className="text-sm font-medium text-[rgb(var(--text-primary))]">
                         {record.diagnosis}
                       </div>
-                      <div className="text-sm text-gray-500">
+                      <div className="text-sm text-[rgb(var(--text-secondary))]">
                         {record.symptoms?.substring(0, 50)}
                         {record.symptoms?.length > 50 && '...'}
                       </div>

@@ -14,6 +14,7 @@ const PatientAppointments = () => {
   const [selectedAppointment, setSelectedAppointment] = useState(null);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [paymentStatuses, setPaymentStatuses] = useState({});
+  const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
     if (user && user.role === 'patient') {
@@ -179,6 +180,19 @@ const PatientAppointments = () => {
     return `${formattedDate} at ${formattedTime}`;
   };
 
+  // Filter appointments based on search query
+  const filteredAppointments = appointments.filter(appointment => {
+    if (!searchQuery) return true;
+    const searchLower = searchQuery.toLowerCase();
+    return (
+      appointment.doctor?.name?.toLowerCase().includes(searchLower) ||
+      appointment.doctor?.specialization?.toLowerCase().includes(searchLower) ||
+      appointment.status?.toLowerCase().includes(searchLower) ||
+      appointment.requestMessage?.toLowerCase().includes(searchLower) ||
+      formatDateTime(appointment.appointmentDate, appointment.startTime).toLowerCase().includes(searchLower)
+    );
+  });
+
   if (loading) return <LoadingSpinner />;
 
   return (
@@ -186,66 +200,113 @@ const PatientAppointments = () => {
       <div className="mb-6">
         <div className="flex justify-between items-center">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">My Appointments</h1>
-            <p className="text-gray-600 mt-2">
+            <h1 className="text-3xl font-bold text-[rgb(var(--text-heading))]">My Appointments</h1>
+            <p className="text-[rgb(var(--text-secondary))] mt-2">
               View your appointment requests and their status
             </p>
+            {!loading && (
+              <div className="mt-3 inline-flex items-center px-3 py-1.5 bg-[rgb(var(--accent))]/10 border border-[rgb(var(--accent))]/20 rounded-lg">
+                <svg className="w-5 h-5 mr-2 text-[rgb(var(--accent))]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+                <span className="text-sm font-semibold text-[rgb(var(--accent))]">
+                  Total Appointments: {appointments.length}
+                </span>
+              </div>
+            )}
           </div>
           <Link
             to="/book-appointment"
-            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md font-medium transition-colors"
+            className="btn-primary"
           >
             + Book New Appointment
           </Link>
         </div>
       </div>
 
+      {/* Search Bar */}
+      <div className="card p-4 mb-6">
+        <div className="relative">
+          <input
+            type="text"
+            placeholder="Search by doctor name, specialization, status, message, or date..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="search-input"
+          />
+          <svg
+            className="absolute left-3 top-2.5 h-5 w-5 text-[rgb(var(--text-secondary))]"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+            />
+          </svg>
+        </div>
+        {searchQuery && (
+          <p className="mt-2 text-sm text-[rgb(var(--text-secondary))]">
+            Found {filteredAppointments.length} result(s)
+          </p>
+        )}
+      </div>
+
       {error && <ErrorMessage message={error} />}
 
-      {appointments.length === 0 ? (
-        <div className="bg-white rounded-lg shadow p-8 text-center">
-          <p className="text-gray-500 mb-4">You haven't booked any appointments yet.</p>
-          <Link
-            to="/book-appointment"
-            className="inline-block bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-md font-medium transition-colors"
-          >
-            Book Your First Appointment
-          </Link>
+      {filteredAppointments.length === 0 ? (
+        <div className="card p-8 text-center">
+          <p className="text-[rgb(var(--text-secondary))] mb-4">
+            {searchQuery 
+              ? 'No appointments match your search query.' 
+              : "You haven't booked any appointments yet."}
+          </p>
+          {!searchQuery && (
+            <Link
+              to="/book-appointment"
+              className="btn-primary inline-block"
+            >
+              Book Your First Appointment
+            </Link>
+          )}
         </div>
       ) : (
-        <div className="bg-white rounded-lg shadow overflow-hidden">
+        <div className="card overflow-hidden">
           <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
+            <table className="min-w-full divide-y divide-[rgb(var(--border-color))]">
+              <thead className="bg-[rgb(var(--bg-secondary))]">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-[rgb(var(--text-secondary))] uppercase tracking-wider">
                     Doctor
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-[rgb(var(--text-secondary))] uppercase tracking-wider">
                     Date & Time
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-[rgb(var(--text-secondary))] uppercase tracking-wider">
                     Status
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-[rgb(var(--text-secondary))] uppercase tracking-wider">
                     Payment
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-[rgb(var(--text-secondary))] uppercase tracking-wider">
                     Message
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-[rgb(var(--text-secondary))] uppercase tracking-wider">
                     Actions
                   </th>
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {appointments.map((appointment) => {
+              <tbody className="divide-y divide-[rgb(var(--border-color))]">
+                {filteredAppointments.map((appointment) => {
                   const payment = paymentStatuses[appointment._id];
                   const needsPayment = appointment.status === 'approved' && !payment;
                   const hasPaidPayment = payment && payment.status === 'paid';
                   
                   return (
-                    <tr key={appointment._id} className="hover:bg-gray-50">
+                    <tr key={appointment._id} className="hover:bg-[rgb(var(--bg-tertiary))] transition-colors">
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center">
                           <div className="flex-shrink-0 h-10 w-10">
@@ -256,16 +317,16 @@ const PatientAppointments = () => {
                             </div>
                           </div>
                           <div className="ml-4">
-                            <div className="text-sm font-medium text-gray-900">
+                            <div className="text-sm font-medium text-[rgb(var(--text-primary))]">
                               Dr. {appointment.doctor.name}
                             </div>
-                            <div className="text-sm text-gray-500">
+                            <div className="text-sm text-[rgb(var(--text-secondary))]">
                               {appointment.doctor.specialization}
                             </div>
                           </div>
                         </div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-[rgb(var(--text-primary))]">
                         {formatDateTime(appointment.appointmentDate, appointment.startTime)}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
@@ -274,7 +335,7 @@ const PatientAppointments = () => {
                       <td className="px-6 py-4 whitespace-nowrap">
                         {getPaymentStatusBadge(appointment._id, appointment.status)}
                       </td>
-                      <td className="px-6 py-4 text-sm text-gray-900">
+                      <td className="px-6 py-4 text-sm text-[rgb(var(--text-primary))]">
                         <div className="max-w-xs">
                           {appointment.requestMessage || 'No message provided'}
                         </div>
