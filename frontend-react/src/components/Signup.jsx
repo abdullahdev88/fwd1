@@ -18,7 +18,8 @@ const Signup = () => {
     phone: '',
     specialization: '',
     experience: '',
-    education: ''
+    education: '',
+    pmdcId: ''
   });
 
   const handleChange = (e) => {
@@ -46,8 +47,8 @@ const Signup = () => {
     }
 
     if (formData.role === 'doctor') {
-      if (!formData.specialization || !formData.experience || !formData.education) {
-        setError('Please fill all doctor details');
+      if (!formData.specialization || !formData.experience || !formData.education || !formData.pmdcId) {
+        setError('Please fill all doctor details including PMDC ID');
         return;
       }
     }
@@ -67,6 +68,7 @@ const Signup = () => {
         dataToSend.specialization = formData.specialization;
         dataToSend.experience = parseInt(formData.experience);
         dataToSend.education = formData.education;
+        dataToSend.pmdcId = formData.pmdcId;
       }
 
       const result = await signup(dataToSend);
@@ -96,13 +98,20 @@ const Signup = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
-        <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            Create your account
-          </h2>
-        </div>
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+      {/* Animated background blobs */}
+      <div className="absolute top-0 left-0 w-96 h-96 bg-blue-300 dark:bg-blue-900 rounded-full mix-blend-multiply dark:mix-blend-soft-light filter blur-3xl opacity-30 animate-blob"></div>
+      <div className="absolute top-0 right-0 w-96 h-96 bg-purple-300 dark:bg-purple-900 rounded-full mix-blend-multiply dark:mix-blend-soft-light filter blur-3xl opacity-30 animate-blob animation-delay-2000"></div>
+      <div className="absolute bottom-0 left-1/2 w-96 h-96 bg-pink-300 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob animation-delay-4000"></div>
+      
+      <div className="max-w-md w-full space-y-8 relative z-10">
+        {/* Glass morphism card */}
+        <div className="bg-white/70 backdrop-blur-lg rounded-2xl shadow-2xl p-8 border border-white/20">
+          <div>
+            <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
+              Create your account
+            </h2>
+          </div>
         
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           {error && (
@@ -176,6 +185,16 @@ const Signup = () => {
             {formData.role === 'doctor' && (
               <>
                 <Input
+                  label="PMDC ID Number"
+                  name="pmdcId"
+                  type="text"
+                  required
+                  value={formData.pmdcId}
+                  onChange={handleChange}
+                  placeholder="Enter your PMDC registration number"
+                />
+
+                <Input
                   label="Specialization"
                   name="specialization"
                   type="text"
@@ -232,7 +251,7 @@ const Signup = () => {
           <button
             type="submit"
             disabled={loading || success}
-            className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             {loading ? 'Creating Account...' : 'Sign Up'}
           </button>
@@ -243,6 +262,7 @@ const Signup = () => {
             </Link>
           </div>
         </form>
+        </div>
       </div>
     </div>
   );

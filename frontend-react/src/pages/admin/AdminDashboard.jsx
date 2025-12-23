@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import axios from 'axios';
 import AdminPrescriptionManager from '../../components/admin/AdminPrescriptionManager';
@@ -327,6 +328,7 @@ const ReportsSection = () => {
 
 const AdminDashboard = () => {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [stats, setStats] = useState({});
   const [pendingDoctors, setPendingDoctors] = useState([]);
   const [appointments, setAppointments] = useState([]);
@@ -587,6 +589,57 @@ const AdminDashboard = () => {
                 </div>
               </div>
             )}
+
+            {/* Quick Actions */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+              <div className="bg-white shadow rounded-lg p-6 hover:shadow-lg transition-shadow">
+                <div className="flex items-center mb-4">
+                  <span className="text-3xl mr-3">💰</span>
+                  <h3 className="text-lg font-semibold text-gray-900">Payment Management</h3>
+                </div>
+                <p className="text-sm text-gray-600 mb-4">
+                  Monitor patient payments, process refunds, and view transaction history
+                </p>
+                <button
+                  onClick={() => navigate('/admin/payments')}
+                  className="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium"
+                >
+                  Manage Payments
+                </button>
+              </div>
+
+              <div className="bg-white shadow rounded-lg p-6 hover:shadow-lg transition-shadow">
+                <div className="flex items-center mb-4">
+                  <span className="text-3xl mr-3">👨‍⚕️</span>
+                  <h3 className="text-lg font-semibold text-gray-900">Doctor Approvals</h3>
+                </div>
+                <p className="text-sm text-gray-600 mb-4">
+                  Review and approve pending doctor registration requests
+                </p>
+                <button
+                  onClick={() => setActiveTab('doctors')}
+                  className="w-full bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md text-sm font-medium"
+                >
+                  Review Applications
+                </button>
+              </div>
+
+              <div className="bg-white shadow rounded-lg p-6 hover:shadow-lg transition-shadow">
+                <div className="flex items-center mb-4">
+                  <span className="text-3xl mr-3">📊</span>
+                  <h3 className="text-lg font-semibold text-gray-900">System Reports</h3>
+                </div>
+                <p className="text-sm text-gray-600 mb-4">
+                  View detailed analytics and performance metrics
+                </p>
+                <button
+                  onClick={() => setActiveTab('reports')}
+                  className="w-full bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-md text-sm font-medium"
+                >
+                  View Reports
+                </button>
+              </div>
+            </div>
           </>
         )}
 
@@ -613,6 +666,9 @@ const AdminDashboard = () => {
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Role
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      PMDC ID
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Status
@@ -656,6 +712,9 @@ const AdminDashboard = () => {
                         }`}>
                           {userItem.role}
                         </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        {userItem.role === 'doctor' && userItem.pmdcId ? userItem.pmdcId : '-'}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
@@ -719,6 +778,7 @@ const AdminDashboard = () => {
                           <p className="text-sm text-gray-500">{doctor.email}</p>
                           <p className="text-sm text-gray-600">Phone: {doctor.phone}</p>
                           <div className="mt-2 space-y-1">
+                            <p className="text-sm"><strong>PMDC ID:</strong> {doctor.pmdcId}</p>
                             <p className="text-sm"><strong>Specialization:</strong> {doctor.specialization}</p>
                             <p className="text-sm"><strong>Experience:</strong> {doctor.experience} years</p>
                             <p className="text-sm"><strong>Education:</strong> {doctor.education}</p>

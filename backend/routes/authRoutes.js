@@ -23,7 +23,12 @@ const generateToken = (userId) => {
 // @access  Public
 router.post('/signup', async (req, res) => {
   try {
-    const { name, email, password, phone, role, specialization, experience, education } = req.body;
+    console.log('📨 Full Request Body:', JSON.stringify(req.body, null, 2));
+    
+    const { name, email, password, phone, role, specialization, experience, education, pmdcId } = req.body;
+    
+    console.log('🔍 Extracted pmdcId:', pmdcId);
+    console.log('🔍 Role:', role);
 
     // Validation
     if (!name || !email || !password || !phone) {
@@ -44,10 +49,10 @@ router.post('/signup', async (req, res) => {
 
     // Validate doctor-specific fields
     if (role === 'doctor') {
-      if (!specialization || !experience || !education) {
+      if (!specialization || !experience || !education || !pmdcId) {
         return res.status(400).json({
           success: false,
-          message: 'Please provide specialization, experience, and education for doctor registration'
+          message: 'Please provide specialization, experience, education, and PMDC ID for doctor registration'
         });
       }
     }
@@ -66,6 +71,7 @@ router.post('/signup', async (req, res) => {
       userData.specialization = specialization;
       userData.experience = parseInt(experience);
       userData.education = education;
+      userData.pmdcId = pmdcId;
       userData.status = 'pending'; // Set to pending for approval
     }
 

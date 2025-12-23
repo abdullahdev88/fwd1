@@ -66,13 +66,18 @@ export const adminProfileAPI = {
 export const appointmentAPI = {
   // Patient functions
   bookAppointment: (data) => api.post('/appointments/book', data),
+  uploadMedicalReports: (appointmentId, formData) => {
+    return api.post(`/appointments/${appointmentId}/upload-reports`, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    });
+  },
   getMyAppointments: () => api.get('/appointments/my-appointments'),
   getAvailableDoctors: () => api.get('/appointments/available-doctors'),
   
   // Doctor functions
   getDoctorRequests: (status = 'pending') => api.get(`/appointments/doctor-requests?status=${status}`),
   getDoctorAppointments: () => api.get('/appointments/doctor-appointments'),
-  approveAppointment: (appointmentId, notes) => api.put(`/appointments/${appointmentId}/approve`, { notes }),
+  approveAppointment: (appointmentId, notes, consultationFee) => api.put(`/appointments/${appointmentId}/approve`, { notes, consultationFee }),
   rejectAppointment: (appointmentId, rejectionReason) => api.put(`/appointments/${appointmentId}/reject`, { rejectionReason }),
   
   // Admin functions
@@ -198,6 +203,54 @@ export const adminAPI = {
     const queryString = queryParams.toString();
     return api.get(`/admin/prescriptions${queryString ? `?${queryString}` : ''}`);
   },
+};
+
+// Second Opinion API calls (Feature 2)
+export const secondOpinionAPI = {
+  // Patient functions
+  submitRequest: (formData) => {
+    return api.post('/second-opinions/submit', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    });
+  },
+  getMyRequests: () => api.get('/second-opinions/my-requests'),
+  getRequestDetails: (requestId) => api.get(`/second-opinions/${requestId}`),
+  cancelRequest: (requestId) => api.put(`/second-opinions/${requestId}/cancel`),
+
+  // Doctor functions
+  getPendingRequests: () => api.get('/second-opinions/doctor/pending'),
+  getMyCases: (status) => {
+    let url = '/second-opinions/doctor/my-cases';
+    if (status) url += `?status=${status}`;
+    return api.get(url);
+  },
+  getCaseDetails: (requestId) => api.get(`/second-opinions/doctor/${requestId}`),
+  acceptRequest: (requestId) => api.put(`/second-opinions/doctor/${requestId}/accept`),
+  startReview: (requestId) => api.put(`/second-opinions/doctor/${requestId}/start-review`),
+  submitOpinion: (requestId, opinionData) => {
+    return api.put(`/second-opinions/doctor/${requestId}/submit-opinion`, opinionData);
+  },
+};
+
+// Payment API calls
+export const paymentAPI = {
+  processPayment: (data) => api.post('/payments/process', data),
+  getPaymentHistory: () => api.get('/payments/patient/history'),
+  getPaymentByAppointment: (appointmentId) => api.get(`/payments/appointment/${appointmentId}`),
+  getPaymentDetails: (paymentId) => api.get(`/payments/${paymentId}`),
+  requestRefund: (paymentId, data) => api.post(`/payments/${paymentId}/refund-request`, data),
+  
+  // Admin APIs
+  getAllPayments: (params) => api.get('/payments/admin/all', { params }),
+  getPaymentStatistics: () => api.get('/payments/admin/statistics'),
+  getRefundRequests: () => api.get('/payments/admin/refund-requests'),
+  processRefund: (paymentId, data) => api.put(`/payments/admin/${paymentId}/process-refund`, data),
+  rejectRefund: (paymentId, data) => api.put(`/payments/admin/${paymentId}/reject-refund`, data),
+  
+  // Invoice APIs
+  generateInvoice: (paymentId) => api.post(`/invoices/generate/${paymentId}`),
+  downloadInvoice: (invoiceNumber) => `${API_BASE_URL.replace('/api', '')}/api/invoices/download/${invoiceNumber}`,
+  viewInvoice: (invoiceNumber) => `${API_BASE_URL.replace('/api', '')}/api/invoices/view/${invoiceNumber}`,
 };
 
 export default api;

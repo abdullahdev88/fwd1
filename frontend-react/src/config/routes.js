@@ -54,6 +54,13 @@ export const ROUTES = {
     ADMIN_LIST: '/admin/prescriptions'
   },
 
+  // Second Opinion routes (Feature 2)
+  SECOND_OPINIONS: {
+    REQUEST: '/patient/request-second-opinion',
+    MY_REQUESTS: '/patient/second-opinions',
+    DOCTOR_CASES: '/doctor/second-opinions'
+  },
+
   // Common routes
   PROFILE: '/profile'
 };

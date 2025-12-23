@@ -14,6 +14,10 @@ const generateToken = (id) => {
 const signup = async (req, res) => {
   try {
     const { name, email, password, role, phone, ...additionalFields } = req.body;
+    
+    // Debug logging
+    console.log('📝 Signup Request Body:', req.body);
+    console.log('📋 Additional Fields:', additionalFields);
 
     // Check if user already exists
     const existingUser = await User.findOne({ email });
@@ -26,7 +30,7 @@ const signup = async (req, res) => {
 
     // Validate role-specific fields
     if (role === 'doctor') {
-      const requiredFields = ['specialization', 'licenseNumber', 'qualification'];
+      const requiredFields = ['specialization', 'pmdcId', 'education', 'experience'];
       const missingFields = requiredFields.filter(field => !additionalFields[field]);
       
       if (missingFields.length > 0) {

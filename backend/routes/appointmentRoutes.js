@@ -1,6 +1,8 @@
 const express = require('express');
 const {
   bookAppointment,
+  uploadMedicalReports,
+  upload,
   getMyAppointments,
   getDoctorAppointmentRequests,
   getDoctorAppointments,
@@ -18,6 +20,7 @@ router.use(protect);
 
 // Patient routes
 router.post('/book', bookAppointment); // Patient books appointment
+router.post('/:appointmentId/upload-reports', upload.array('reports', 5), uploadMedicalReports); // Patient uploads medical reports (Feature 1)
 router.get('/my-appointments', getMyAppointments); // Patient views their appointments
 router.get('/available-doctors', getAvailableDoctors); // Patient views available doctors
 

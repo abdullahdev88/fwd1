@@ -68,6 +68,12 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: function() { return this.role === 'doctor'; }
   },
+  pmdcId: {
+    type: String,
+    required: function() { return this.role === 'doctor'; },
+    unique: true,
+    sparse: true
+  },
   // Doctor approval system
   status: {
     type: String,

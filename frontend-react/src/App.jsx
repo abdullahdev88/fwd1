@@ -9,6 +9,7 @@ import PatientDashboard from './pages/patient/PatientDashboard';
 
 import DoctorDashboard from './pages/doctor/DoctorDashboard';
 import AdminDashboard from './pages/admin/AdminDashboard';
+import AdminPayments from './pages/admin/AdminPayments';
 import ProfileSettings from './pages/ProfileSettings';
 import CreateMedicalRecord from './pages/medicalRecords/CreateMedicalRecord';
 import MedicalRecordsList from './pages/medicalRecords/MedicalRecordsList';
@@ -16,6 +17,9 @@ import MedicalRecordDetail from './pages/medicalRecords/MedicalRecordDetail';
 import BookAppointment from './pages/appointments/BookAppointment';
 import PatientAppointments from './pages/appointments/PatientAppointments';
 import DoctorAppointmentRequests from './pages/appointments/DoctorAppointmentRequests';
+import RequestSecondOpinion from './pages/patient/RequestSecondOpinion';
+import MySecondOpinions from './pages/patient/MySecondOpinions';
+import DoctorSecondOpinions from './pages/doctor/DoctorSecondOpinions';
 import { ROUTES } from './config/routes';
 
 function App() {
@@ -67,6 +71,14 @@ function App() {
                 </PrivateRoute>
               }
             />
+            <Route
+              path="/admin/payments"
+              element={
+                <PrivateRoute allowedRoles={['admin']}>
+                  <AdminPayments />
+                </PrivateRoute>
+              }
+            />
 
             {/* Appointment Routes */}
             {/* Book Appointment - Patient only */}
@@ -85,6 +97,37 @@ function App() {
               element={
                 <PrivateRoute allowedRoles={['doctor']}>
                   <DoctorAppointmentRequests />
+                </PrivateRoute>
+              }
+            />
+
+            {/* Second Opinion Routes (Feature 2) */}
+            {/* Request Second Opinion - Patient only */}
+            <Route
+              path={ROUTES.SECOND_OPINIONS.REQUEST}
+              element={
+                <PrivateRoute allowedRoles={['patient']}>
+                  <RequestSecondOpinion />
+                </PrivateRoute>
+              }
+            />
+            
+            {/* My Second Opinions - Patient only */}
+            <Route
+              path={ROUTES.SECOND_OPINIONS.MY_REQUESTS}
+              element={
+                <PrivateRoute allowedRoles={['patient']}>
+                  <MySecondOpinions />
+                </PrivateRoute>
+              }
+            />
+            
+            {/* Doctor Second Opinions - Doctor only */}
+            <Route
+              path={ROUTES.SECOND_OPINIONS.DOCTOR_CASES}
+              element={
+                <PrivateRoute allowedRoles={['doctor']}>
+                  <DoctorSecondOpinions />
                 </PrivateRoute>
               }
             />

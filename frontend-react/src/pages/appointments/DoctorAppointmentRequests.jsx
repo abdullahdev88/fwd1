@@ -12,6 +12,10 @@ const DoctorAppointmentRequests = () => {
   const [error, setError] = useState(null);
   const [activeTab, setActiveTab] = useState('pending');
   const [actionLoading, setActionLoading] = useState({});
+  const [showApprovalModal, setShowApprovalModal] = useState(false);
+  const [selectedAppointment, setSelectedAppointment] = useState(null);
+  const [consultationFee, setConsultationFee] = useState('2000');
+  const [approvalNotes, setApprovalNotes] = useState('');
 
   useEffect(() => {
     if (user && user.role === 'doctor') {
@@ -38,20 +42,39 @@ const DoctorAppointmentRequests = () => {
     }
   };
 
-  const handleApprove = async (appointmentId, notes = '') => {
+  const handleApprove = async (appointmentId, notes = '', fee = 2000) => {
     setActionLoading(prev => ({ ...prev, [appointmentId]: 'approving' }));
     
     try {
-      await appointmentAPI.approveAppointment(appointmentId, notes);
+      await appointmentAPI.approveAppointment(appointmentId, notes, fee);
       
       // Refresh the appointments
       await fetchAppointments();
+      
+      // Close modal
+      setShowApprovalModal(false);
+      setSelectedAppointment(null);
+      setConsultationFee('2000');
+      setApprovalNotes('');
       
     } catch (err) {
       alert('Error approving appointment: ' + (err.response?.data?.message || 'Unknown error'));
     } finally {
       setActionLoading(prev => ({ ...prev, [appointmentId]: null }));
     }
+  };
+
+  const openApprovalModal = (appointment) => {
+    setSelectedAppointment(appointment);
+    setConsultationFee('2000');
+    setApprovalNotes('');
+    setShowApprovalModal(true);
+  };
+
+  const handleApprovalSubmit = () => {
+    if (!selectedAppointment) return;
+    const fee = parseInt(consultationFee) || 2000;
+    handleApprove(selectedAppointment._id, approvalNotes, fee);
   };
 
   const handleReject = async (appointmentId, rejectionReason = '') => {
@@ -228,7 +251,7 @@ const DoctorAppointmentRequests = () => {
                     {activeTab === 'pending' && (
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
                         <button
-                          onClick={() => handleApprove(appointment._id)}
+                          onClick={() => openApprovalModal(appointment)}
                           disabled={actionLoading[appointment._id]}
                           className="text-green-600 hover:text-green-900 disabled:opacity-50"
                         >
@@ -247,6 +270,80 @@ const DoctorAppointmentRequests = () => {
                 ))}
               </tbody>
             </table>
+          </div>
+        </div>
+      )}
+      
+      {/* Approval Modal */}
+      {showApprovalModal && selectedAppointment && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-xl max-w-md w-full">
+            <div className="bg-green-600 text-white p-4 rounded-t-lg">
+              <h3 className="text-xl font-bold">✅ Approve Appointment</h3>
+            </div>
+            <div className="p-6 space-y-4">
+              <div>
+                <p className="text-sm text-gray-600 mb-2">
+                  <strong>Patient:</strong> {selectedAppointment.patient.name}
+                </p>
+                <p className="text-sm text-gray-600">
+                  <strong>Date:</strong> {formatDateTime(selectedAppointment.appointmentDate, selectedAppointment.startTime)}
+                </p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Consultation Fee (PKR) *
+                </label>
+                <input
+                  type="number"
+                  value={consultationFee}
+                  onChange={(e) => setConsultationFee(e.target.value)}
+                  min="0"
+                  step="100"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                  placeholder="e.g., 2000"
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  Patient will pay this amount before consultation
+                </p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Notes (Optional)
+                </label>
+                <textarea
+                  value={approvalNotes}
+                  onChange={(e) => setApprovalNotes(e.target.value)}
+                  rows="3"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                  placeholder="Any special instructions for the patient..."
+                />
+              </div>
+
+              <div className="flex space-x-3 pt-4">
+                <button
+                  onClick={handleApprovalSubmit}
+                  disabled={actionLoading[selectedAppointment._id]}
+                  className="flex-1 bg-green-600 hover:bg-green-700 text-white py-2 rounded-md font-medium disabled:opacity-50"
+                >
+                  {actionLoading[selectedAppointment._id] ? 'Approving...' : 'Approve & Set Fee'}
+                </button>
+                <button
+                  onClick={() => {
+                    setShowApprovalModal(false);
+                    setSelectedAppointment(null);
+                    setConsultationFee('2000');
+                    setApprovalNotes('');
+                  }}
+                  disabled={actionLoading[selectedAppointment._id]}
+                  className="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-700 py-2 rounded-md font-medium disabled:opacity-50"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       )}

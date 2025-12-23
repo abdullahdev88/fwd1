@@ -1,5 +1,47 @@
 const Appointment = require('../../models/Appointment');
 const User = require('../../models/User');
+const MedicalReport = require('../../models/MedicalReport');
+const { sendNotification } = require('../../utils/notificationService');
+const { sendAppointmentConfirmationEmail } = require('../../services/emailService');
+const { generateNotificationMessage } = require('../../services/aiMessageGenerator');
+const multer = require('multer');
+const path = require('path');
+const fs = require('fs');
+
+// Configure multer for file uploads
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    const uploadDir = path.join(__dirname, '../../uploads/medical-reports');
+    // Create directory if it doesn't exist
+    if (!fs.existsSync(uploadDir)) {
+      fs.mkdirSync(uploadDir, { recursive: true });
+    }
+    cb(null, uploadDir);
+  },
+  filename: (req, file, cb) => {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    cb(null, `report-${uniqueSuffix}${path.extname(file.originalname)}`);
+  }
+});
+
+const fileFilter = (req, file, cb) => {
+  // Accept images and PDFs only
+  const allowedTypes = /jpeg|jpg|png|pdf|doc|docx/;
+  const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
+  const mimetype = allowedTypes.test(file.mimetype);
+
+  if (mimetype && extname) {
+    return cb(null, true);
+  } else {
+    cb(new Error('Only images, PDFs, and documents are allowed'));
+  }
+};
+
+const upload = multer({
+  storage: storage,
+  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB limit
+  fileFilter: fileFilter
+});
 
 // @desc    Create appointment booking request
 // @route   POST /api/appointments/book
@@ -57,6 +99,9 @@ const bookAppointment = async (req, res) => {
       status: 'pending'
     });
 
+    // Send notification to patient
+    await sendNotification('APPOINTMENT_BOOKED', req.user, { appointmentId: appointment._id });
+
     // Populate the appointment with patient and doctor info
     const populatedAppointment = await Appointment.findById(appointment._id)
       .populate('patient', 'name email phone')
@@ -73,6 +118,85 @@ const bookAppointment = async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Server error while booking appointment'
+    });
+  }
+};
+
+// @desc    Upload medical reports for an appointment (Feature 1)
+// @route   POST /api/appointments/:appointmentId/upload-reports
+// @access  Patient only
+const uploadMedicalReports = async (req, res) => {
+  try {
+    const { appointmentId } = req.params;
+
+    // Find appointment
+    const appointment = await Appointment.findById(appointmentId);
+    
+    if (!appointment) {
+      return res.status(404).json({
+        success: false,
+        message: 'Appointment not found'
+      });
+    }
+
+    // Verify patient owns this appointment
+    if (appointment.patient.toString() !== req.user.id) {
+      return res.status(403).json({
+        success: false,
+        message: 'You can only upload reports for your own appointments'
+      });
+    }
+
+    // Check if files were uploaded
+    if (!req.files || req.files.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'No files uploaded'
+      });
+    }
+
+    // Create medical report records
+    const reportIds = [];
+    const uploadedReports = [];
+
+    for (const file of req.files) {
+      const medicalReport = await MedicalReport.create({
+        patient: req.user.id,
+        appointment: appointmentId,
+        reportType: req.body.reportType || 'other',
+        fileName: file.originalname,
+        fileUrl: `/uploads/medical-reports/${file.filename}`,
+        fileSize: file.size,
+        mimeType: file.mimetype,
+        description: req.body.description || ''
+      });
+
+      reportIds.push(medicalReport._id);
+      uploadedReports.push(medicalReport);
+    }
+
+    // Update appointment with medical reports
+    appointment.medicalReports = [...appointment.medicalReports, ...reportIds];
+    appointment.hasMedicalReports = true;
+    await appointment.save();
+
+    // Send notification
+    await sendNotification('REPORTS_UPLOADED', req.user, { appointmentId });
+
+    res.status(200).json({
+      success: true,
+      message: `${uploadedReports.length} medical report(s) uploaded successfully`,
+      data: {
+        appointment: appointmentId,
+        reports: uploadedReports
+      }
+    });
+
+  } catch (error) {
+    console.error('Upload Medical Reports Error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error while uploading reports'
     });
   }
 };
@@ -192,7 +316,7 @@ const approveAppointment = async (req, res) => {
     }
 
     const { appointmentId } = req.params;
-    const { notes } = req.body;
+    const { notes, consultationFee } = req.body;
 
     // Find the appointment
     const appointment = await Appointment.findById(appointmentId);
@@ -224,13 +348,29 @@ const approveAppointment = async (req, res) => {
     appointment.status = 'approved';
     appointment.approvedAt = new Date();
     if (notes) appointment.notes = notes;
+    if (consultationFee !== undefined && consultationFee !== null) {
+      appointment.consultationFee = consultationFee;
+    }
     
     await appointment.save();
 
     // Populate and return updated appointment
     const updatedAppointment = await Appointment.findById(appointmentId)
       .populate('patient', 'name email phone')
-      .populate('doctor', 'name specialization');
+      .populate('doctor', 'name email phone specialization');
+
+    // Send instant AI-enhanced email notification to patient
+    try {
+      console.log('📧 Sending AI-enhanced appointment approval email to patient...');
+      
+      // Send AI-enhanced Email notification only
+      await sendAppointmentConfirmationEmail(updatedAppointment, 'patient');
+      
+      console.log('✅ AI-enhanced approval email sent to patient');
+    } catch (notificationError) {
+      console.error('⚠️ Error sending approval email:', notificationError.message);
+      // Don't fail the approval if notification fails
+    }
 
     res.status(200).json({
       success: true,
@@ -394,6 +534,8 @@ const getAvailableDoctors = async (req, res) => {
 
 module.exports = {
   bookAppointment,
+  uploadMedicalReports,
+  upload, // Export multer middleware
   getMyAppointments,
   getDoctorAppointmentRequests,
   getDoctorAppointments,
