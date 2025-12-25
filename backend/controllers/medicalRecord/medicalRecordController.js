@@ -16,7 +16,11 @@ const createMedicalRecord = async (req, res) => {
     }
 
     const {
+      // Support both old patientId and new patient identifier fields
       patientId,
+      patientEmail,
+      patientPhone,
+      patientName,
       appointmentId,
       diagnosis,
       symptoms,
@@ -28,16 +32,70 @@ const createMedicalRecord = async (req, res) => {
       followUpDate
     } = req.body;
 
-    // Validate patient exists
-    const patient = await User.findById(patientId);
-    if (!patient || patient.role !== 'patient') {
-      return res.status(404).json({
+    let patient = null;
+
+    // PRIORITY 1: If appointment ID is provided, get patient from appointment
+    if (appointmentId) {
+      const appointment = await Appointment.findById(appointmentId);
+      if (!appointment) {
+        return res.status(404).json({
+          success: false,
+          message: 'Appointment not found'
+        });
+      }
+
+      // Verify the appointment belongs to this doctor
+      if (appointment.doctor.toString() !== req.user.id) {
+        return res.status(403).json({
+          success: false,
+          message: 'You can only create records for your own appointments'
+        });
+      }
+
+      // Get patient from appointment
+      patient = await User.findById(appointment.patient);
+    }
+    // PRIORITY 2: Search by email (most unique)
+    else if (patientEmail) {
+      patient = await User.findOne({ 
+        email: patientEmail.toLowerCase().trim(),
+        role: 'patient' 
+      });
+    }
+    // PRIORITY 3: Search by phone
+    else if (patientPhone) {
+      patient = await User.findOne({ 
+        phone: patientPhone.trim(),
+        role: 'patient' 
+      });
+    }
+    // PRIORITY 4: Search by name (less unique, may have duplicates)
+    else if (patientName) {
+      patient = await User.findOne({ 
+        name: { $regex: new RegExp('^' + patientName.trim(), 'i') },
+        role: 'patient' 
+      });
+    }
+    // FALLBACK: Direct patient ID (for backward compatibility)
+    else if (patientId) {
+      patient = await User.findById(patientId);
+    }
+    else {
+      return res.status(400).json({
         success: false,
-        message: 'Patient not found'
+        message: 'Please provide patient identifier (email, phone, name, or appointment ID)'
       });
     }
 
-    // Validate appointment if provided
+    // Validate patient exists and is a patient
+    if (!patient || patient.role !== 'patient') {
+      return res.status(404).json({
+        success: false,
+        message: 'Patient not found. Please verify the patient information.'
+      });
+    }
+
+    // Validate appointment if provided and not already checked
     if (appointmentId) {
       const appointment = await Appointment.findById(appointmentId);
       if (!appointment) {
@@ -49,7 +107,7 @@ const createMedicalRecord = async (req, res) => {
 
       // Verify the appointment is between this doctor and patient
       if (appointment.doctor.toString() !== req.user.id || 
-          appointment.patient.toString() !== patientId) {
+          appointment.patient.toString() !== patient._id.toString()) {
         return res.status(403).json({
           success: false,
           message: 'You can only create records for your own appointments'
@@ -57,9 +115,9 @@ const createMedicalRecord = async (req, res) => {
       }
     }
 
-    // Create medical record
+    // Create medical record using resolved patient ID
     const medicalRecord = await MedicalRecord.create({
-      patient: patientId,
+      patient: patient._id,  // Use resolved patient ID
       doctor: req.user.id,
       appointment: appointmentId || null,
       diagnosis,
@@ -444,6 +502,97 @@ const getAllMedicalRecords = async (req, res) => {
   }
 };
 
+// @desc    Search patients by name, email, or phone (for doctors to find patients)
+// @route   GET /api/medical-records/search/patients?query=...
+// @access  Doctor only
+const searchPatients = async (req, res) => {
+  try {
+    // Only doctors can search for patients
+    if (req.user.role !== 'doctor') {
+      return res.status(403).json({
+        success: false,
+        message: 'Only doctors can search for patients'
+      });
+    }
+
+    const { query } = req.query;
+
+    if (!query || query.trim().length < 2) {
+      return res.status(400).json({
+        success: false,
+        message: 'Please provide a search query (minimum 2 characters)'
+      });
+    }
+
+    const searchTerm = query.trim();
+
+    // Search patients by name, email, or phone
+    // Using $or operator to search across multiple fields
+    const patients = await User.find({
+      role: 'patient',
+      $or: [
+        { name: { $regex: searchTerm, $options: 'i' } },
+        { email: { $regex: searchTerm, $options: 'i' } },
+        { phone: { $regex: searchTerm, $options: 'i' } }
+      ]
+    })
+    .select('name email phone createdAt')
+    .limit(20) // Limit results to 20 patients
+    .sort({ name: 1 });
+
+    res.status(200).json({
+      success: true,
+      count: patients.length,
+      data: patients
+    });
+
+  } catch (error) {
+    console.error('Search Patients Error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error'
+    });
+  }
+};
+
+// @desc    Get doctor's appointments with patient details (helps doctor select patient)
+// @route   GET /api/medical-records/doctor/appointments
+// @access  Doctor only
+const getDoctorAppointments = async (req, res) => {
+  try {
+    // Only doctors can access
+    if (req.user.role !== 'doctor') {
+      return res.status(403).json({
+        success: false,
+        message: 'Only doctors can access this endpoint'
+      });
+    }
+
+    // Get appointments for this doctor
+    const appointments = await Appointment.find({ 
+      doctor: req.user.id,
+      status: { $in: ['confirmed', 'completed'] } // Only confirmed or completed appointments
+    })
+    .populate('patient', 'name email phone')
+    .select('appointmentDate startTime endTime status patient')
+    .sort({ appointmentDate: -1 })
+    .limit(50);
+
+    res.status(200).json({
+      success: true,
+      count: appointments.length,
+      data: appointments
+    });
+
+  } catch (error) {
+    console.error('Get Doctor Appointments Error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error'
+    });
+  }
+};
+
 module.exports = {
   createMedicalRecord,
   getMyMedicalRecords,
@@ -452,5 +601,7 @@ module.exports = {
   updateMedicalRecord,
   deleteMedicalRecord,
   getDoctorMedicalRecords,
-  getAllMedicalRecords
+  getAllMedicalRecords,
+  searchPatients,
+  getDoctorAppointments
 };

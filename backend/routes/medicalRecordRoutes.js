@@ -7,7 +7,9 @@ const {
   updateMedicalRecord,
   deleteMedicalRecord,
   getDoctorMedicalRecords,
-  getAllMedicalRecords
+  getAllMedicalRecords,
+  searchPatients,
+  getDoctorAppointments
 } = require('../controllers/medicalRecord/medicalRecordController');
 const { protect } = require('../middleware/auth');
 
@@ -15,6 +17,10 @@ const router = express.Router();
 
 // All routes require authentication
 router.use(protect);
+
+// Patient search and appointment retrieval for doctors (must be before parameterized routes)
+router.get('/search/patients', searchPatients); // Doctor only - search for patients
+router.get('/doctor/appointments', getDoctorAppointments); // Doctor only - get appointments with patient details
 
 // Medical record CRUD routes
 router.post('/', createMedicalRecord); // Doctor only
