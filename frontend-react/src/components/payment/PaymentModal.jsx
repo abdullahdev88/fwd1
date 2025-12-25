@@ -4,14 +4,11 @@ import { paymentAPI } from '../../services/api';
 const PaymentModal = ({ appointment, onSuccess, onClose }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [selectedMethod, setSelectedMethod] = useState('credit_card');
+  const [selectedMethod, setSelectedMethod] = useState('clinic_visit');
   const [phoneNumber, setPhoneNumber] = useState('');
 
   const paymentMethods = [
-    { value: 'credit_card', label: '💳 Credit Card', icon: '💳' },
-    { value: 'debit_card', label: '💳 Debit Card', icon: '💳' },
-    { value: 'easypaisa', label: '📱 Easypaisa', icon: '📱' },
-    { value: 'jazzcash', label: '📱 JazzCash', icon: '📱' }
+    { value: 'clinic_visit', label: '🏥 Pay at Clinic', icon: '🏥' }
   ];
 
   const handlePayment = async (e) => {
@@ -28,7 +25,11 @@ const PaymentModal = ({ appointment, onSuccess, onClose }) => {
       });
 
       // Show success message
-      alert(`✅ Payment Successful!\n\nTransaction ID: ${response.data.data.transactionId}\nInvoice: ${response.data.data.invoiceNumber}`);
+      const statusMessage = response.data.data.status === 'pending' 
+        ? '✅ Payment Record Created!\n\nPlease complete payment at clinic.\nDoctor will confirm once received.'
+        : `✅ Payment Successful!\n\nTransaction ID: ${response.data.data.transactionId}\nInvoice: ${response.data.data.invoiceNumber}`;
+      
+      alert(statusMessage);
       
       // Call success callback
       onSuccess(response.data.data);
@@ -98,7 +99,7 @@ const PaymentModal = ({ appointment, onSuccess, onClose }) => {
               </span>
             </div>
             <p className="text-xs text-gray-500 mt-2">
-              ⚠️ Simulation Mode - No real money will be charged
+              🏥 Please pay at the clinic during your visit
             </p>
           </div>
 
@@ -114,73 +115,24 @@ const PaymentModal = ({ appointment, onSuccess, onClose }) => {
             {/* Payment Method Selection */}
             <div className="mb-6">
               <label className="block text-sm font-medium text-gray-700 mb-3">
-                Select Payment Method *
+                Payment Method
               </label>
-              <div className="grid grid-cols-2 gap-3">
-                {paymentMethods.map((method) => (
-                  <button
-                    key={method.value}
-                    type="button"
-                    onClick={() => setSelectedMethod(method.value)}
-                    className={`p-3 border-2 rounded-lg text-left transition-all ${
-                      selectedMethod === method.value
-                        ? 'border-blue-600 bg-blue-50 shadow-md'
-                        : 'border-gray-200 hover:border-gray-300'
-                    }`}
-                  >
-                    <div className="flex items-center">
-                      <span className="text-2xl mr-2">{method.icon}</span>
-                      <span className="text-sm font-medium">{method.label.replace(method.icon + ' ', '')}</span>
-                    </div>
-                    {selectedMethod === method.value && (
-                      <div className="mt-2">
-                        <span className="text-xs text-blue-600 font-medium">✓ Selected</span>
-                      </div>
-                    )}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Phone Number for Mobile Wallets */}
-            {(selectedMethod === 'easypaisa' || selectedMethod === 'jazzcash') && (
-              <div className="mb-6">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Phone Number *
-                </label>
-                <input
-                  type="tel"
-                  placeholder="03XX XXXXXXX"
-                  value={phoneNumber}
-                  onChange={(e) => setPhoneNumber(e.target.value.replace(/[^\d]/g, ''))}
-                  maxLength="11"
-                  required
-                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                />
-                <p className="text-xs text-gray-500 mt-1">
-                  Enter your {selectedMethod === 'easypaisa' ? 'Easypaisa' : 'JazzCash'} registered number
-                </p>
-              </div>
-            )}
-
-            {/* Credit/Debit Card Notice */}
-            {(selectedMethod === 'credit_card' || selectedMethod === 'debit_card') && (
-              <div className="mb-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
-                <div className="flex items-start">
-                  <span className="text-2xl mr-3">💳</span>
-                  <div>
-                    <h4 className="font-semibold text-gray-900 mb-1">Card Payment</h4>
-                    <p className="text-sm text-gray-600 mb-3">
-                      In simulation mode, card details are not required. Payment will be automatically processed.
+              <div className="bg-blue-50 border-2 border-blue-200 rounded-lg p-4">
+                <div className="flex items-center">
+                  <span className="text-3xl mr-3">🏥</span>
+                  <div className="flex-1">
+                    <h4 className="font-semibold text-gray-900 mb-1">Pay at Clinic</h4>
+                    <p className="text-sm text-gray-600">
+                      Please visit the clinic during your appointment and pay at the reception desk. We accept cash and card payments on-site.
                     </p>
-                    <div className="bg-white border border-gray-300 rounded px-3 py-2 text-sm">
-                      <span className="font-medium">Test Card:</span> 4111 1111 1111 1111<br/>
-                      <span className="font-medium">Expiry:</span> 12/25 | <span className="font-medium">CVV:</span> 123
-                    </div>
                   </div>
                 </div>
               </div>
-            )}
+              <p className="text-xs text-orange-600 mt-3 flex items-start">
+                <span className="mr-1">ℹ️</span>
+                <span>Online payment methods (Credit Card, Debit Card, Easypaisa, JazzCash) are currently unavailable. All payments must be made in-person at the clinic.</span>
+              </p>
+            </div>
 
             {/* Action Buttons */}
             <div className="flex space-x-3">
@@ -206,14 +158,14 @@ const PaymentModal = ({ appointment, onSuccess, onClose }) => {
                     Processing...
                   </>
                 ) : (
-                  <>💳 Pay PKR {(appointment.consultationFee || 2000).toLocaleString()}</>
+                  <>✅ Confirm Clinic Payment</>
                 )}
               </button>
             </div>
 
             {/* Disclaimer */}
             <p className="text-xs text-center text-gray-500 mt-4">
-              🔒 This is a simulated payment. No real money will be charged.
+              🏥 Payment record will be created. Please complete payment at clinic reception.
             </p>
           </form>
         </div>

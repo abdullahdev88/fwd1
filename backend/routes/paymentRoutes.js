@@ -7,7 +7,8 @@ const {
   getPaymentByAppointment,
   getPatientPaymentHistory,
   getDoctorEarnings,
-  requestRefund
+  requestRefund,
+  confirmClinicPayment
 } = require('../controllers/payment/paymentController');
 
 const {
@@ -26,6 +27,7 @@ router.post('/:paymentId/refund-request', protect, authorize('patient', 'doctor'
 
 // Doctor Routes
 router.get('/doctor/earnings', protect, authorize('doctor'), getDoctorEarnings);
+router.put('/:paymentId/confirm', protect, authorize('doctor'), confirmClinicPayment);
 
 // General Routes (Patient/Doctor/Admin)
 router.get('/:paymentId', protect, getPaymentDetails);

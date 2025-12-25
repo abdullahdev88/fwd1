@@ -27,17 +27,20 @@ const AdminPayments = () => {
 
       // Fetch statistics
       const statsResponse = await paymentAPI.getPaymentStatistics();
-      setStatistics(statsResponse.data.data);
+      console.log('Stats Response:', statsResponse.data);
+      setStatistics(statsResponse.data.statistics || statsResponse.data.data);
 
       // Fetch all payments
       const params = { page: 1, limit: 100 };
       if (statusFilter) params.status = statusFilter;
       
       const paymentsResponse = await paymentAPI.getAllPayments(params);
-      setPayments(paymentsResponse.data.data.payments || []);
+      console.log('Payments Response:', paymentsResponse.data);
+      setPayments(paymentsResponse.data.data || paymentsResponse.data.payments || []);
 
       // Fetch refund requests
       const refundResponse = await paymentAPI.getRefundRequests();
+      console.log('Refund Response:', refundResponse.data);
       setRefundRequests(refundResponse.data.data || []);
 
       setError(null);
@@ -84,12 +87,12 @@ const AdminPayments = () => {
 
   const getStatusBadge = (status) => {
     const statusStyles = {
-      pending: 'bg-yellow-100 text-yellow-800',
-      paid: 'bg-green-100 text-green-800',
-      failed: 'bg-red-100 text-red-800',
-      refund_requested: 'bg-orange-100 text-orange-800',
-      refunded: 'bg-purple-100 text-purple-800',
-      cancelled: 'bg-gray-100 text-gray-800'
+      pending: 'bg-amber-500/10 border border-amber-500/20 text-amber-400',
+      paid: 'bg-emerald-500/10 border border-emerald-500/20 text-emerald-400',
+      failed: 'bg-red-500/10 border border-red-500/20 text-red-400',
+      refund_requested: 'bg-orange-500/10 border border-orange-500/20 text-orange-400',
+      refunded: 'bg-purple-500/10 border border-purple-500/20 text-purple-400',
+      cancelled: 'bg-gray-500/10 border border-gray-500/20 text-gray-400'
     };
 
     return (
@@ -115,8 +118,8 @@ const AdminPayments = () => {
     <div className="max-w-7xl mx-auto p-6">
       {/* Header */}
       <div className="mb-6">
-        <h1 className="text-3xl font-bold text-gray-900">💰 Payment Management</h1>
-        <p className="text-gray-600 mt-2">
+        <h1 className="text-3xl font-bold text-[rgb(var(--text-heading))]">💰 Payment Management</h1>
+        <p className="text-[rgb(var(--text-secondary))] mt-2">
           Monitor all payments and handle refund requests
         </p>
       </div>
@@ -124,11 +127,11 @@ const AdminPayments = () => {
       {/* Statistics Cards */}
       {statistics && (
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
-          <div className="bg-white rounded-lg shadow p-6">
+          <div className="card">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600">Total Revenue</p>
-                <p className="text-2xl font-bold text-green-600">
+                <p className="text-sm text-[rgb(var(--text-secondary))]">Total Revenue</p>
+                <p className="text-2xl font-bold text-emerald-400">
                   PKR {statistics.totalRevenue?.toLocaleString() || 0}
                 </p>
               </div>
@@ -136,11 +139,11 @@ const AdminPayments = () => {
             </div>
           </div>
 
-          <div className="bg-white rounded-lg shadow p-6">
+          <div className="card">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600">Total Payments</p>
-                <p className="text-2xl font-bold text-blue-600">
+                <p className="text-sm text-[rgb(var(--text-secondary))]">Total Payments</p>
+                <p className="text-2xl font-bold text-[rgb(var(--accent))]">
                   {statistics.totalPayments || 0}
                 </p>
               </div>
@@ -148,11 +151,11 @@ const AdminPayments = () => {
             </div>
           </div>
 
-          <div className="bg-white rounded-lg shadow p-6">
+          <div className="card">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600">Refunded Amount</p>
-                <p className="text-2xl font-bold text-purple-600">
+                <p className="text-sm text-[rgb(var(--text-secondary))]">Refunded Amount</p>
+                <p className="text-2xl font-bold text-purple-400">
                   PKR {statistics.totalRefunded?.toLocaleString() || 0}
                 </p>
               </div>
@@ -160,11 +163,11 @@ const AdminPayments = () => {
             </div>
           </div>
 
-          <div className="bg-white rounded-lg shadow p-6">
+          <div className="card">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600">Pending Refunds</p>
-                <p className="text-2xl font-bold text-orange-600">
+                <p className="text-sm text-[rgb(var(--text-secondary))]">Pending Refunds</p>
+                <p className="text-2xl font-bold text-amber-400">
                   {refundRequests.length}
                 </p>
               </div>
@@ -178,13 +181,13 @@ const AdminPayments = () => {
 
       {/* Tabs */}
       <div className="mb-6">
-        <nav className="flex space-x-8 border-b">
+        <nav className="flex space-x-8 border-b border-[rgb(var(--border-color))]">
           <button
             onClick={() => setActiveTab('all')}
             className={`py-2 px-1 border-b-2 font-medium text-sm ${
               activeTab === 'all'
-                ? 'border-blue-500 text-blue-600'
-                : 'border-transparent text-gray-500 hover:text-gray-700'
+                ? 'border-[rgb(var(--accent))] text-[rgb(var(--accent))]'
+                : 'border-transparent text-[rgb(var(--text-secondary))] hover:text-[rgb(var(--text-primary))]'
             }`}
           >
             All Payments ({payments.length})
@@ -193,8 +196,8 @@ const AdminPayments = () => {
             onClick={() => setActiveTab('refunds')}
             className={`py-2 px-1 border-b-2 font-medium text-sm ${
               activeTab === 'refunds'
-                ? 'border-blue-500 text-blue-600'
-                : 'border-transparent text-gray-500 hover:text-gray-700'
+                ? 'border-[rgb(var(--accent))] text-[rgb(var(--accent))]'
+                : 'border-transparent text-[rgb(var(--text-secondary))] hover:text-[rgb(var(--text-primary))]'
             }`}
           >
             Refund Requests ({refundRequests.length})
@@ -204,17 +207,18 @@ const AdminPayments = () => {
 
       {/* All Payments Tab */}
       {activeTab === 'all' && (
-        <div className="bg-white rounded-lg shadow overflow-hidden">
-          <div className="p-4 border-b">
+        <div className="card overflow-hidden">
+          <div className="p-4 border-b border-[rgb(var(--border-color))]">
             <div className="flex items-center space-x-4">
-              <label className="text-sm font-medium text-gray-700">Filter by Status:</label>
+              <label className="text-sm font-medium text-[rgb(var(--text-primary))]">Filter by Status:</label>
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
-                className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="px-3 py-2 bg-[rgb(var(--bg-secondary))] border border-[rgb(var(--border-color))] text-[rgb(var(--text-primary))] rounded-md focus:outline-none focus:ring-2 focus:ring-[rgb(var(--accent))]"
               >
                 <option value="">All Status</option>
                 <option value="paid">Paid</option>
+                <option value="pending">Pending</option>
                 <option value="refund_requested">Refund Requested</option>
                 <option value="refunded">Refunded</option>
                 <option value="failed">Failed</option>
@@ -223,50 +227,50 @@ const AdminPayments = () => {
           </div>
 
           <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
+            <table className="min-w-full divide-y divide-[rgb(var(--border-color))]">
+              <thead className="bg-[rgb(var(--bg-tertiary))]">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Transaction ID</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Patient</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Doctor</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Amount</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Method</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-[rgb(var(--text-secondary))] uppercase">Transaction ID</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-[rgb(var(--text-secondary))] uppercase">Patient</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-[rgb(var(--text-secondary))] uppercase">Doctor</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-[rgb(var(--text-secondary))] uppercase">Amount</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-[rgb(var(--text-secondary))] uppercase">Method</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-[rgb(var(--text-secondary))] uppercase">Status</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-[rgb(var(--text-secondary))] uppercase">Date</th>
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
+              <tbody className="bg-[rgb(var(--bg-primary))] divide-y divide-[rgb(var(--border-color))]">
                 {payments.map((payment) => (
-                  <tr key={payment._id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-mono">
+                  <tr key={payment._id} className="hover:bg-[rgb(var(--bg-secondary))] transition-colors">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-mono text-[rgb(var(--text-primary))]">
                       {payment.transactionId?.substring(0, 20)}...
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm font-medium text-gray-900">
+                      <div className="text-sm font-medium text-[rgb(var(--text-heading))]">
                         {payment.patient?.name || 'N/A'}
                       </div>
-                      <div className="text-sm text-gray-500">
+                      <div className="text-sm text-[rgb(var(--text-secondary))]">
                         {payment.patient?.email || 'N/A'}
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm font-medium text-gray-900">
+                      <div className="text-sm font-medium text-[rgb(var(--text-heading))]">
                         Dr. {payment.doctor?.name || 'N/A'}
                       </div>
-                      <div className="text-sm text-gray-500">
+                      <div className="text-sm text-[rgb(var(--text-secondary))]">
                         {payment.doctor?.specialization || 'N/A'}
                       </div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-green-600">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-emerald-400">
                       PKR {payment.amount?.toLocaleString() || 0}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-[rgb(var(--text-primary))]">
                       {payment.paymentMethod?.replace('_', ' ').toUpperCase()}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       {getStatusBadge(payment.status)}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-[rgb(var(--text-secondary))]">
                       {formatDate(payment.transactionDate)}
                     </td>
                   </tr>
@@ -277,7 +281,7 @@ const AdminPayments = () => {
 
           {payments.length === 0 && (
             <div className="text-center py-12">
-              <p className="text-gray-500">No payments found</p>
+              <p className="text-[rgb(var(--text-secondary))]">No payments found</p>
             </div>
           )}
         </div>
@@ -285,60 +289,60 @@ const AdminPayments = () => {
 
       {/* Refund Requests Tab */}
       {activeTab === 'refunds' && (
-        <div className="bg-white rounded-lg shadow overflow-hidden">
+        <div className="card overflow-hidden">
           <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
+            <table className="min-w-full divide-y divide-[rgb(var(--border-color))]">
+              <thead className="bg-[rgb(var(--bg-tertiary))]">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Transaction ID</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Patient</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Doctor</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Amount</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Reason</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Requested</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-[rgb(var(--text-secondary))] uppercase">Transaction ID</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-[rgb(var(--text-secondary))] uppercase">Patient</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-[rgb(var(--text-secondary))] uppercase">Doctor</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-[rgb(var(--text-secondary))] uppercase">Amount</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-[rgb(var(--text-secondary))] uppercase">Reason</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-[rgb(var(--text-secondary))] uppercase">Requested</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-[rgb(var(--text-secondary))] uppercase">Actions</th>
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
+              <tbody className="bg-[rgb(var(--bg-primary))] divide-y divide-[rgb(var(--border-color))]">
                 {refundRequests.map((payment) => (
-                  <tr key={payment._id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-mono">
+                  <tr key={payment._id} className="hover:bg-[rgb(var(--bg-secondary))] transition-colors">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-mono text-[rgb(var(--text-primary))]">
                       {payment.transactionId?.substring(0, 20)}...
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm font-medium text-gray-900">
+                      <div className="text-sm font-medium text-[rgb(var(--text-heading))]">
                         {payment.patient?.name || 'N/A'}
                       </div>
-                      <div className="text-sm text-gray-500">
+                      <div className="text-sm text-[rgb(var(--text-secondary))]">
                         {payment.patient?.email || 'N/A'}
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm font-medium text-gray-900">
+                      <div className="text-sm font-medium text-[rgb(var(--text-heading))]">
                         Dr. {payment.doctor?.name || 'N/A'}
                       </div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-green-600">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-emerald-400">
                       PKR {payment.amount?.toLocaleString() || 0}
                     </td>
-                    <td className="px-6 py-4 text-sm text-gray-900 max-w-xs">
+                    <td className="px-6 py-4 text-sm text-[rgb(var(--text-primary))] max-w-xs">
                       {payment.refundReason || 'No reason provided'}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-[rgb(var(--text-secondary))]">
                       {formatDate(payment.refundRequestedAt)}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
                       <button
                         onClick={() => handleApproveRefund(payment._id)}
                         disabled={processingRefund[payment._id]}
-                        className="text-green-600 hover:text-green-900 disabled:opacity-50"
+                        className="text-emerald-400 hover:text-emerald-300 disabled:opacity-50 transition-colors"
                       >
                         ✅ Approve
                       </button>
                       <button
                         onClick={() => handleRejectRefund(payment._id)}
                         disabled={processingRefund[payment._id]}
-                        className="text-red-600 hover:text-red-900 disabled:opacity-50"
+                        className="text-red-400 hover:text-red-300 disabled:opacity-50 transition-colors"
                       >
                         ❌ Reject
                       </button>
@@ -352,7 +356,7 @@ const AdminPayments = () => {
           {refundRequests.length === 0 && (
             <div className="text-center py-12">
               <div className="text-6xl mb-4">✅</div>
-              <p className="text-gray-500">No pending refund requests</p>
+              <p className="text-[rgb(var(--text-secondary))]">No pending refund requests</p>
             </div>
           )}
         </div>

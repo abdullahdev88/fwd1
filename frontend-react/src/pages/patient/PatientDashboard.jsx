@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import axios from 'axios';
 import PatientPrescriptionList from '../../components/patient/PatientPrescriptionList';
@@ -21,13 +21,17 @@ const PatientDashboard = () => {
   const { user } = useAuth();
   const [doctors, setDoctors] = useState([]);
   const [appointments, setAppointments] = useState([]);
-  const [loading, setLoading] = useState(true);
+  
+  // Loading states
+  const [initialLoading, setInitialLoading] = useState(true); // Sirf shuru mein loading dikhane ke liye
+  const [bookingLoading, setBookingLoading] = useState(false);
+  
+  // Booking states
   const [bookingModal, setBookingModal] = useState(false);
   const [selectedDoctor, setSelectedDoctor] = useState(null);
   const [selectedSlot, setSelectedSlot] = useState(null);
   const [bookingNotes, setBookingNotes] = useState('');
   const [error, setError] = useState('');
-  const [bookingLoading, setBookingLoading] = useState(false);
   
   // Prescription state
   const [activeTab, setActiveTab] = useState('dashboard');
@@ -37,61 +41,60 @@ const PatientDashboard = () => {
     new Date(app.appointmentDate) >= new Date() && app.status === 'scheduled'
   );
 
-  useEffect(() => {
-    fetchDoctors();
-    fetchAppointments();
-    
-    // Refresh doctors and appointments every 30 seconds to show latest data
-    const interval = setInterval(() => {
-      fetchDoctors();
-      fetchAppointments();
-    }, 30000);
-    
-    return () => clearInterval(interval);
-  }, []);
-
-  const fetchDoctors = async () => {
+  // --- Data Fetching Logic ---
+  const fetchData = useCallback(async (isBackgroundUpdate = false) => {
     try {
-      const response = await axios.get('/api/patient/doctors', {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('token')}`
-        }
-      });
-      
-      if (response.data && response.data.data) {
-        setDoctors(response.data.data.doctors || []);
+      const token = localStorage.getItem('token');
+      if (!token) return;
+
+      const headers = { Authorization: `Bearer ${token}` };
+
+      // Dono API calls parallel mein chalayenge taake jaldi data aaye
+      const [doctorsRes, appointmentsRes] = await Promise.all([
+        axios.get('/api/patient/doctors', { headers }),
+        axios.get('/api/patient/appointments', { headers })
+      ]);
+
+      // Update Doctors
+      if (doctorsRes.data && doctorsRes.data.data) {
+        setDoctors(doctorsRes.data.data.doctors || []);
         setError('');
       }
-    } catch (error) {
-      console.error('Error fetching doctors:', error);
-      setError(error.response?.data?.message || 'Failed to fetch doctors');
-      setDoctors([]);
-    }
-  };
 
-  const fetchAppointments = async () => {
-    try {
-      const response = await axios.get('/api/patient/appointments', {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('token')}`
-        }
-      });
-      
-      console.log('Appointments response:', response.data);
-      
-      if (response.data && response.data.data) {
-        const appointmentsData = response.data.data.appointments || response.data.data || [];
-        console.log('Setting appointments:', appointmentsData);
+      // Update Appointments
+      if (appointmentsRes.data && appointmentsRes.data.data) {
+        const appointmentsData = appointmentsRes.data.data.appointments || appointmentsRes.data.data || [];
         setAppointments(appointmentsData);
       }
-    } catch (error) {
-      console.error('Error fetching appointments:', error);
-      setAppointments([]);
-    } finally {
-      setLoading(false);
-    }
-  };
 
+    } catch (error) {
+      console.error('Error fetching data:', error);
+      // Agar background update hai to purana data rehne do, error mat dikhao
+      if (!isBackgroundUpdate) {
+          setError(error.response?.data?.message || 'Failed to connect to server');
+      }
+    } finally {
+      if (!isBackgroundUpdate) {
+        setInitialLoading(false);
+      }
+    }
+  }, []);
+
+  // --- Real-time Effect ---
+  useEffect(() => {
+    // 1. Pehli dafa foran fetch karein
+    fetchData(false);
+
+    // 2. Phir har 5 second baad refresh karein (Real-time feel ke liye)
+    const interval = setInterval(() => {
+      fetchData(true); // true = background update (no spinner)
+    }, 5000); // 30000 ki jagah 5000 ms
+
+    return () => clearInterval(interval);
+  }, [fetchData, user]); // User change honay par dobara chalega
+
+
+  // --- Booking Handler ---
   const handleBooking = async () => {
     if (!selectedDoctor || !selectedSlot) return;
     
@@ -117,9 +120,8 @@ const PatientDashboard = () => {
         setSelectedSlot(null);
         setBookingNotes('');
       
-        // Refresh appointments to show updated count
-        fetchAppointments();
-        fetchDoctors();
+        // Foran naya data fetch karein
+        fetchData(false);
       }
     } catch (error) {
       console.error('Error booking appointment:', error);
@@ -148,7 +150,7 @@ const PatientDashboard = () => {
     setSelectedPrescription(null);
   };
 
-  if (loading) {
+  if (initialLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[rgb(var(--bg-primary))]">
         <div className="text-center">
@@ -169,18 +171,27 @@ const PatientDashboard = () => {
               <h1 className="text-3xl font-bold text-[rgb(var(--text-heading))]">Patient Dashboard</h1>
               <p className="mt-2 text-[rgb(var(--text-secondary))]">Welcome back, {user?.name}!</p>
             </div>
-            <button
-              onClick={() => {
-                fetchAppointments();
-                fetchDoctors();
-              }}
-              className="btn-secondary flex items-center space-x-2"
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-              </svg>
-              <span>Refresh</span>
-            </button>
+            
+            <div className="flex items-center gap-3">
+                 {/* Live Indicator */}
+                 <div className="hidden md:flex items-center px-3 py-1 bg-emerald-500/10 border border-emerald-500/20 rounded-full">
+                    <span className="relative flex h-2 w-2 mr-2">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                    </span>
+                    <span className="text-xs font-medium text-emerald-500">Live Updates</span>
+                 </div>
+
+                <button
+                  onClick={() => fetchData(false)}
+                  className="btn-secondary flex items-center space-x-2"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                  </svg>
+                  <span>Refresh</span>
+                </button>
+            </div>
           </div>
           
           <div className="mt-6 border-b-2 border-[rgb(var(--border-color))]">
@@ -218,7 +229,7 @@ const PatientDashboard = () => {
               )}
 
               {/* Stats Cards */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8 mt-4">
                 <div className="stat-card">
                   <div className="flex items-center">
                     <div className="flex-shrink-0">
@@ -268,24 +279,15 @@ const PatientDashboard = () => {
                   <div>
                     <h3 className="text-lg leading-6 font-medium text-[rgb(var(--text-heading))]">Available Doctors</h3>
                     <p className="mt-1 text-sm text-[rgb(var(--text-secondary))]">
-                      Book appointments with approved doctors (Updates every 30 seconds)
+                      Book appointments with approved doctors (Auto-updates enabled)
                     </p>
                   </div>
-                  <button
-                    onClick={fetchDoctors}
-                    className="btn-secondary flex items-center space-x-2"
-                  >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                    </svg>
-                    <span>Refresh</span>
-                  </button>
                 </div>
                 
                 {doctors.length > 0 ? (
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {doctors.map((doctor) => (
-                      <div key={doctor._id} className="card hover:shadow-lg transition-shadow">
+                      <div key={doctor._id} className="card hover:shadow-lg transition-shadow border border-[rgb(var(--border-color))]">
                         <div className="flex items-center mb-3">
                           <div className="h-12 w-12 rounded-full bg-[rgb(var(--accent))]/10 flex items-center justify-center">
                             <svg className="w-6 h-6 text-[rgb(var(--accent))]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -307,7 +309,7 @@ const PatientDashboard = () => {
                           <h5 className="font-medium text-[rgb(var(--text-heading))]">Available Slots:</h5>
                           {doctor.availability && doctor.availability.length > 0 ? (
                             doctor.availability.map((date) => (
-                              <div key={date._id} className="border-l-4 border-[rgb(var(--accent))] pl-3 py-1">
+                              <div key={date._id} className="border-l-4 border-[rgb(var(--accent))] pl-3 py-1 mb-2">
                                 <p className="font-medium text-sm text-[rgb(var(--text-primary))]">
                                   {new Date(date.date).toLocaleDateString()}
                                 </p>
@@ -333,7 +335,7 @@ const PatientDashboard = () => {
                   </div>
                 ) : (
                   <div className="p-6 text-center text-[rgb(var(--text-secondary))]">
-                    {error ? 'Failed to load doctors' : 'No approved doctors available at the moment'}
+                    {error ? <span className="text-red-400">{error}</span> : 'No approved doctors available at the moment'}
                   </div>
                 )}
               </div>
@@ -400,7 +402,7 @@ const PatientDashboard = () => {
           />
         )}
 
-        {/* Booking Modal */}
+        {/* Booking Modal (Same as before) */}
         {bookingModal && selectedDoctor && selectedSlot && (
           <div className="fixed inset-0 bg-black/60 backdrop-blur-sm overflow-y-auto h-full w-full z-50 flex items-center justify-center">
             <div className="relative mx-auto p-6 border-2 border-[rgb(var(--border-color))] w-96 shadow-2xl rounded-lg bg-[rgb(var(--bg-secondary))]">
@@ -409,26 +411,20 @@ const PatientDashboard = () => {
               </h3>
               
               <div className="mb-4">
-                <label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-2">
-                  Doctor
-                </label>
+                <label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-2">Doctor</label>
                 <p className="text-sm text-[rgb(var(--text-primary))]">Dr. {selectedDoctor.name}</p>
                 <p className="text-sm text-[rgb(var(--text-secondary))]">{selectedDoctor.specialization}</p>
               </div>
 
               <div className="mb-4">
-                <label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-2">
-                  Date & Time
-                </label>
+                <label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-2">Date & Time</label>
                 <p className="text-sm text-[rgb(var(--text-primary))]">
                   {new Date(selectedSlot.date).toLocaleDateString()} at {selectedSlot.time}
                 </p>
               </div>
 
               <div className="mb-4">
-                <label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-2">
-                  Additional Notes (Optional)
-                </label>
+                <label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-2">Additional Notes (Optional)</label>
                 <textarea
                   value={bookingNotes}
                   onChange={(e) => setBookingNotes(e.target.value)}

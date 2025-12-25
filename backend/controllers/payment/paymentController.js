@@ -49,23 +49,29 @@ const processPayment = async (req, res) => {
     // Simulate payment processing delay
     await new Promise(resolve => setTimeout(resolve, 1500));
 
-    // Create payment record (SIMULATED - no real money transfer)
+    // Determine payment status based on method
+    const paymentStatus = paymentMethod === 'clinic_visit' ? 'pending' : 'paid';
+    const appointmentPaymentStatus = paymentMethod === 'clinic_visit' ? 'pending' : 'paid';
+
+    // Create payment record
     const payment = new Payment({
       appointment: appointmentId,
       patient: appointment.patient._id,
       doctor: appointment.doctor._id,
-      amount: appointment.consultationFee || 2000, // Use fee set by doctor
+      amount: appointment.consultationFee || 2000,
       currency: 'PKR',
       paymentMethod,
-      status: 'paid', // Simulated success
+      status: paymentStatus,
       phoneNumber: phoneNumber || null,
-      description: `Online Consultation with Dr. ${appointment.doctor.name}`
+      description: paymentMethod === 'clinic_visit' 
+        ? `Clinic Payment - Dr. ${appointment.doctor.name}`
+        : `Online Consultation with Dr. ${appointment.doctor.name}`
     });
 
     await payment.save();
 
     // Update appointment with payment status
-    appointment.paymentStatus = 'paid';
+    appointment.paymentStatus = appointmentPaymentStatus;
     appointment.paymentId = payment._id;
     await appointment.save();
 
@@ -79,10 +85,15 @@ const processPayment = async (req, res) => {
     console.log(`   Transaction ID: ${payment.transactionId}`);
     console.log(`   Amount: PKR ${payment.amount}`);
     console.log(`   Method: ${paymentMethod}`);
+    console.log(`   Status: ${paymentStatus}`);
+
+    const successMessage = paymentMethod === 'clinic_visit' 
+      ? 'Payment record created. Please complete payment at clinic reception. Doctor will confirm once received.'
+      : 'Payment processed successfully (Simulated)';
 
     res.status(201).json({
       success: true,
-      message: 'Payment processed successfully (Simulated)',
+      message: successMessage,
       data: populatedPayment
     });
 
@@ -211,7 +222,7 @@ const getDoctorEarnings = async (req, res) => {
   try {
     const payments = await Payment.find({ 
       doctor: req.user.id,
-      status: { $in: ['paid', 'refund_requested'] }
+      status: { $in: ['pending', 'paid', 'refund_requested'] }
     })
       .populate('appointment')
       .populate('patient', 'name email')
@@ -306,11 +317,80 @@ const requestRefund = async (req, res) => {
   }
 };
 
+// @desc    Confirm clinic payment (Doctor only)
+// @route   PUT /api/payments/:paymentId/confirm
+// @access  Doctor only
+const confirmClinicPayment = async (req, res) => {
+  try {
+    const { paymentId } = req.params;
+
+    const payment = await Payment.findById(paymentId)
+      .populate('appointment')
+      .populate('patient', 'name email')
+      .populate('doctor', 'name email');
+
+    if (!payment) {
+      return res.status(404).json({
+        success: false,
+        message: 'Payment not found'
+      });
+    }
+
+    if (payment.doctor._id.toString() !== req.user.id) {
+      return res.status(403).json({
+        success: false,
+        message: 'You can only confirm payments for your own appointments'
+      });
+    }
+
+    if (payment.status !== 'pending') {
+      return res.status(400).json({
+        success: false,
+        message: `Payment is already ${payment.status}`
+      });
+    }
+
+    if (payment.paymentMethod !== 'clinic_visit') {
+      return res.status(400).json({
+        success: false,
+        message: 'Only clinic visit payments require confirmation'
+      });
+    }
+
+    payment.status = 'paid';
+    payment.confirmedBy = req.user.id;
+    payment.confirmedAt = new Date();
+    await payment.save();
+
+    const appointment = await Appointment.findById(payment.appointment);
+    if (appointment) {
+      appointment.paymentStatus = 'paid';
+      await appointment.save();
+    }
+
+    console.log(`✅ Clinic payment confirmed by doctor for payment ${paymentId}`);
+
+    res.status(200).json({
+      success: true,
+      message: 'Clinic payment confirmed successfully',
+      data: payment
+    });
+  } catch (error) {
+    console.error('Error confirming payment:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error confirming payment',
+      error: error.message
+    });
+  }
+};
+
 module.exports = {
   processPayment,
   getPaymentDetails,
   getPaymentByAppointment,
   getPatientPaymentHistory,
   getDoctorEarnings,
-  requestRefund
+  requestRefund,
+  confirmClinicPayment
 };

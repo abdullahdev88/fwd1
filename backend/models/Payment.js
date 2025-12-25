@@ -42,7 +42,8 @@ const paymentSchema = new mongoose.Schema({
       'paypal',
       'apple_pay',
       'google_pay',
-      'bank_transfer'
+      'bank_transfer',
+      'clinic_visit'
     ]
   },
   
@@ -86,6 +87,15 @@ const paymentSchema = new mongoose.Schema({
   },
   refundAmount: {
     type: Number
+  },
+  
+  // Clinic Payment Confirmation
+  confirmedBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User'
+  },
+  confirmedAt: {
+    type: Date
   },
   
   // Invoice Details

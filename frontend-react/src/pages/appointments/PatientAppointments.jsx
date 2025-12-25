@@ -136,6 +136,14 @@ const PatientAppointments = () => {
       );
     }
     
+    if (payment.status === 'pending') {
+      return (
+        <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-amber-100 text-amber-800">
+          🏥 Awaiting Clinic Confirmation
+        </span>
+      );
+    }
+    
     if (payment.status === 'paid') {
       return (
         <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
@@ -216,7 +224,7 @@ const PatientAppointments = () => {
             )}
           </div>
           <Link
-            to="/book-appointment"
+            to="/appointments/book"
             className="btn-primary"
           >
             + Book New Appointment
@@ -303,6 +311,7 @@ const PatientAppointments = () => {
                 {filteredAppointments.map((appointment) => {
                   const payment = paymentStatuses[appointment._id];
                   const needsPayment = appointment.status === 'approved' && !payment;
+                  const hasPendingPayment = payment && payment.status === 'pending';
                   const hasPaidPayment = payment && payment.status === 'paid';
                   
                   return (
@@ -346,21 +355,35 @@ const PatientAppointments = () => {
                             onClick={() => handlePayNow(appointment)}
                             className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md font-medium transition-colors"
                           >
-                            💳 Pay
+                            💳 Pay Now
                           </button>
                         )}
                         
+                        {hasPendingPayment && (
+                          <div className="text-amber-600 text-xs">
+                            <div className="flex items-center gap-1 mb-1">
+                              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
+                              </svg>
+                              <strong>Pending Clinic Confirmation</strong>
+                            </div>
+                            <p className="text-xs text-gray-500">
+                              Please complete payment at clinic
+                            </p>
+                          </div>
+                        )}
+                        
                         {hasPaidPayment && (
-                          <div className="flex flex-col space-y-2">
-                            <button
-                              onClick={() => handleDownloadInvoice(payment)}
-                              className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-xs font-medium transition-colors"
-                            >
-                              📄 Download Invoice
-                            </button>
-                            <span className="text-xs text-gray-500">
-                              Trans: {payment.transactionId.substring(0, 15)}...
-                            </span>
+                          <div className="flex flex-col items-center space-y-2">
+                            <div className="flex items-center gap-2 px-3 py-2 bg-emerald-500/10 border border-emerald-500/20 rounded-lg">
+                              <span className="text-2xl">✅</span>
+                              <div className="flex flex-col">
+                                <span className="text-sm font-semibold text-emerald-400">Payment Successful</span>
+                                <span className="text-xs text-[rgb(var(--text-secondary))]">
+                                  Trans: {payment.transactionId.substring(0, 15)}...
+                                </span>
+                              </div>
+                            </div>
                           </div>
                         )}
                         

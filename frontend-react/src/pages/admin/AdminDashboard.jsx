@@ -19,12 +19,21 @@ const ReportsSection = () => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    fetchReportsData();
+    // Initial load with loading spinner
+    fetchReportsData(true);
+
+    // Auto-refresh every 5 seconds without spinner
+    const interval = setInterval(() => {
+      fetchReportsData(false);
+    }, 5000);
+
+    return () => clearInterval(interval);
   }, []);
 
-  const fetchReportsData = async () => {
+  const fetchReportsData = async (showLoader = true) => {
     try {
-      setLoading(true);
+      if (showLoader) setLoading(true);
+      
       const token = localStorage.getItem('token');
       const headers = { Authorization: `Bearer ${token}` };
 
@@ -44,11 +53,13 @@ const ReportsSection = () => {
         patients: patientsRes.data.data || {},
         prescriptions: prescriptionsRes.data.data || {}
       });
+      
+      if (error) setError(null);
     } catch (error) {
       console.error('Error fetching reports data:', error);
       setError('Failed to load reports data');
     } finally {
-      setLoading(false);
+      if (showLoader) setLoading(false);
     }
   };
 
@@ -336,6 +347,9 @@ const AdminDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('overview');
   
+  // Payment statistics state
+  const [paymentStats, setPaymentStats] = useState(null);
+  
   // Prescription state
   const [selectedPrescription, setSelectedPrescription] = useState(null);
   const [deleteMessage, setDeleteMessage] = useState('');
@@ -353,6 +367,7 @@ const AdminDashboard = () => {
     fetchPendingDoctors();
     fetchAppointmentLogs();
     fetchAllUsers();
+    fetchPaymentStats();
   }, []);
 
   // Filter appointments based on search query
@@ -462,6 +477,20 @@ const AdminDashboard = () => {
       }
     } catch (error) {
       console.error('Error fetching users:', error);
+    }
+  };
+
+  const fetchPaymentStats = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await axios.get('http://localhost:5000/api/payments/statistics', {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (response.data.success) {
+        setPaymentStats(response.data.data);
+      }
+    } catch (error) {
+      console.error('Error fetching payment stats:', error);
     }
   };
 
@@ -653,6 +682,25 @@ const AdminDashboard = () => {
                 <p className="text-sm text-[rgb(var(--text-secondary))] mb-4">
                   Monitor patient payments, process refunds, and view transaction history
                 </p>
+                
+                {/* Payment Stats Summary */}
+                {paymentStats && (
+                  <div className="bg-[rgb(var(--bg-tertiary))] rounded-lg p-3 mb-4 space-y-2">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-[rgb(var(--text-secondary))]">Total Paid:</span>
+                      <span className="font-semibold text-emerald-400">PKR {paymentStats.totalEarnings?.toLocaleString() || 0}</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-[rgb(var(--text-secondary))]">Pending:</span>
+                      <span className="font-semibold text-amber-400">{paymentStats.totalPending || 0} payments</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-[rgb(var(--text-secondary))]">Refund Requests:</span>
+                      <span className="font-semibold text-orange-400">{paymentStats.totalRefundRequests || 0}</span>
+                    </div>
+                  </div>
+                )}
+                
                 <button
                   onClick={() => navigate('/admin/payments')}
                   className="btn-primary w-full"
