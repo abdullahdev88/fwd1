@@ -27,9 +27,9 @@ app.use((req, res, next) => {
 const connectDB = async () => {
   try {
     await mongoose.connect(process.env.MONGODB_URI);
-    console.log('✅ MongoDB Connected Successfully');
+    console.log('MongoDB Connected Successfully');
   } catch (error) {
-    console.error('❌ MongoDB Connection Error:', error.message);
+    console.error('MongoDB Connection Error:', error.message);
     process.exit(1);
   }
 };
@@ -97,13 +97,13 @@ const PORT = process.env.PORT || 5000;
 // Connect to MongoDB and start server
 connectDB().then(() => {
   app.listen(PORT, () => {
-    console.log(`🚀 Server running on port ${PORT}`);
-    console.log(`📍 API URL: http://localhost:${PORT}`);
+    console.log(`Server running on port ${PORT}`);
+    console.log(`API URL: http://localhost:${PORT}`);
     
     // Start appointment reminder scheduler
     startReminderScheduler();
   });
 }).catch((error) => {
-  console.error('❌ Failed to connect to database:', error);
+  console.error('Failed to connect to database:', error);
   process.exit(1);
 });

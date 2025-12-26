@@ -12,9 +12,19 @@ const CreateMedicalRecord = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(false);
+  
+  // Patient search state
+  const [patientSearchQuery, setPatientSearchQuery] = useState('');
+  const [patientSearchResults, setPatientSearchResults] = useState([]);
+  const [selectedPatient, setSelectedPatient] = useState(null);
+  const [searchingPatients, setSearchingPatients] = useState(false);
+  const [showPatientDropdown, setShowPatientDropdown] = useState(false);
+  
+  // Appointments state
+  const [appointments, setAppointments] = useState([]);
+  const [loadingAppointments, setLoadingAppointments] = useState(false);
 
   const [formData, setFormData] = useState({
-    patientId: '',
     appointmentId: '',
     diagnosis: '',
     symptoms: '',
@@ -38,6 +48,70 @@ const CreateMedicalRecord = () => {
       navigate('/');
     }
   }, [user, navigate]);
+  
+  // Load doctor's appointments on component mount
+  useEffect(() => {
+    if (user && user.role === 'doctor') {
+      loadDoctorAppointments();
+    }
+  }, [user]);
+  
+  // Load doctor's appointments
+  const loadDoctorAppointments = async () => {
+    setLoadingAppointments(true);
+    try {
+      const response = await medicalRecordsAPI.getDoctorAppointments();
+      setAppointments(response.data.data || []);
+    } catch (err) {
+      console.error('Error loading appointments:', err);
+    } finally {
+      setLoadingAppointments(false);
+    }
+  };
+  
+  // Search for patients
+  const handlePatientSearch = async (query) => {
+    setPatientSearchQuery(query);
+    
+    if (query.length < 2) {
+      setPatientSearchResults([]);
+      setShowPatientDropdown(false);
+      return;
+    }
+    
+    setSearchingPatients(true);
+    try {
+      const response = await medicalRecordsAPI.searchPatients(query);
+      setPatientSearchResults(response.data.data || []);
+      setShowPatientDropdown(true);
+    } catch (err) {
+      console.error('Error searching patients:', err);
+      setPatientSearchResults([]);
+    } finally {
+      setSearchingPatients(false);
+    }
+  };
+  
+  // Select a patient from search results
+  const handleSelectPatient = (patient) => {
+    setSelectedPatient(patient);
+    setPatientSearchQuery(patient.name);
+    setShowPatientDropdown(false);
+    setPatientSearchResults([]);
+  };
+  
+  // Handle appointment selection
+  const handleAppointmentSelect = (appointmentId) => {
+    const appointment = appointments.find(a => a._id === appointmentId);
+    if (appointment && appointment.patient) {
+      setSelectedPatient(appointment.patient);
+      setPatientSearchQuery(appointment.patient.name);
+      setFormData(prev => ({
+        ...prev,
+        appointmentId: appointmentId
+      }));
+    }
+  };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -79,6 +153,13 @@ const CreateMedicalRecord = () => {
     setLoading(true);
     setError(null);
     setSuccess(false);
+    
+    // Validate patient selection
+    if (!selectedPatient && !formData.appointmentId) {
+      setError('Please select a patient or appointment');
+      setLoading(false);
+      return;
+    }
 
     try {
       // Clean up vital signs data
@@ -96,6 +177,8 @@ const CreateMedicalRecord = () => {
 
       const submitData = {
         ...formData,
+        // Use patientEmail to identify patient (backend will handle mapping to _id)
+        patientEmail: selectedPatient?.email,
         vitalSigns: cleanedVitalSigns,
         appointmentId: formData.appointmentId || undefined,
         followUpDate: formData.followUpDate || undefined
@@ -106,7 +189,6 @@ const CreateMedicalRecord = () => {
       
       // Reset form
       setFormData({
-        patientId: '',
         appointmentId: '',
         diagnosis: '',
         symptoms: '',
@@ -123,6 +205,8 @@ const CreateMedicalRecord = () => {
         labResults: '',
         followUpDate: ''
       });
+      setSelectedPatient(null);
+      setPatientSearchQuery('');
 
       // Redirect after 2 seconds
       setTimeout(() => {
@@ -162,33 +246,102 @@ const CreateMedicalRecord = () => {
         <div className="card">
           <h2 className="text-xl font-semibold text-[rgb(var(--text-heading))] mb-4">Patient Information</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
+            {/* Appointment Selection */}
+            <div className="md:col-span-2">
               <label className="label">
-                Patient ID *
+                Select from Your Appointments (Recommended)
               </label>
-              <input
-                type="text"
-                name="patientId"
-                value={formData.patientId}
-                onChange={handleInputChange}
-                className="input-field"
-                placeholder="Enter patient's MongoDB ID"
-                required
-              />
-            </div>
-            
-            <div>
-              <label className="label">
-                Appointment ID (Optional)
-              </label>
-              <input
-                type="text"
+              <select
                 name="appointmentId"
                 value={formData.appointmentId}
-                onChange={handleInputChange}
+                onChange={(e) => handleAppointmentSelect(e.target.value)}
                 className="input-field"
-                placeholder="Enter appointment ID if applicable"
-              />
+              >
+                <option value="">-- Select an appointment --</option>
+                {loadingAppointments ? (
+                  <option>Loading appointments...</option>
+                ) : (
+                  appointments.map(apt => (
+                    <option key={apt._id} value={apt._id}>
+                      {apt.patient?.name} - {new Date(apt.appointmentDate).toLocaleDateString()} at {apt.startTime}
+                    </option>
+                  ))
+                )}
+              </select>
+              <p className="text-sm text-[rgb(var(--text-secondary))] mt-1">
+                Selecting an appointment automatically fills the patient information
+              </p>
+            </div>
+            
+            {/* Patient Search */}
+            <div className="md:col-span-2">
+              <label className="label">
+                Or Search Patient by Name, Email, or Phone *
+              </label>
+              <div className="relative">
+                <input
+                  type="text"
+                  value={patientSearchQuery}
+                  onChange={(e) => handlePatientSearch(e.target.value)}
+                  onFocus={() => patientSearchResults.length > 0 && setShowPatientDropdown(true)}
+                  className="input-field"
+                  placeholder="Type to search for a patient..."
+                  disabled={!!formData.appointmentId}
+                />
+                
+                {searchingPatients && (
+                  <div className="absolute right-3 top-3">
+                    <div className="animate-spin h-5 w-5 border-2 border-blue-500 border-t-transparent rounded-full"></div>
+                  </div>
+                )}
+                
+                {/* Search Results Dropdown */}
+                {showPatientDropdown && patientSearchResults.length > 0 && (
+                  <div className="absolute z-10 w-full mt-1 bg-[rgb(var(--bg-secondary))] border border-[rgb(var(--border))] rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                    {patientSearchResults.map(patient => (
+                      <button
+                        key={patient._id}
+                        type="button"
+                        onClick={() => handleSelectPatient(patient)}
+                        className="w-full text-left px-4 py-3 hover:bg-[rgb(var(--bg-tertiary))] border-b border-[rgb(var(--border))] last:border-b-0"
+                      >
+                        <div className="font-medium text-[rgb(var(--text-heading))]">{patient.name}</div>
+                        <div className="text-sm text-[rgb(var(--text-secondary))]">{patient.email}</div>
+                        {patient.phone && (
+                          <div className="text-sm text-[rgb(var(--text-secondary))]">{patient.phone}</div>
+                        )}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+              
+              {/* Selected Patient Display */}
+              {selectedPatient && (
+                <div className="mt-3 p-3 bg-emerald-500/10 border border-emerald-500/20 rounded-lg">
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <p className="font-medium text-emerald-400">Selected Patient:</p>
+                      <p className="text-[rgb(var(--text-primary))]">{selectedPatient.name}</p>
+                      <p className="text-sm text-[rgb(var(--text-secondary))]">{selectedPatient.email}</p>
+                      {selectedPatient.phone && (
+                        <p className="text-sm text-[rgb(var(--text-secondary))]">{selectedPatient.phone}</p>
+                      )}
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSelectedPatient(null);
+                        setPatientSearchQuery('');
+                        setFormData(prev => ({ ...prev, appointmentId: '' }));
+                      }}
+                      className="text-red-400 hover:text-red-300"
+                    >
+                      Clear
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>

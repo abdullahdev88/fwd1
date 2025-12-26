@@ -45,15 +45,20 @@ export const AuthProvider = ({ children }) => {
       const data = await response.json();
       
       if (response.ok && data.success) {
-        return { success: true, message: data.message || 'Account created successfully!' };
+        return { 
+          success: true, 
+          message: data.message || 'Account created successfully!',
+          requiresApproval: data.requiresApproval || false
+        };
       }
       
       throw new Error(data.message || 'Signup failed');
     } catch (error) {
-      console.error('❌ Signup error:', error);
+      console.error('Signup error:', error);
       const message = error.message === 'Failed to fetch' 
         ? 'Cannot connect to server. Please ensure the backend is running.'
         : error.message;
+      setError(message);
       return { success: false, message };
     } finally {
       setLoading(false);

@@ -112,7 +112,13 @@ export const medicalRecordsAPI = {
   updateRecord: (recordId, data) => api.put(`/medical-records/${recordId}`, data),
   
   // Delete medical record (Admin only)
-  deleteRecord: (recordId) => api.delete(`/medical-records/${recordId}`)
+  deleteRecord: (recordId) => api.delete(`/medical-records/${recordId}`),
+  
+  // Search patients by name, email, or phone (Doctor only)
+  searchPatients: (query) => api.get(`/medical-records/search/patients?query=${encodeURIComponent(query)}`),
+  
+  // Get doctor's appointments with patient details (Doctor only)
+  getDoctorAppointments: () => api.get('/medical-records/doctor/appointments')
 };
 
 // Patient API calls

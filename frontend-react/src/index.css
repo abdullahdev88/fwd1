@@ -92,8 +92,8 @@
   /* Input Fields - Clear & Accessible */
   .input-field {
     @apply w-full px-4 py-2.5 rounded-lg transition-all;
-    @apply bg-[rgb(var(--bg-tertiary))] border-2 border-[rgb(var(--border-color))];
-    @apply text-[rgb(var(--text-primary))] placeholder-[rgb(var(--text-secondary))];
+    @apply bg-white dark:bg-gray-700 border-2 border-gray-300 dark:border-gray-600;
+    @apply text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400;
     @apply focus:border-[rgb(var(--accent))] focus:ring-2 focus:ring-blue-500/20;
     @apply outline-none;
   }

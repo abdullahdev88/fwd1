@@ -4,7 +4,6 @@ import { useAuth } from '../../context/AuthContext'
 import Button from '../../components/common/Button'
 import Input from '../../components/common/Input'
 import ErrorMessage from '../../components/common/ErrorMessage'
-import ThemeToggle from '../../components/common/ThemeToggle'
 
 const Login = () => {
   const [formData, setFormData] = useState({
@@ -122,8 +121,6 @@ const Login = () => {
       <div className="absolute top-0 left-0 w-96 h-96 bg-blue-300 dark:bg-blue-900 rounded-full mix-blend-multiply dark:mix-blend-soft-light filter blur-3xl opacity-30 animate-blob"></div>
       <div className="absolute top-0 right-0 w-96 h-96 bg-purple-300 dark:bg-purple-900 rounded-full mix-blend-multiply dark:mix-blend-soft-light filter blur-3xl opacity-30 animate-blob animation-delay-2000"></div>
       <div className="absolute bottom-0 left-1/2 w-96 h-96 bg-pink-300 dark:bg-pink-900 rounded-full mix-blend-multiply dark:mix-blend-soft-light filter blur-3xl opacity-30 animate-blob animation-delay-4000"></div>
-      
-      <ThemeToggle />
       
       <div className="max-w-md w-full space-y-8 relative z-10">
         {/* Glass morphism card */}

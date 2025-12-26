@@ -45,13 +45,13 @@ const MedicalRecordDetail = () => {
 
   const getStatusBadge = (status) => {
     const statusStyles = {
-      active: 'bg-green-100 text-green-800',
-      completed: 'bg-blue-100 text-blue-800',
-      cancelled: 'bg-red-100 text-red-800'
+      active: 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400 border border-green-200 dark:border-green-800',
+      completed: 'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-400 border border-blue-200 dark:border-blue-800',
+      cancelled: 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-400 border border-red-200 dark:border-red-800'
     };
 
     return (
-      <span className={`px-3 py-1 text-sm font-medium rounded-full ${statusStyles[status] || 'bg-gray-100 text-gray-800'}`}>
+      <span className={`px-3 py-1 text-sm font-medium rounded-full ${statusStyles[status] || 'bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-300'}`}>
         {status.charAt(0).toUpperCase() + status.slice(1)}
       </span>
     );
@@ -81,12 +81,12 @@ const MedicalRecordDetail = () => {
   return (
     <div className="max-w-4xl mx-auto p-6">
       {/* Header */}
-      <div className="bg-white shadow rounded-lg mb-6">
-        <div className="px-6 py-4 border-b border-gray-200">
+      <div className="bg-white dark:bg-gray-800 shadow dark:shadow-gray-900/50 rounded-lg mb-6 border border-gray-200 dark:border-gray-700">
+        <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
           <div className="flex justify-between items-start">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">Medical Record Details</h1>
-              <p className="text-sm text-gray-500 mt-1">
+              <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Medical Record Details</h1>
+              <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
                 Created on {new Date(record.createdAt).toLocaleDateString()} at{' '}
                 {new Date(record.createdAt).toLocaleTimeString()}
               </p>
@@ -97,7 +97,7 @@ const MedicalRecordDetail = () => {
               {user.role === 'doctor' && (
                 <Link
                   to={`/medical-records/${record._id}/edit`}
-                  className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium"
+                  className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors"
                 >
                   Edit Record
                 </Link>
@@ -106,7 +106,7 @@ const MedicalRecordDetail = () => {
               {user.role === 'admin' && (
                 <button
                   onClick={handleDelete}
-                  className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md text-sm font-medium"
+                  className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors"
                 >
                   Delete
                 </button>
@@ -118,36 +118,36 @@ const MedicalRecordDetail = () => {
 
       {/* Patient & Doctor Info */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-        <div className="bg-blue-50 rounded-lg p-6">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">Patient Information</h2>
+        <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-6 border border-blue-100 dark:border-blue-800">
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Patient Information</h2>
           <div className="space-y-2">
             <div className="flex items-center">
-              <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
-                <span className="text-sm font-medium text-blue-600">
+              <div className="h-10 w-10 rounded-full bg-blue-100 dark:bg-blue-800 flex items-center justify-center">
+                <span className="text-sm font-medium text-blue-600 dark:text-blue-300">
                   {record.patient?.name?.charAt(0)}
                 </span>
               </div>
               <div className="ml-3">
-                <p className="font-medium text-gray-900">{record.patient?.name}</p>
-                <p className="text-sm text-gray-500">{record.patient?.email}</p>
+                <p className="font-medium text-gray-900 dark:text-white">{record.patient?.name}</p>
+                <p className="text-sm text-gray-500 dark:text-gray-400">{record.patient?.email}</p>
                 {record.patient?.phone && (
-                  <p className="text-sm text-gray-500">{record.patient.phone}</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">{record.patient.phone}</p>
                 )}
               </div>
             </div>
           </div>
         </div>
 
-        <div className="bg-green-50 rounded-lg p-6">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">Doctor Information</h2>
+        <div className="bg-green-50 dark:bg-green-900/20 rounded-lg p-6 border border-green-100 dark:border-green-800">
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Doctor Information</h2>
           <div className="space-y-2">
             <div className="flex items-center">
-              <div className="h-10 w-10 rounded-full bg-green-100 flex items-center justify-center">
-                <span className="text-sm font-medium text-green-600">Dr</span>
+              <div className="h-10 w-10 rounded-full bg-green-100 dark:bg-green-800 flex items-center justify-center">
+                <span className="text-sm font-medium text-green-600 dark:text-green-300">Dr</span>
               </div>
               <div className="ml-3">
-                <p className="font-medium text-gray-900">{record.doctor?.name}</p>
-                <p className="text-sm text-gray-500">{record.doctor?.specialization}</p>
+                <p className="font-medium text-gray-900 dark:text-white">{record.doctor?.name}</p>
+                <p className="text-sm text-gray-500 dark:text-gray-400">{record.doctor?.specialization}</p>
               </div>
             </div>
           </div>
@@ -155,18 +155,18 @@ const MedicalRecordDetail = () => {
       </div>
 
       {/* Medical Information */}
-      <div className="bg-white shadow rounded-lg mb-6">
-        <div className="px-6 py-4 border-b border-gray-200">
-          <h2 className="text-lg font-semibold text-gray-900">Medical Information</h2>
+      <div className="bg-white dark:bg-gray-800 shadow dark:shadow-gray-900/50 rounded-lg mb-6 border border-gray-200 dark:border-gray-700">
+        <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Medical Information</h2>
         </div>
         <div className="p-6 space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <h3 className="text-sm font-medium text-gray-500 mb-2">Diagnosis</h3>
-              <p className="text-gray-900 bg-red-50 p-3 rounded-md">{record.diagnosis}</p>
+              <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">Diagnosis</h3>
+              <p className="text-gray-900 dark:text-gray-100 bg-red-50 dark:bg-red-900/20 p-3 rounded-md border border-red-100 dark:border-red-800">{record.diagnosis}</p>
             </div>
             <div>
-              <h3 className="text-sm font-medium text-gray-500 mb-2">Status</h3>
+              <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">Status</h3>
               <div className="flex items-center">
                 {getStatusBadge(record.status)}
               </div>
@@ -174,23 +174,23 @@ const MedicalRecordDetail = () => {
           </div>
 
           <div>
-            <h3 className="text-sm font-medium text-gray-500 mb-2">Symptoms</h3>
-            <p className="text-gray-900 bg-orange-50 p-4 rounded-md whitespace-pre-wrap">
+            <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">Symptoms</h3>
+            <p className="text-gray-900 dark:text-gray-100 bg-orange-50 dark:bg-orange-900/20 p-4 rounded-md whitespace-pre-wrap border border-orange-100 dark:border-orange-800">
               {record.symptoms}
             </p>
           </div>
 
           <div>
-            <h3 className="text-sm font-medium text-gray-500 mb-2">Treatment Plan</h3>
-            <p className="text-gray-900 bg-blue-50 p-4 rounded-md whitespace-pre-wrap">
+            <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">Treatment Plan</h3>
+            <p className="text-gray-900 dark:text-gray-100 bg-blue-50 dark:bg-blue-900/20 p-4 rounded-md whitespace-pre-wrap border border-blue-100 dark:border-blue-800">
               {record.treatmentPlan}
             </p>
           </div>
 
           {record.prescription && (
             <div>
-              <h3 className="text-sm font-medium text-gray-500 mb-2">Prescription</h3>
-              <p className="text-gray-900 bg-green-50 p-4 rounded-md whitespace-pre-wrap">
+              <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">Prescription</h3>
+              <p className="text-gray-900 dark:text-gray-100 bg-green-50 dark:bg-green-900/20 p-4 rounded-md whitespace-pre-wrap border border-green-100 dark:border-green-800">
                 {record.prescription}
               </p>
             </div>
@@ -198,8 +198,8 @@ const MedicalRecordDetail = () => {
 
           {record.notes && (
             <div>
-              <h3 className="text-sm font-medium text-gray-500 mb-2">Additional Notes</h3>
-              <p className="text-gray-900 bg-gray-50 p-4 rounded-md whitespace-pre-wrap">
+              <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">Additional Notes</h3>
+              <p className="text-gray-900 dark:text-gray-100 bg-gray-50 dark:bg-gray-700 p-4 rounded-md whitespace-pre-wrap border border-gray-200 dark:border-gray-600">
                 {record.notes}
               </p>
             </div>
@@ -209,12 +209,12 @@ const MedicalRecordDetail = () => {
 
       {/* Vital Signs */}
       {record.vitalSigns && Object.keys(record.vitalSigns).length > 0 && (
-        <div className="bg-white shadow rounded-lg mb-6">
-          <div className="px-6 py-4 border-b border-gray-200">
-            <h2 className="text-lg font-semibold text-gray-900">Vital Signs</h2>
+        <div className="bg-white dark:bg-gray-800 shadow dark:shadow-gray-900/50 rounded-lg mb-6 border border-gray-200 dark:border-gray-700">
+          <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Vital Signs</h2>
           </div>
           <div className="p-6">
-            <p className="text-gray-900 bg-yellow-50 p-4 rounded-md">
+            <p className="text-gray-900 dark:text-gray-100 bg-yellow-50 dark:bg-yellow-900/20 p-4 rounded-md border border-yellow-100 dark:border-yellow-800">
               {formatVitalSigns(record.vitalSigns)}
             </p>
           </div>
@@ -223,12 +223,12 @@ const MedicalRecordDetail = () => {
 
       {/* Lab Results */}
       {record.labResults && (
-        <div className="bg-white shadow rounded-lg mb-6">
-          <div className="px-6 py-4 border-b border-gray-200">
-            <h2 className="text-lg font-semibold text-gray-900">Lab Results</h2>
+        <div className="bg-white dark:bg-gray-800 shadow dark:shadow-gray-900/50 rounded-lg mb-6 border border-gray-200 dark:border-gray-700">
+          <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Lab Results</h2>
           </div>
           <div className="p-6">
-            <p className="text-gray-900 bg-purple-50 p-4 rounded-md whitespace-pre-wrap">
+            <p className="text-gray-900 dark:text-gray-100 bg-purple-50 dark:bg-purple-900/20 p-4 rounded-md whitespace-pre-wrap border border-purple-100 dark:border-purple-800">
               {record.labResults}
             </p>
           </div>
@@ -238,26 +238,26 @@ const MedicalRecordDetail = () => {
       {/* Follow-up & Appointment Info */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
         {record.appointment && (
-          <div className="bg-white shadow rounded-lg">
-            <div className="px-6 py-4 border-b border-gray-200">
-              <h2 className="text-lg font-semibold text-gray-900">Related Appointment</h2>
+          <div className="bg-white dark:bg-gray-800 shadow dark:shadow-gray-900/50 rounded-lg border border-gray-200 dark:border-gray-700">
+            <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Related Appointment</h2>
             </div>
             <div className="p-6">
-              <p className="text-gray-900">
+              <p className="text-gray-900 dark:text-gray-100">
                 Date: {new Date(record.appointment.appointmentDate).toLocaleDateString()}
               </p>
-              <p className="text-gray-500 text-sm">Time: {record.appointment.startTime}</p>
+              <p className="text-gray-500 dark:text-gray-400 text-sm">Time: {record.appointment.startTime}</p>
             </div>
           </div>
         )}
 
         {record.followUpDate && (
-          <div className="bg-white shadow rounded-lg">
-            <div className="px-6 py-4 border-b border-gray-200">
-              <h2 className="text-lg font-semibold text-gray-900">Follow-up Date</h2>
+          <div className="bg-white dark:bg-gray-800 shadow dark:shadow-gray-900/50 rounded-lg border border-gray-200 dark:border-gray-700">
+            <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Follow-up Date</h2>
             </div>
             <div className="p-6">
-              <p className="text-gray-900 font-medium">
+              <p className="text-gray-900 dark:text-gray-100 font-medium">
                 {new Date(record.followUpDate).toLocaleDateString()}
               </p>
             </div>
@@ -269,7 +269,7 @@ const MedicalRecordDetail = () => {
       <div className="flex justify-start">
         <button
           onClick={() => navigate(-1)}
-          className="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-md"
+          className="bg-gray-500 hover:bg-gray-600 dark:bg-gray-700 dark:hover:bg-gray-600 text-white px-4 py-2 rounded-md transition-colors"
         >
           ← Back
         </button>
