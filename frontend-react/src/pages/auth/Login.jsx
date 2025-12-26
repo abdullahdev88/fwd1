@@ -145,18 +145,18 @@ const Login = () => {
 
         {/* Show signup success message */}
         {location.state?.message && (
-          <div className="rounded-md bg-green-50 p-4">
-            <p className="text-sm text-green-800">{location.state.message}</p>
+          <div className="rounded-md bg-green-50 dark:bg-green-900/30 p-4 mb-6">
+            <p className="text-sm text-green-800 dark:text-green-200">{location.state.message}</p>
           </div>
         )}
         
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
+        <form className="mt-6 space-y-5" onSubmit={handleSubmit}>
+          <ErrorMessage 
+            message={error} 
+            onClose={() => setError('')}
+          />
+          
           <div className="space-y-4">
-            <ErrorMessage 
-              message={error} 
-              onClose={() => setError('')}
-            />
-            
             <Input
               label="Email address"
               name="email"
@@ -189,13 +189,6 @@ const Login = () => {
           >
             {loading ? 'Signing in...' : 'Sign in'}
           </Button>
-
-          {/* Admin credentials help */}
-          <div className="text-center">
-            <p className="text-xs text-gray-500 dark:text-gray-200 mt-4">
-              Admin Login: admin@hospital.com / admin123456
-            </p>
-          </div>
         </form>
         </div>
       </div>

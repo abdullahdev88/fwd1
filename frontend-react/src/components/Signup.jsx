@@ -41,8 +41,11 @@ const Signup = () => {
       return;
     }
 
-    if (formData.password.length < 6) {
-      setError('Password must be at least 6 characters');
+    // Strong password validation
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#])[A-Za-z\d@$!%*?&#]{8,}$/;
+    
+    if (!passwordRegex.test(formData.password)) {
+      setError('Password must be at least 8 characters and include: uppercase letter, lowercase letter, number, and special character (@$!%*?&#)');
       return;
     }
 
@@ -104,24 +107,24 @@ const Signup = () => {
       <div className="absolute top-0 right-0 w-96 h-96 bg-purple-300 dark:bg-purple-900 rounded-full mix-blend-multiply dark:mix-blend-soft-light filter blur-3xl opacity-30 animate-blob animation-delay-2000"></div>
       <div className="absolute bottom-0 left-1/2 w-96 h-96 bg-pink-300 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob animation-delay-4000"></div>
       
-      <div className="max-w-md w-full space-y-8 relative z-10">
+      <div className="max-w-md w-full space-y-6 relative z-10">
         {/* Glass morphism card */}
-        <div className="bg-white/70 backdrop-blur-lg rounded-2xl shadow-2xl p-8 border border-white/20">
+        <div className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-lg rounded-2xl shadow-2xl p-8 border border-white/20 dark:border-gray-700/50">
           <div>
-            <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
+            <h2 className="text-center text-3xl font-extrabold text-gray-900 dark:text-white">
               Create your account
             </h2>
           </div>
         
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
+        <form className="mt-6 space-y-5" onSubmit={handleSubmit}>
           {error && (
-            <div className="rounded-md bg-red-50 p-4">
-              <p className="text-sm text-red-800">{error}</p>
+            <div className="rounded-md bg-red-50 dark:bg-red-900/30 p-4">
+              <p className="text-sm text-red-800 dark:text-red-200">{error}</p>
             </div>
           )}
 
           {success && (
-            <div className="rounded-md bg-green-50 p-4">
+            <div className="rounded-md bg-green-50 dark:bg-green-900/30 p-4">
               <div className="flex">
                 <div className="flex-shrink-0">
                   <svg className="h-5 w-5 text-green-400" viewBox="0 0 20 20" fill="currentColor">
@@ -129,8 +132,8 @@ const Signup = () => {
                   </svg>
                 </div>
                 <div className="ml-3">
-                  <p className="text-sm text-green-800">{success}</p>
-                  <p className="text-xs text-green-600 mt-1">Redirecting to login page...</p>
+                  <p className="text-sm text-green-800 dark:text-green-200">{success}</p>
+                  <p className="text-xs text-green-600 dark:text-green-300 mt-1">Redirecting to login page...</p>
                 </div>
               </div>
             </div>
@@ -227,15 +230,20 @@ const Signup = () => {
               </>
             )}
 
-            <Input
-              label="Password"
-              name="password"
-              type="password"
-              required
-              value={formData.password}
-              onChange={handleChange}
-              placeholder="Enter password (min 6 characters)"
-            />
+            <div className="space-y-1">
+              <Input
+                label="Password"
+                name="password"
+                type="password"
+                required
+                value={formData.password}
+                onChange={handleChange}
+                placeholder="Enter strong password"
+              />
+              <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
+                Password must contain: 8+ characters, uppercase, lowercase, number, and special character (@$!%*?&#)
+              </p>
+            </div>
 
             <Input
               label="Confirm Password"

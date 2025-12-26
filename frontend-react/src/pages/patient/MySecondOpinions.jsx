@@ -67,27 +67,39 @@ const MySecondOpinions = () => {
 
   return (
     <div className="max-w-6xl mx-auto p-6">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold text-[rgb(var(--text-heading))]">My Second Opinion Requests</h1>
-        <Button
-          onClick={() => navigate('/patient/request-second-opinion')}
-          className="btn-primary"
-        >
-          + New Request
-        </Button>
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-[rgb(var(--text-heading))] mb-2">My Second Opinion Requests</h1>
+        <p className="text-[rgb(var(--text-secondary))]">View and track all your second opinion requests</p>
       </div>
 
       {error && <ErrorMessage message={error} />}
 
       {requests.length === 0 ? (
-        <div className="card p-12 text-center">
-          <p className="text-[rgb(var(--text-secondary))] text-lg mb-4">No second opinion requests yet</p>
-          <Button
-            onClick={() => navigate('/patient/request-second-opinion')}
-            className="btn-primary"
-          >
-            Request Second Opinion
-          </Button>
+        <div className="card p-16 text-center">
+          <div className="flex flex-col items-center space-y-6">
+            {/* Icon */}
+            <div className="w-24 h-24 bg-[rgb(var(--accent))]/10 rounded-full flex items-center justify-center">
+              <svg className="w-12 h-12 text-[rgb(var(--accent))]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+            </div>
+            
+            {/* Text */}
+            <div>
+              <h3 className="text-xl font-semibold text-[rgb(var(--text-heading))] mb-2">No second opinion requests yet</h3>
+              <p className="text-[rgb(var(--text-secondary))] max-w-md mx-auto">
+                Get expert medical opinions from our qualified specialists. Submit your first request to get started.
+              </p>
+            </div>
+            
+            {/* Action Button */}
+            <Button
+              onClick={() => navigate('/patient/request-second-opinion')}
+              className="btn-primary px-8 py-3 text-base"
+            >
+              Request Second Opinion
+            </Button>
+          </div>
         </div>
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -110,23 +122,23 @@ const MySecondOpinions = () => {
                       {request.priority.toUpperCase()}
                     </span>
                   </div>
-                  <span className="text-xs text-gray-500">
+                  <span className="text-xs text-[rgb(var(--text-secondary))]">
                     {new Date(request.requestDate).toLocaleDateString()}
                   </span>
                 </div>
 
-                <p className="font-semibold text-gray-800 mb-2">
+                <p className="font-semibold text-[rgb(var(--text-heading))] mb-2">
                   {request.chiefComplaint.substring(0, 100)}
                   {request.chiefComplaint.length > 100 && '...'}
                 </p>
 
                 {request.assignedDoctor && (
-                  <p className="text-sm text-gray-600 mb-2">
+                  <p className="text-sm text-[rgb(var(--text-secondary))] mb-2">
                     👨‍⚕️ Dr. {request.assignedDoctor.name} - {request.assignedDoctor.specialization}
                   </p>
                 )}
 
-                <div className="flex items-center gap-4 text-xs text-gray-500 mt-3">
+                <div className="flex items-center gap-4 text-xs text-[rgb(var(--text-secondary))] mt-3">
                   <span>📄 {request.medicalReports?.length || 0} reports</span>
                   <span>⏱️ {request.estimatedResponseTime}</span>
                 </div>
@@ -142,7 +154,7 @@ const MySecondOpinions = () => {
 
                 <div className="space-y-4">
                   <div>
-                    <label className="font-semibold text-gray-700">Status:</label>
+                    <label className="font-semibold text-[rgb(var(--text-primary))]">Status:</label>
                     <p className="mt-1">
                       <span className={`px-3 py-1 rounded-full text-sm font-semibold ${getStatusBadge(selectedRequest.status)}`}>
                         {selectedRequest.status.replace('_', ' ').toUpperCase()}
@@ -151,28 +163,28 @@ const MySecondOpinions = () => {
                   </div>
 
                   <div>
-                    <label className="font-semibold text-gray-700">Chief Complaint:</label>
-                    <p className="text-gray-600 mt-1">{selectedRequest.chiefComplaint}</p>
+                    <label className="font-semibold text-[rgb(var(--text-primary))]">Chief Complaint:</label>
+                    <p className="text-[rgb(var(--text-secondary))] mt-1">{selectedRequest.chiefComplaint}</p>
                   </div>
 
                   {selectedRequest.medicalHistory && (
                     <div>
-                      <label className="font-semibold text-gray-700">Medical History:</label>
-                      <p className="text-gray-600 mt-1">{selectedRequest.medicalHistory}</p>
+                      <label className="font-semibold text-[rgb(var(--text-primary))]">Medical History:</label>
+                      <p className="text-[rgb(var(--text-secondary))] mt-1">{selectedRequest.medicalHistory}</p>
                     </div>
                   )}
 
                   {selectedRequest.currentMedications && (
                     <div>
-                      <label className="font-semibold text-gray-700">Current Medications:</label>
-                      <p className="text-gray-600 mt-1">{selectedRequest.currentMedications}</p>
+                      <label className="font-semibold text-[rgb(var(--text-primary))]">Current Medications:</label>
+                      <p className="text-[rgb(var(--text-secondary))] mt-1">{selectedRequest.currentMedications}</p>
                     </div>
                   )}
 
                   {selectedRequest.assignedDoctor && (
                     <div>
-                      <label className="font-semibold text-gray-700">Assigned Doctor:</label>
-                      <p className="text-gray-600 mt-1">
+                      <label className="font-semibold text-[rgb(var(--text-primary))]">Assigned Doctor:</label>
+                      <p className="text-[rgb(var(--text-secondary))] mt-1">
                         Dr. {selectedRequest.assignedDoctor.name}<br />
                         {selectedRequest.assignedDoctor.specialization}
                       </p>
@@ -180,31 +192,31 @@ const MySecondOpinions = () => {
                   )}
 
                   {selectedRequest.doctorOpinion?.diagnosis && (
-                    <div className="bg-green-50 p-4 rounded-lg border border-green-200">
-                      <h3 className="font-bold text-green-800 mb-3">Doctor's Opinion</h3>
+                    <div className="bg-green-50 dark:bg-green-900/20 p-4 rounded-lg border border-green-200 dark:border-green-800">
+                      <h3 className="font-bold text-green-800 dark:text-green-400 mb-3">Doctor's Opinion</h3>
                       
                       <div className="space-y-3">
                         <div>
-                          <label className="font-semibold text-gray-700">Diagnosis:</label>
-                          <p className="text-gray-700 mt-1">{selectedRequest.doctorOpinion.diagnosis}</p>
+                          <label className="font-semibold text-[rgb(var(--text-primary))]">Diagnosis:</label>
+                          <p className="text-[rgb(var(--text-secondary))] mt-1">{selectedRequest.doctorOpinion.diagnosis}</p>
                         </div>
 
                         <div>
-                          <label className="font-semibold text-gray-700">Recommendations:</label>
-                          <p className="text-gray-700 mt-1">{selectedRequest.doctorOpinion.recommendations}</p>
+                          <label className="font-semibold text-[rgb(var(--text-primary))]">Recommendations:</label>
+                          <p className="text-[rgb(var(--text-secondary))] mt-1">{selectedRequest.doctorOpinion.recommendations}</p>
                         </div>
 
                         {selectedRequest.doctorOpinion.prescribedTreatment && (
                           <div>
-                            <label className="font-semibold text-gray-700">Prescribed Treatment:</label>
-                            <p className="text-gray-700 mt-1">{selectedRequest.doctorOpinion.prescribedTreatment}</p>
+                            <label className="font-semibold text-[rgb(var(--text-primary))]">Prescribed Treatment:</label>
+                            <p className="text-[rgb(var(--text-secondary))] mt-1">{selectedRequest.doctorOpinion.prescribedTreatment}</p>
                           </div>
                         )}
 
                         {selectedRequest.doctorOpinion.additionalNotes && (
                           <div>
-                            <label className="font-semibold text-gray-700">Additional Notes:</label>
-                            <p className="text-gray-700 mt-1">{selectedRequest.doctorOpinion.additionalNotes}</p>
+                            <label className="font-semibold text-[rgb(var(--text-primary))]">Additional Notes:</label>
+                            <p className="text-[rgb(var(--text-secondary))] mt-1">{selectedRequest.doctorOpinion.additionalNotes}</p>
                           </div>
                         )}
                       </div>
@@ -212,7 +224,7 @@ const MySecondOpinions = () => {
                   )}
 
                   <div>
-                    <label className="font-semibold text-gray-700 mb-2 block">Uploaded Reports:</label>
+                    <label className="font-semibold text-[rgb(var(--text-primary))] mb-2 block">Uploaded Reports:</label>
                     <div className="space-y-3">
                       {selectedRequest.medicalReports?.map((report, idx) => {
                         const fileSize = report.fileSize ? (report.fileSize / 1024).toFixed(2) : 'Unknown';
@@ -228,11 +240,11 @@ const MySecondOpinions = () => {
                                     href={`http://localhost:5000${report.fileUrl}`}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="text-blue-600 hover:text-blue-800 hover:underline font-medium block truncate"
+                                    className="text-[rgb(var(--accent))] hover:underline font-medium block truncate"
                                   >
                                     {report.fileName}
                                   </a>
-                                  <div className="text-xs text-gray-500 mt-1">
+                                  <div className="text-xs text-[rgb(var(--text-secondary))] mt-1">
                                     Type: {report.reportType} • Size: {fileSize} KB • {description}
                                   </div>
                                 </div>
@@ -240,7 +252,7 @@ const MySecondOpinions = () => {
                               <a
                                 href={`http://localhost:5000${report.fileUrl}`}
                                 download
-                                className="px-3 py-1 bg-blue-500 hover:bg-blue-600 text-white text-sm rounded transition-colors whitespace-nowrap"
+                                className="px-3 py-1 bg-[rgb(var(--accent))] hover:bg-blue-600 text-white text-sm rounded transition-colors whitespace-nowrap"
                               >
                                 Download
                               </a>
@@ -262,8 +274,8 @@ const MySecondOpinions = () => {
                 </div>
               </div>
             ) : (
-              <div className="bg-gray-50 rounded-lg p-12 text-center">
-                <p className="text-gray-500">Select a request to view details</p>
+              <div className="card p-12 text-center">
+                <p className="text-[rgb(var(--text-secondary))]">Select a request to view details</p>
               </div>
             )}
           </div>

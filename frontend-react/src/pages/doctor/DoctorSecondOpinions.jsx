@@ -110,7 +110,7 @@ const DoctorSecondOpinions = () => {
 
   return (
     <div className="max-w-7xl mx-auto p-6">
-      <h1 className="text-3xl font-bold mb-6 text-gray-800">Second Opinion Cases</h1>
+      <h1 className="text-3xl font-bold mb-6 text-[rgb(var(--text-heading))]">Second Opinion Cases</h1>
 
       {error && <ErrorMessage message={error} />}
 
@@ -120,8 +120,8 @@ const DoctorSecondOpinions = () => {
           onClick={() => setActiveTab('pending')}
           className={`px-6 py-3 rounded-lg font-semibold transition-colors ${
             activeTab === 'pending'
-              ? 'bg-blue-600 text-white'
-              : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+              ? 'bg-[rgb(var(--accent))] text-white'
+              : 'bg-[rgb(var(--bg-tertiary))] text-[rgb(var(--text-primary))] hover:bg-[rgb(var(--bg-secondary))]'
           }`}
         >
           Pending Requests ({pendingRequests.length})
@@ -130,8 +130,8 @@ const DoctorSecondOpinions = () => {
           onClick={() => setActiveTab('my-cases')}
           className={`px-6 py-3 rounded-lg font-semibold transition-colors ${
             activeTab === 'my-cases'
-              ? 'bg-blue-600 text-white'
-              : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+              ? 'bg-[rgb(var(--accent))] text-white'
+              : 'bg-[rgb(var(--bg-tertiary))] text-[rgb(var(--text-primary))] hover:bg-[rgb(var(--bg-secondary))]'
           }`}
         >
           My Cases ({myCases.length})
@@ -143,8 +143,8 @@ const DoctorSecondOpinions = () => {
         <div className="space-y-4">
           {activeTab === 'pending' ? (
             pendingRequests.length === 0 ? (
-              <div className="bg-white rounded-lg shadow p-8 text-center">
-                <p className="text-gray-500">No pending requests</p>
+              <div className="card p-8 text-center">
+                <p className="text-[rgb(var(--text-secondary))]">No pending requests</p>
               </div>
             ) : (
               pendingRequests.map((request) => (
@@ -153,13 +153,13 @@ const DoctorSecondOpinions = () => {
                     <span className={`px-3 py-1 rounded-full text-xs font-semibold ${getPriorityBadge(request.priority)}`}>
                       {request.priority.toUpperCase()}
                     </span>
-                    <span className="text-xs text-gray-500">
+                    <span className="text-xs text-[rgb(var(--text-secondary))]">
                       {new Date(request.requestDate).toLocaleDateString()}
                     </span>
                   </div>
 
-                  <p className="font-semibold text-gray-800 mb-2">{request.chiefComplaint.substring(0, 100)}...</p>
-                  <p className="text-sm text-gray-600 mb-3">
+                  <p className="font-semibold text-[rgb(var(--text-heading))] mb-2">{request.chiefComplaint.substring(0, 100)}...</p>
+                  <p className="text-sm text-[rgb(var(--text-secondary))] mb-3">
                     Patient: {request.patient?.name} • {request.medicalReports?.length || 0} reports
                   </p>
 
@@ -174,8 +174,8 @@ const DoctorSecondOpinions = () => {
             )
           ) : (
             myCases.length === 0 ? (
-              <div className="bg-white rounded-lg shadow p-8 text-center">
-                <p className="text-gray-500">No assigned cases</p>
+              <div className="card p-8 text-center">
+                <p className="text-[rgb(var(--text-secondary))]">No assigned cases</p>
               </div>
             ) : (
               myCases.map((caseItem) => (
@@ -190,13 +190,13 @@ const DoctorSecondOpinions = () => {
                     <span className={`px-3 py-1 rounded-full text-xs font-semibold ${getStatusBadge(caseItem.status)}`}>
                       {caseItem.status.replace('_', ' ').toUpperCase()}
                     </span>
-                    <span className="text-xs text-gray-500">
+                    <span className="text-xs text-[rgb(var(--text-secondary))]">
                       {new Date(caseItem.requestDate).toLocaleDateString()}
                     </span>
                   </div>
 
-                  <p className="font-semibold text-gray-800 mb-2">{caseItem.chiefComplaint.substring(0, 100)}...</p>
-                  <p className="text-sm text-gray-600">Patient: {caseItem.patient?.name}</p>
+                  <p className="font-semibold text-[rgb(var(--text-heading))] mb-2">{caseItem.chiefComplaint.substring(0, 100)}...</p>
+                  <p className="text-sm text-[rgb(var(--text-secondary))]">Patient: {caseItem.patient?.name}</p>
                 </div>
               ))
             )
@@ -274,7 +274,7 @@ const DoctorSecondOpinions = () => {
                 <h2 className="text-2xl font-bold mb-4 text-[rgb(var(--text-heading))]">Case Details</h2>
                 <div className="space-y-4">
                   <div>
-                    <label className="font-semibold">Status:</label>
+                    <label className="font-semibold text-[rgb(var(--text-primary))]">Status:</label>
                     <p className="mt-1">
                       <span className={`px-3 py-1 rounded-full text-sm ${getStatusBadge(selectedCase.status)}`}>
                         {selectedCase.status.replace('_', ' ').toUpperCase()}
@@ -283,38 +283,38 @@ const DoctorSecondOpinions = () => {
                   </div>
 
                   <div>
-                    <label className="font-semibold">Patient:</label>
-                    <p className="text-gray-700 mt-1">{selectedCase.patient?.name}</p>
+                    <label className="font-semibold text-[rgb(var(--text-primary))]">Patient:</label>
+                    <p className="text-[rgb(var(--text-secondary))] mt-1">{selectedCase.patient?.name}</p>
                   </div>
 
                   <div>
-                    <label className="font-semibold">Chief Complaint:</label>
-                    <p className="text-gray-700 mt-1">{selectedCase.chiefComplaint}</p>
+                    <label className="font-semibold text-[rgb(var(--text-primary))]">Chief Complaint:</label>
+                    <p className="text-[rgb(var(--text-secondary))] mt-1">{selectedCase.chiefComplaint}</p>
                   </div>
 
                   {selectedCase.medicalHistory && (
                     <div>
-                      <label className="font-semibold">Medical History:</label>
-                      <p className="text-gray-700 mt-1">{selectedCase.medicalHistory}</p>
+                      <label className="font-semibold text-[rgb(var(--text-primary))]">Medical History:</label>
+                      <p className="text-[rgb(var(--text-secondary))] mt-1">{selectedCase.medicalHistory}</p>
                     </div>
                   )}
 
                   {selectedCase.currentMedications && (
                     <div>
-                      <label className="font-semibold">Current Medications:</label>
-                      <p className="text-gray-700 mt-1">{selectedCase.currentMedications}</p>
+                      <label className="font-semibold text-[rgb(var(--text-primary))]">Current Medications:</label>
+                      <p className="text-[rgb(var(--text-secondary))] mt-1">{selectedCase.currentMedications}</p>
                     </div>
                   )}
 
                   {selectedCase.allergies && (
                     <div>
-                      <label className="font-semibold">Allergies:</label>
-                      <p className="text-gray-700 mt-1">{selectedCase.allergies}</p>
+                      <label className="font-semibold text-[rgb(var(--text-primary))]">Allergies:</label>
+                      <p className="text-[rgb(var(--text-secondary))] mt-1">{selectedCase.allergies}</p>
                     </div>
                   )}
 
                   <div>
-                    <label className="font-semibold mb-2 block">Medical Reports:</label>
+                    <label className="font-semibold text-[rgb(var(--text-primary))] mb-2 block">Medical Reports:</label>
                     <div className="space-y-2">
                       {selectedCase.medicalReports?.map((report, idx) => (
                         <div key={idx} className="flex items-center gap-2 bg-[rgb(var(--bg-tertiary))] p-3 rounded hover:bg-[rgb(var(--bg-secondary))] transition-colors">
@@ -324,7 +324,7 @@ const DoctorSecondOpinions = () => {
                               href={`http://localhost:5000${report.fileUrl}`}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="text-blue-600 hover:text-blue-800 hover:underline font-medium"
+                              className="text-[rgb(var(--accent))] hover:underline font-medium"
                             >
                               {report.fileName}
                             </a>
@@ -366,8 +366,8 @@ const DoctorSecondOpinions = () => {
               </div>
             )
           ) : (
-            <div className="bg-gray-50 rounded-lg p-12 text-center">
-              <p className="text-gray-500">Select a case to view details</p>
+            <div className="card p-12 text-center">
+              <p className="text-[rgb(var(--text-secondary))]">Select a case to view details</p>
             </div>
           )}
         </div>
