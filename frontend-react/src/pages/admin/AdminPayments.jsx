@@ -7,12 +7,14 @@ import ErrorMessage from '../../components/common/ErrorMessage';
 const AdminPayments = () => {
   const { user } = useAuth();
   const [payments, setPayments] = useState([]);
+  const [filteredPayments, setFilteredPayments] = useState([]);
   const [refundRequests, setRefundRequests] = useState([]);
   const [statistics, setStatistics] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [activeTab, setActiveTab] = useState('all');
   const [statusFilter, setStatusFilter] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
   const [processingRefund, setProcessingRefund] = useState({});
 
   useEffect(() => {
@@ -20,6 +22,30 @@ const AdminPayments = () => {
       fetchData();
     }
   }, [user, statusFilter]);
+
+  useEffect(() => {
+    if (!searchQuery.trim()) {
+      setFilteredPayments(payments);
+    } else {
+      const query = searchQuery.toLowerCase();
+      const filtered = payments.filter(payment => {
+        const patientName = payment.patient?.name?.toLowerCase() || '';
+        const patientEmail = payment.patient?.email?.toLowerCase() || '';
+        const doctorName = payment.doctor?.name?.toLowerCase() || '';
+        const transactionId = payment.transactionId?.toLowerCase() || '';
+        const amount = payment.amount?.toString() || '';
+        const method = payment.paymentMethod?.toLowerCase() || '';
+        
+        return patientName.includes(query) || 
+               patientEmail.includes(query) || 
+               doctorName.includes(query) ||
+               transactionId.includes(query) ||
+               amount.includes(query) ||
+               method.includes(query);
+      });
+      setFilteredPayments(filtered);
+    }
+  }, [searchQuery, payments]);
 
   const fetchData = async () => {
     try {
@@ -36,7 +62,9 @@ const AdminPayments = () => {
       
       const paymentsResponse = await paymentAPI.getAllPayments(params);
       console.log('Payments Response:', paymentsResponse.data);
-      setPayments(paymentsResponse.data.data || paymentsResponse.data.payments || []);
+      const paymentsData = paymentsResponse.data.data || paymentsResponse.data.payments || [];
+      setPayments(paymentsData);
+      setFilteredPayments(paymentsData);
 
       // Fetch refund requests
       const refundResponse = await paymentAPI.getRefundRequests();
@@ -118,7 +146,7 @@ const AdminPayments = () => {
     <div className="max-w-7xl mx-auto p-6">
       {/* Header */}
       <div className="mb-6">
-        <h1 className="text-3xl font-bold text-[rgb(var(--text-heading))]">💰 Payment Management</h1>
+        <h1 className="text-3xl font-bold text-[rgb(var(--text-heading))]">Payment Management</h1>
         <p className="text-[rgb(var(--text-secondary))] mt-2">
           Monitor all payments and handle refund requests
         </p>
@@ -128,50 +156,46 @@ const AdminPayments = () => {
       {statistics && (
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
           <div className="card">
-            <div className="flex items-center justify-between">
+            <div className="flex items-center">
               <div>
                 <p className="text-sm text-[rgb(var(--text-secondary))]">Total Revenue</p>
                 <p className="text-2xl font-bold text-emerald-400">
                   PKR {statistics.totalRevenue?.toLocaleString() || 0}
                 </p>
               </div>
-              <div className="text-4xl">💵</div>
             </div>
           </div>
 
           <div className="card">
-            <div className="flex items-center justify-between">
+            <div className="flex items-center">
               <div>
                 <p className="text-sm text-[rgb(var(--text-secondary))]">Total Payments</p>
                 <p className="text-2xl font-bold text-[rgb(var(--accent))]">
                   {statistics.totalPayments || 0}
                 </p>
               </div>
-              <div className="text-4xl">💳</div>
             </div>
           </div>
 
           <div className="card">
-            <div className="flex items-center justify-between">
+            <div className="flex items-center">
               <div>
                 <p className="text-sm text-[rgb(var(--text-secondary))]">Refunded Amount</p>
                 <p className="text-2xl font-bold text-purple-400">
                   PKR {statistics.totalRefunded?.toLocaleString() || 0}
                 </p>
               </div>
-              <div className="text-4xl">🔄</div>
             </div>
           </div>
 
           <div className="card">
-            <div className="flex items-center justify-between">
+            <div className="flex items-center">
               <div>
                 <p className="text-sm text-[rgb(var(--text-secondary))]">Pending Refunds</p>
                 <p className="text-2xl font-bold text-amber-400">
                   {refundRequests.length}
                 </p>
               </div>
-              <div className="text-4xl">⏳</div>
             </div>
           </div>
         </div>
@@ -209,6 +233,38 @@ const AdminPayments = () => {
       {activeTab === 'all' && (
         <div className="card overflow-hidden">
           <div className="p-4 border-b border-[rgb(var(--border-color))]">
+            {/* Search Bar */}
+            <div className="mb-4">
+              <div className="relative">
+                <input
+                  type="text"
+                  placeholder="Search by patient name, email, doctor, transaction ID, amount..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full pl-10 pr-4 py-2 bg-[rgb(var(--bg-secondary))] border border-[rgb(var(--border-color))] text-[rgb(var(--text-primary))] rounded-md focus:outline-none focus:ring-2 focus:ring-[rgb(var(--accent))]"
+                />
+                <svg
+                  className="absolute left-3 top-2.5 h-5 w-5 text-[rgb(var(--text-secondary))]"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                  />
+                </svg>
+              </div>
+              {searchQuery && (
+                <p className="mt-2 text-sm text-[rgb(var(--text-secondary))]">
+                  Found {filteredPayments.length} result(s)
+                </p>
+              )}
+            </div>
+            
+            {/* Status Filter */}
             <div className="flex items-center space-x-4">
               <label className="text-sm font-medium text-[rgb(var(--text-primary))]">Filter by Status:</label>
               <select
@@ -240,7 +296,7 @@ const AdminPayments = () => {
                 </tr>
               </thead>
               <tbody className="bg-[rgb(var(--bg-primary))] divide-y divide-[rgb(var(--border-color))]">
-                {payments.map((payment) => (
+                {filteredPayments.map((payment) => (
                   <tr key={payment._id} className="hover:bg-[rgb(var(--bg-secondary))] transition-colors">
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-mono text-[rgb(var(--text-primary))]">
                       {payment.transactionId?.substring(0, 20)}...
@@ -279,9 +335,9 @@ const AdminPayments = () => {
             </table>
           </div>
 
-          {payments.length === 0 && (
+          {filteredPayments.length === 0 && (
             <div className="text-center py-12">
-              <p className="text-[rgb(var(--text-secondary))]">No payments found</p>
+              <p className="text-[rgb(var(--text-secondary))]">{searchQuery ? 'No payments found matching your search' : 'No payments found'}</p>
             </div>
           )}
         </div>

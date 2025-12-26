@@ -22,10 +22,10 @@ const ReportsSection = () => {
     // Initial load with loading spinner
     fetchReportsData(true);
 
-    // Auto-refresh every 5 seconds without spinner
+    // Auto-refresh every 30 seconds without spinner
     const interval = setInterval(() => {
       fetchReportsData(false);
-    }, 5000);
+    }, 30000);
 
     return () => clearInterval(interval);
   }, []);
@@ -37,7 +37,6 @@ const ReportsSection = () => {
       const token = localStorage.getItem('token');
       const headers = { Authorization: `Bearer ${token}` };
 
-      // Fetch all reports data in parallel
       const [overviewRes, doctorsRes, appointmentsRes, patientsRes, prescriptionsRes] = await Promise.all([
         axios.get('http://localhost:5000/api/admin/reports/overview', { headers }),
         axios.get('http://localhost:5000/api/admin/reports/doctors', { headers }),
@@ -47,11 +46,11 @@ const ReportsSection = () => {
       ]);
 
       setReportsData({
-        overview: overviewRes.data.data || {},
-        doctors: doctorsRes.data.data || [],
-        appointments: appointmentsRes.data.data || {},
-        patients: patientsRes.data.data || {},
-        prescriptions: prescriptionsRes.data.data || {}
+        overview: overviewRes.data.data || overviewRes.data || {},
+        doctors: doctorsRes.data.data || doctorsRes.data || [],
+        appointments: appointmentsRes.data.data || appointmentsRes.data || {},
+        patients: patientsRes.data.data || patientsRes.data || {},
+        prescriptions: prescriptionsRes.data.data || prescriptionsRes.data || {}
       });
       
       if (error) setError(null);
@@ -76,12 +75,7 @@ const ReportsSection = () => {
     return (
       <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-4">
         <div className="text-red-400">{error}</div>
-        <button 
-          onClick={fetchReportsData}
-          className="mt-2 bg-red-500/20 hover:bg-red-500/30 text-red-400 px-3 py-1 rounded text-sm transition-colors"
-        >
-          Retry
-        </button>
+        <button onClick={fetchReportsData} className="mt-2 bg-red-500/20 hover:bg-red-500/30 text-red-400 px-3 py-1 rounded text-sm transition-colors">Retry</button>
       </div>
     );
   }
@@ -92,12 +86,7 @@ const ReportsSection = () => {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold text-[rgb(var(--text-heading))]">Performance & Reports Dashboard</h2>
-        <button
-          onClick={fetchReportsData}
-          className="btn-primary"
-        >
-          Refresh Data
-        </button>
+        <button onClick={fetchReportsData} className="btn-primary">Refresh Data</button>
       </div>
 
       {/* Summary Cards */}
@@ -105,15 +94,11 @@ const ReportsSection = () => {
         <div className="stat-card">
           <div className="flex items-center">
             <div className="flex-shrink-0">
-              <svg className="w-8 h-8 text-[rgb(var(--accent))]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
+              <svg className="w-8 h-8 text-[rgb(var(--accent))]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
             </div>
             <div className="ml-3">
               <p className="text-sm font-medium text-[rgb(var(--text-secondary))]">Total Doctors</p>
-              <p className="text-2xl font-semibold text-[rgb(var(--text-heading))]">
-                {reportsData.overview.overview?.totalDoctors || 0}
-              </p>
+              <p className="text-2xl font-semibold text-[rgb(var(--text-heading))]">{reportsData.overview.overview?.totalDoctors || 0}</p>
             </div>
           </div>
         </div>
@@ -121,15 +106,11 @@ const ReportsSection = () => {
         <div className="stat-card">
           <div className="flex items-center">
             <div className="flex-shrink-0">
-              <svg className="w-8 h-8 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-              </svg>
+              <svg className="w-8 h-8 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
             </div>
             <div className="ml-3">
               <p className="text-sm font-medium text-[rgb(var(--text-secondary))]">Total Patients</p>
-              <p className="text-2xl font-semibold text-emerald-400">
-                {reportsData.overview.overview?.totalPatients || 0}
-              </p>
+              <p className="text-2xl font-semibold text-emerald-400">{reportsData.overview.overview?.totalPatients || 0}</p>
             </div>
           </div>
         </div>
@@ -137,15 +118,11 @@ const ReportsSection = () => {
         <div className="stat-card">
           <div className="flex items-center">
             <div className="flex-shrink-0">
-              <svg className="w-8 h-8 text-[rgb(var(--accent))]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-              </svg>
+              <svg className="w-8 h-8 text-[rgb(var(--accent))]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
             </div>
             <div className="ml-3">
               <p className="text-sm font-medium text-[rgb(var(--text-secondary))]">Today's Appointments</p>
-              <p className="text-2xl font-semibold text-[rgb(var(--text-heading))]">
-                {reportsData.overview.overview?.todayAppointments || 0}
-              </p>
+              <p className="text-2xl font-semibold text-[rgb(var(--text-heading))]">{reportsData.overview.overview?.todayAppointments || 0}</p>
             </div>
           </div>
         </div>
@@ -153,15 +130,11 @@ const ReportsSection = () => {
         <div className="stat-card">
           <div className="flex items-center">
             <div className="flex-shrink-0">
-              <svg className="w-8 h-8 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-              </svg>
+              <svg className="w-8 h-8 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
             </div>
             <div className="ml-3">
               <p className="text-sm font-medium text-[rgb(var(--text-secondary))]">Today's Prescriptions</p>
-              <p className="text-2xl font-semibold text-purple-400">
-                {reportsData.overview.overview?.todayPrescriptions || 0}
-              </p>
+              <p className="text-2xl font-semibold text-purple-400">{reportsData.overview.overview?.todayPrescriptions || 0}</p>
             </div>
           </div>
         </div>
@@ -169,7 +142,6 @@ const ReportsSection = () => {
 
       {/* Charts Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Doctor Performance Chart */}
         <div className="card">
           <h3 className="text-lg font-semibold text-[rgb(var(--text-heading))] mb-4">Doctor Performance</h3>
           <ResponsiveContainer width="100%" height={300}>
@@ -185,7 +157,6 @@ const ReportsSection = () => {
           </ResponsiveContainer>
         </div>
 
-        {/* Appointment Trends */}
         <div className="card">
           <h3 className="text-lg font-semibold text-[rgb(var(--text-heading))] mb-4">Monthly Appointment Trends</h3>
           <ResponsiveContainer width="100%" height={300}>
@@ -200,20 +171,11 @@ const ReportsSection = () => {
           </ResponsiveContainer>
         </div>
 
-        {/* Appointment Status Distribution */}
         <div className="card">
           <h3 className="text-lg font-semibold text-[rgb(var(--text-heading))] mb-4">Appointment Status Distribution</h3>
           <ResponsiveContainer width="100%" height={300}>
             <PieChart>
-              <Pie
-                data={reportsData.appointments.statusDistribution || []}
-                cx="50%"
-                cy="50%"
-                innerRadius={60}
-                outerRadius={100}
-                paddingAngle={5}
-                dataKey="count"
-              >
+              <Pie data={reportsData.appointments.statusDistribution || []} cx="50%" cy="50%" innerRadius={60} outerRadius={100} paddingAngle={5} dataKey="count">
                 {(reportsData.appointments.statusDistribution || []).map((entry, index) => (
                   <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                 ))}
@@ -224,7 +186,6 @@ const ReportsSection = () => {
           </ResponsiveContainer>
         </div>
 
-        {/* Top Medications */}
         <div className="card">
           <h3 className="text-lg font-semibold text-[rgb(var(--text-heading))] mb-4">Most Prescribed Medications</h3>
           <ResponsiveContainer width="100%" height={300}>
@@ -241,7 +202,6 @@ const ReportsSection = () => {
 
       {/* Tables */}
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-        {/* Top Performing Doctors Table */}
         <div className="card">
           <div className="border-b-2 border-[rgb(var(--border-color))] pb-4 mb-4">
             <h3 className="text-lg font-semibold text-[rgb(var(--text-heading))]">Top Performing Doctors</h3>
@@ -250,15 +210,9 @@ const ReportsSection = () => {
             <table className="min-w-full divide-y divide-[rgb(var(--border-color))]">
               <thead className="table-header">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
-                    Doctor
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
-                    Appointments
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
-                    Completion Rate
-                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Doctor</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Appointments</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Completion Rate</th>
                 </tr>
               </thead>
               <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
@@ -266,20 +220,12 @@ const ReportsSection = () => {
                   <tr key={index}>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div>
-                        <div className="text-sm font-medium text-gray-900 dark:text-gray-50">
-                          {doctor.doctorName}
-                        </div>
-                        <div className="text-sm text-gray-500 dark:text-gray-400">
-                          {doctor.specialization}
-                        </div>
+                        <div className="text-sm font-medium text-gray-900 dark:text-gray-50">{doctor.doctorName}</div>
+                        <div className="text-sm text-gray-500 dark:text-gray-400">{doctor.specialization}</div>
                       </div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-50">
-                      {doctor.totalAppointments}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-50">
-                      {doctor.completionRate?.toFixed(1)}%
-                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-50">{doctor.totalAppointments}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-50">{doctor.completionRate?.toFixed(1)}%</td>
                   </tr>
                 ))}
               </tbody>
@@ -287,7 +233,6 @@ const ReportsSection = () => {
           </div>
         </div>
 
-        {/* Recent Appointments */}
         <div className="bg-white dark:bg-gray-800 shadow rounded-lg">
           <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-50">Recent Appointments</h3>
@@ -296,26 +241,16 @@ const ReportsSection = () => {
             <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
               <thead className="bg-gray-50">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Patient
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Doctor
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Status
-                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Patient</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Doctor</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                 </tr>
               </thead>
               <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
                 {(reportsData.overview.recentAppointments || []).slice(0, 10).map((appointment, index) => (
                   <tr key={index}>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-50">
-                      {appointment.patient?.name}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-50">
-                      {appointment.doctor?.name}
-                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-50">{appointment.patient?.name}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-50">{appointment.doctor?.name}</td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
                         appointment.status === 'completed' ? 'bg-green-100 text-green-800' :
@@ -557,11 +492,11 @@ const AdminDashboard = () => {
           <p className="mt-2 text-[rgb(var(--text-secondary))]">System overview and management</p>
         </div>
 
-        {/* Tabs */}
+        {/* Tabs - Added 'payments' beside reports */}
         <div className="mb-8">
           <div className="border-b-2 border-[rgb(var(--border-color))]">
             <nav className="-mb-px flex space-x-8">
-              {['overview', 'doctors', 'users', 'appointments', 'prescriptions', 'reports'].map((tab) => (
+              {['overview', 'doctors', 'users', 'appointments', 'prescriptions', 'payments', 'reports'].map((tab) => (
                 <button
                   key={tab}
                   onClick={() => setActiveTab(tab)}
@@ -572,14 +507,15 @@ const AdminDashboard = () => {
                   }`}
                 >
                   {tab === 'doctors' ? `Doctor Approvals (${pendingDoctors.length})` : 
-                   tab === 'prescriptions' ? 'Prescription Management' : tab}
+                   tab === 'prescriptions' ? 'Prescription Management' : 
+                   tab === 'payments' ? 'Payment Management' : tab}
                 </button>
               ))}
             </nav>
           </div>
         </div>
 
-        {/* Overview Tab */}
+        {/* Overview Tab - Removed Red Circle Part (Quick Actions) */}
         {activeTab === 'overview' && (
           <>
             {/* Stats Cards */}
@@ -669,82 +605,6 @@ const AdminDashboard = () => {
                 </div>
               </div>
             )}
-
-            {/* Quick Actions */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-              <div className="card hover:shadow-lg transition-shadow">
-                <div className="flex items-center mb-4">
-                  <svg className="w-8 h-8 mr-3 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                  <h3 className="text-lg font-semibold text-[rgb(var(--text-heading))]">Payment Management</h3>
-                </div>
-                <p className="text-sm text-[rgb(var(--text-secondary))] mb-4">
-                  Monitor patient payments, process refunds, and view transaction history
-                </p>
-                
-                {/* Payment Stats Summary */}
-                {paymentStats && (
-                  <div className="bg-[rgb(var(--bg-tertiary))] rounded-lg p-3 mb-4 space-y-2">
-                    <div className="flex justify-between text-sm">
-                      <span className="text-[rgb(var(--text-secondary))]">Total Paid:</span>
-                      <span className="font-semibold text-emerald-400">PKR {paymentStats.totalEarnings?.toLocaleString() || 0}</span>
-                    </div>
-                    <div className="flex justify-between text-sm">
-                      <span className="text-[rgb(var(--text-secondary))]">Pending:</span>
-                      <span className="font-semibold text-amber-400">{paymentStats.totalPending || 0} payments</span>
-                    </div>
-                    <div className="flex justify-between text-sm">
-                      <span className="text-[rgb(var(--text-secondary))]">Refund Requests:</span>
-                      <span className="font-semibold text-orange-400">{paymentStats.totalRefundRequests || 0}</span>
-                    </div>
-                  </div>
-                )}
-                
-                <button
-                  onClick={() => navigate('/admin/payments')}
-                  className="btn-primary w-full"
-                >
-                  Manage Payments
-                </button>
-              </div>
-
-              <div className="card hover:shadow-lg transition-shadow">
-                <div className="flex items-center mb-4">
-                  <svg className="w-8 h-8 mr-3 text-[rgb(var(--accent))]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                  </svg>
-                  <h3 className="text-lg font-semibold text-[rgb(var(--text-heading))]">Doctor Approvals</h3>
-                </div>
-                <p className="text-sm text-[rgb(var(--text-secondary))] mb-4">
-                  Review and approve pending doctor registration requests
-                </p>
-                <button
-                  onClick={() => setActiveTab('doctors')}
-                  className="w-full bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg font-medium transition-colors"
-                >
-                  Review Applications
-                </button>
-              </div>
-
-              <div className="card hover:shadow-lg transition-shadow">
-                <div className="flex items-center mb-4">
-                  <svg className="w-8 h-8 mr-3 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                  </svg>
-                  <h3 className="text-lg font-semibold text-[rgb(var(--text-heading))]">System Reports</h3>
-                </div>
-                <p className="text-sm text-[rgb(var(--text-secondary))] mb-4">
-                  View detailed analytics and performance metrics
-                </p>
-                <button
-                  onClick={() => setActiveTab('reports')}
-                  className="w-full bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg font-medium transition-colors"
-                >
-                  View Reports
-                </button>
-              </div>
-            </div>
           </>
         )}
 
@@ -1087,6 +947,37 @@ const AdminDashboard = () => {
               onViewPrescription={handleViewPrescription}
               onDeletePrescription={handleDeletePrescription}
             />
+          </div>
+        )}
+
+        {/* Payment Management Tab */}
+        {activeTab === 'payments' && (
+          <div className="card">
+             <div className="px-4 py-5 sm:px-6 flex justify-between items-center">
+                <div>
+                  <h3 className="text-lg leading-6 font-medium text-[rgb(var(--text-heading))]">Payment Management</h3>
+                  <p className="mt-1 text-sm text-[rgb(var(--text-secondary))]">Monitor patient payments, refunds, and history</p>
+                </div>
+                <button onClick={() => navigate('/admin/payments')} className="btn-primary">
+                   Go to Payment Portal
+                </button>
+             </div>
+             {paymentStats && (
+                <div className="px-4 py-5 sm:p-6 grid grid-cols-1 md:grid-cols-3 gap-6">
+                   <div className="stat-card bg-[rgb(var(--bg-tertiary))]">
+                      <p className="text-sm font-medium text-[rgb(var(--text-secondary))]">Total Paid</p>
+                      <p className="text-2xl font-semibold text-emerald-400">PKR {paymentStats.totalEarnings?.toLocaleString() || 0}</p>
+                   </div>
+                   <div className="stat-card bg-[rgb(var(--bg-tertiary))]">
+                      <p className="text-sm font-medium text-[rgb(var(--text-secondary))]">Pending Payments</p>
+                      <p className="text-2xl font-semibold text-amber-400">{paymentStats.totalPending || 0}</p>
+                   </div>
+                   <div className="stat-card bg-[rgb(var(--bg-tertiary))]">
+                      <p className="text-sm font-medium text-[rgb(var(--text-secondary))]">Refund Requests</p>
+                      <p className="text-2xl font-semibold text-orange-400">{paymentStats.totalRefundRequests || 0}</p>
+                   </div>
+                </div>
+             )}
           </div>
         )}
 
