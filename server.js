@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const path = require('path');
 const rateLimit = require('express-rate-limit');
+const mongoose = require('mongoose');
 
 // CRITICAL: Validate environment variables BEFORE anything else
 const { validateEnv, config } = require('./config/env');
@@ -51,26 +52,24 @@ app.get('/api/health', (req, res) => {
   res.json({
     status: 'OK',
     database: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected',
+    environment: config.nodeEnv,
     time: new Date().toISOString()
   });
 });
 
 app.get('/api/test-db', async (req, res) => {
   try {
-  const mongoose = require('mongoose');
-  res.json({
-    status: 'OK',
-    database: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected',
-    environment: config.nodeEnv
+    const collections = await mongoose.connection.db.listCollections().toArray();
+    res.json({
+      connected: true,
+      database: mongoose.connection.name,
       collections: collections.map(c => c.name)
     });
   } catch (error) {
     res.status(500).json({ connected: false, error: error.message });
-  }mongoose = require('mongoose');
-    const collections = await mongoose.connection.db.listCollections().toArray();
-    res.json({
-      connected: true,
-      database: mongoose.connection.nam
+  }
+});
+
 /* -------------------- API ROUTES -------------------- */
 
 app.use('/api/auth', require('./backend/routes/authRoutes'));
@@ -92,11 +91,11 @@ app.use('/api/*', (req, res) => {
     success: false,
     message: `API route ${req.originalUrl} not found`
   });
-});config.nodeEnv
+});
 
 /* -------------------- FRONTEND HANDLING -------------------- */
 
-if (process.env.NODE_ENV === 'production') {
+if (config.nodeEnv === 'production') {
   app.use(express.static(path.join(__dirname, 'frontend-react', 'dist')));
 
   app.get('*', (req, res) => {
@@ -124,12 +123,12 @@ app.use((err, req, res, next) => {
   });
 });
 
+/* -------------------- SERVER -------------------- */
+
 // Only start server if we got this far (env vars + DB validated)
 app.listen(config.port, () => {
   console.log('🚀 Server running');
   console.log(`📡 Port: ${config.port}`);
   console.log(`🌍 Environment: ${config.nodeEnv}`);
-  console.log(`💚 Health check running');
-  console.log(`📡 API: /api`);
-  console.log(`💚 Health: /api/health`);
+  console.log(`💚 Health check: /api/health`);
 });
