@@ -61,4 +61,6 @@ medicalReportSchema.index({ patient: 1, uploadDate: -1 });
 medicalReportSchema.index({ appointment: 1 });
 medicalReportSchema.index({ secondOpinionRequest: 1 });
 
-module.exports = mongoose.model('MedicalReport', medicalReportSchema);
+// Avoid OverwriteModelError
+const MedicalReport = mongoose.models.MedicalReport || mongoose.model('MedicalReport', medicalReportSchema);
+module.exports = MedicalReport;

@@ -261,4 +261,6 @@ prescriptionSchema.pre('validate', async function(next) {
   }
 });
 
-module.exports = mongoose.model('Prescription', prescriptionSchema);
+// Avoid OverwriteModelError
+const Prescription = mongoose.models.Prescription || mongoose.model('Prescription', prescriptionSchema);
+module.exports = Prescription;
