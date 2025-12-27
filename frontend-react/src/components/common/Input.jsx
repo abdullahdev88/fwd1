@@ -19,8 +19,9 @@ const Input = ({
           ${error ? 'border-red-300 dark:border-red-500' : 'border-gray-300 dark:border-gray-600'}
           placeholder-gray-500 dark:placeholder-gray-400
           text-gray-900 dark:text-white
-          bg-white dark:bg-gray-700
-          focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm 
+          bg-white dark:bg-gray-700/50
+          focus:outline-none focus:ring-blue-500 dark:focus:ring-blue-400 
+          focus:border-blue-500 dark:focus:border-blue-400 focus:z-10 sm:text-sm 
           transition-colors ${className}
         `}
         {...props}
