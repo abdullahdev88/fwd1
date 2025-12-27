@@ -1,11 +1,12 @@
 {
-  "name": "authentication-backend",
+  "name": "medical-appointment-backend",
   "version": "1.0.0",
-  "description": "Authentication API with Node.js, Express, and MongoDB",
-  "main": "server.js",
+  "description": "Medical Appointment System API with Node.js, Express, and MongoDB",
+  "main": "api/index.js",
   "scripts": {
-    "start": "node server.js",
-    "dev": "nodemon server.js"
+    "start": "node api/index.js",
+    "dev": "nodemon server.js",
+    "vercel-build": "echo 'Building for Vercel'"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
