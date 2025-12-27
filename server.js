@@ -1,16 +1,13 @@
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
-const dotenv = require('dotenv');
 const rateLimit = require('express-rate-limit');
-const mongoose = require('mongoose');
 
-// Load env variables
-dotenv.config();
+// CRITICAL: Validate environment variables BEFORE anything else
+const { validateEnv, config } = require('./config/env');
+validateEnv(); // Exits if required vars missing
 
-// Debug: Check if env vars are loaded
-console.log('🔍 MONGODB_URI exists:', !!process.env.MONGODB_URI);
-console.log('🔍 Environment:', process.env.NODE_ENV);
+const connectDB = require('./config/db');
 
 const app = express();
 
@@ -21,13 +18,12 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // CORS (local + deployed frontend)
+const allowedOrigins = config.nodeEnv === 'production'
+  ? [process.env.FRONTEND_URL || 'https://your-frontend.vercel.app']
+  : ['http://localhost:3000', 'http://127.0.0.1:3000', 'http://localhost:5173'];
+
 app.use(cors({
-  origin: [
-    'http://localhost:3000',
-    'http://127.0.0.1:3000',
-    'http://localhost:5173',
-    'https://your-frontend.vercel.app' // 🔁 replace with your real Vercel URL
-  ],
+  origin: allowedOrigins,
   credentials: true
 }));
 
@@ -47,16 +43,7 @@ app.use('/api', (req, res, next) => {
 /* -------------------- DATABASE -------------------- */
 
 const connectDB = async () => {
-  try {
-    const conn = await mongoose.connect(process.env.MONGODB_URI);
-    console.log(`✅ MongoDB Connected: ${conn.connection.host}`);
-  } catch (error) {
-    console.error('❌ MongoDB Error:', error.message);
-    process.exit(1);
-  }
-};
-
-connectDB();
+// Connect to database - exits if connection failsconnectDB();
 
 /* -------------------- HEALTH ROUTES -------------------- */
 
@@ -70,16 +57,20 @@ app.get('/api/health', (req, res) => {
 
 app.get('/api/test-db', async (req, res) => {
   try {
-    const collections = await mongoose.connection.db.listCollections().toArray();
-    res.json({
-      connected: true,
+  const mongoose = require('mongoose');
+  res.json({
+    status: 'OK',
+    database: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected',
+    environment: config.nodeEnv
       collections: collections.map(c => c.name)
     });
   } catch (error) {
     res.status(500).json({ connected: false, error: error.message });
-  }
-});
-
+  }mongoose = require('mongoose');
+    const collections = await mongoose.connection.db.listCollections().toArray();
+    res.json({
+      connected: true,
+      database: mongoose.connection.nam
 /* -------------------- API ROUTES -------------------- */
 
 app.use('/api/auth', require('./backend/routes/authRoutes'));
@@ -101,7 +92,7 @@ app.use('/api/*', (req, res) => {
     success: false,
     message: `API route ${req.originalUrl} not found`
   });
-});
+});config.nodeEnv
 
 /* -------------------- FRONTEND HANDLING -------------------- */
 
@@ -133,12 +124,12 @@ app.use((err, req, res, next) => {
   });
 });
 
-/* -------------------- SERVER -------------------- */
-
-const PORT = process.env.PORT || 5000;
-
-app.listen(PORT, () => {
+// Only start server if we got this far (env vars + DB validated)
+app.listen(config.port, () => {
   console.log('🚀 Server running');
+  console.log(`📡 Port: ${config.port}`);
+  console.log(`🌍 Environment: ${config.nodeEnv}`);
+  console.log(`💚 Health check running');
   console.log(`📡 API: /api`);
   console.log(`💚 Health: /api/health`);
 });

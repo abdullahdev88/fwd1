@@ -54,20 +54,20 @@ const prescriptionSchema = new mongoose.Schema({
   patient: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
-    required: [true, 'Patient ID is required'],
-    index: true
+    required: [true, 'Patient ID is required']
+    // Removed index: true to avoid duplicate index warning
   },
   doctor: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
-    required: [true, 'Doctor ID is required'],
-    index: true
+    required: [true, 'Doctor ID is required']
+    // Removed index: true to avoid duplicate index warning
   },
   appointment: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Appointment',
-    required: [true, 'Appointment ID is required'],
-    index: true
+    required: [true, 'Appointment ID is required']
+    // Removed index: true to avoid duplicate index warning
   },
   
   // Medical information
