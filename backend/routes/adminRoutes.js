@@ -12,6 +12,52 @@ const {
   getPrescriptionAnalytics
 } = require('../controllers/admin/adminReportsController');
 
+// @route   GET /api/admin/dashboard
+// @desc    Get admin dashboard data
+// @access  Admin only
+router.get('/dashboard', protect, adminOnly, async (req, res) => {
+  try {
+    // Get counts
+    const totalDoctors = await User.countDocuments({ role: 'doctor', status: 'approved' });
+    const totalPatients = await User.countDocuments({ role: 'patient' });
+    const pendingDoctors = await User.countDocuments({ role: 'doctor', status: 'pending' });
+    const totalAppointments = await Appointment.countDocuments();
+    const todayAppointments = await Appointment.countDocuments({
+      appointmentDate: {
+        $gte: new Date(new Date().setHours(0, 0, 0, 0)),
+        $lt: new Date(new Date().setHours(23, 59, 59, 999))
+      }
+    });
+
+    // Get recent appointments
+    const recentAppointments = await Appointment.find()
+      .populate('patient', 'name email')
+      .populate('doctor', 'name specialization')
+      .sort({ createdAt: -1 })
+      .limit(5);
+
+    res.json({
+      success: true,
+      data: {
+        stats: {
+          totalDoctors,
+          totalPatients,
+          pendingDoctors,
+          totalAppointments,
+          todayAppointments
+        },
+        recentAppointments
+      }
+    });
+  } catch (error) {
+    console.error('Error fetching admin dashboard:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error fetching dashboard data'
+    });
+  }
+});
+
 // @route   GET /api/admin/pending-doctors
 // @desc    Get all pending doctors for approval
 // @access  Admin only

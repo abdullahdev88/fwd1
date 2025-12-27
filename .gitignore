@@ -54,3 +54,6 @@ static/
 index.html
 style.css
 script.js
+
+# Local Netlify folder
+.netlify

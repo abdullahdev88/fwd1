@@ -5,6 +5,58 @@ const Appointment = require('../models/Appointment');
 const { protect, doctorOnly } = require('../middleware/auth');
 const { getDoctorPrescriptions } = require('../controllers/doctor/doctorController');
 
+// @route   GET /api/doctor/dashboard
+// @desc    Get doctor dashboard data
+// @access  Doctor only
+router.get('/dashboard', protect, doctorOnly, async (req, res) => {
+  try {
+    // Get doctor's appointments
+    const appointments = await Appointment.find({ doctor: req.user.id })
+      .populate('patient', 'name email phone')
+      .sort({ appointmentDate: -1 })
+      .limit(10);
+
+    // Count statistics
+    const totalAppointments = await Appointment.countDocuments({ doctor: req.user.id });
+    const todayAppointments = await Appointment.countDocuments({
+      doctor: req.user.id,
+      appointmentDate: {
+        $gte: new Date(new Date().setHours(0, 0, 0, 0)),
+        $lt: new Date(new Date().setHours(23, 59, 59, 999))
+      }
+    });
+    const upcomingAppointments = await Appointment.countDocuments({
+      doctor: req.user.id,
+      appointmentDate: { $gte: new Date() },
+      status: { $in: ['pending', 'confirmed'] }
+    });
+
+    res.json({
+      success: true,
+      data: {
+        appointments,
+        stats: {
+          total: totalAppointments,
+          today: todayAppointments,
+          upcoming: upcomingAppointments
+        },
+        doctor: {
+          name: req.user.name,
+          email: req.user.email,
+          specialization: req.user.specialization,
+          experience: req.user.experience
+        }
+      }
+    });
+  } catch (error) {
+    console.error('Error fetching dashboard:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error fetching dashboard data'
+    });
+  }
+});
+
 // @route   POST /api/doctor/availability
 // @desc    Add availability slots
 // @access  Doctor only

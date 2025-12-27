@@ -4,6 +4,54 @@ const User = require('../models/User');
 const Appointment = require('../models/Appointment');
 const { protect, patientOnly } = require('../middleware/auth');
 
+// @route   GET /api/patient/dashboard
+// @desc    Get patient dashboard data
+// @access  Patient only
+router.get('/dashboard', protect, patientOnly, async (req, res) => {
+  try {
+    // Get patient's appointments
+    const appointments = await Appointment.find({ patient: req.user.id })
+      .populate('doctor', 'name specialization email')
+      .sort({ appointmentDate: -1 })
+      .limit(5);
+
+    // Count statistics
+    const totalAppointments = await Appointment.countDocuments({ patient: req.user.id });
+    const upcomingAppointments = await Appointment.countDocuments({
+      patient: req.user.id,
+      appointmentDate: { $gte: new Date() },
+      status: { $in: ['pending', 'confirmed'] }
+    });
+    const completedAppointments = await Appointment.countDocuments({
+      patient: req.user.id,
+      status: 'completed'
+    });
+
+    res.json({
+      success: true,
+      data: {
+        appointments,
+        stats: {
+          total: totalAppointments,
+          upcoming: upcomingAppointments,
+          completed: completedAppointments
+        },
+        user: {
+          name: req.user.name,
+          email: req.user.email,
+          phone: req.user.phone
+        }
+      }
+    });
+  } catch (error) {
+    console.error('Error fetching dashboard:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error fetching dashboard data'
+    });
+  }
+});
+
 // @route   GET /api/patient/doctors
 // @desc    Get all approved doctors with their availability
 // @access  Patient only
