@@ -42,8 +42,8 @@ app.use('/api', (req, res, next) => {
 
 /* -------------------- DATABASE -------------------- */
 
-const connectDB = async () => {
-// Connect to database - exits if connection failsconnectDB();
+// Connect to database - exits if connection fails
+connectDB();
 
 /* -------------------- HEALTH ROUTES -------------------- */
 
