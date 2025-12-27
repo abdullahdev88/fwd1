@@ -132,4 +132,6 @@ userSchema.methods.getPublicProfile = function() {
   return user;
 };
 
-module.exports = mongoose.model('User', userSchema);
+// Avoid OverwriteModelError
+const User = mongoose.models.User || mongoose.model('User', userSchema);
+module.exports = User;

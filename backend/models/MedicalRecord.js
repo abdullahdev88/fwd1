@@ -105,4 +105,6 @@ medicalRecordSchema.statics.findByDoctor = function(doctorId) {
     .sort({ createdAt: -1 });
 };
 
-module.exports = mongoose.model('MedicalRecord', medicalRecordSchema);
+// Avoid OverwriteModelError
+const MedicalRecord = mongoose.models.MedicalRecord || mongoose.model('MedicalRecord', medicalRecordSchema);
+module.exports = MedicalRecord;

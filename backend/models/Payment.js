@@ -157,4 +157,6 @@ paymentSchema.index({ status: 1 });
 paymentSchema.index({ transactionId: 1 });
 paymentSchema.index({ invoiceNumber: 1 });
 
-module.exports = mongoose.model('Payment', paymentSchema);
+// Avoid OverwriteModelError
+const Payment = mongoose.models.Payment || mongoose.model('Payment', paymentSchema);
+module.exports = Payment;

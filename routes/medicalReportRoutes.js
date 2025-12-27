@@ -3,11 +3,11 @@ const router = express.Router();
 
 const { protect } = require('../middleware/authMiddleware');
 const { authorizeRole } = require('../middleware/roleMiddleware');
-const upload = require('../middleware/uploadMiddleware');
+const upload = require('../backend/middleware/uploadMiddleware');
 
 const {
   uploadMedicalReports
-} = require('../controllers/patient/medicalReportController');
+} = require('../backend/controllers/patient/medicalReportController');
 
 router.post(
   '/upload',

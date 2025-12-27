@@ -105,4 +105,6 @@ secondOpinionRequestSchema.virtual('requestAge').get(function() {
   return Math.floor((Date.now() - this.requestDate) / (1000 * 60 * 60)); // in hours
 });
 
-module.exports = mongoose.model('SecondOpinionRequest', secondOpinionRequestSchema);
+// Avoid OverwriteModelError
+const SecondOpinionRequest = mongoose.models.SecondOpinionRequest || mongoose.model('SecondOpinionRequest', secondOpinionRequestSchema);
+module.exports = SecondOpinionRequest;

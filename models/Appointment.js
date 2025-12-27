@@ -45,4 +45,6 @@ const appointmentSchema = new mongoose.Schema({
 appointmentSchema.index({ patient: 1, appointmentDate: 1 });
 appointmentSchema.index({ doctor: 1, appointmentDate: 1 });
 
-module.exports = mongoose.model('Appointment', appointmentSchema);
+// Avoid OverwriteModelError in hot-reload or duplicate requires
+const Appointment = mongoose.models.Appointment || mongoose.model('Appointment', appointmentSchema);
+module.exports = Appointment;

@@ -1,28 +1,30 @@
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
-const dotenv = require('dotenv');
 const rateLimit = require('express-rate-limit');
 const mongoose = require('mongoose');
 
-// Load env variables
-dotenv.config();
+// CRITICAL: Validate environment variables BEFORE anything else
+const { validateEnv, config } = require('./config/env');
+validateEnv(); // Exits if required vars missing
+
+const connectDB = require('./config/db');
 
 const app = express();
 
 /* -------------------- MIDDLEWARE -------------------- */
 
-// Body parsers (IMPORTANT for multer + forms)
+// Body parsers
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// CORS
+// CORS (local + deployed frontend)
+const allowedOrigins = config.nodeEnv === 'production'
+  ? [process.env.FRONTEND_URL || 'https://your-frontend.vercel.app']
+  : ['http://localhost:3000', 'http://127.0.0.1:3000', 'http://localhost:5173'];
+
 app.use(cors({
-  origin: [
-    'http://localhost:3000',
-    'http://127.0.0.1:3000',
-    'http://localhost:5173'
-  ],
+  origin: allowedOrigins,
   credentials: true
 }));
 
@@ -41,15 +43,7 @@ app.use('/api', (req, res, next) => {
 
 /* -------------------- DATABASE -------------------- */
 
-const connectDB = async () => {
-  try {
-    const conn = await mongoose.connect(process.env.MONGODB_URI);
-    console.log(`✅ MongoDB Connected: ${conn.connection.host}`);
-  } catch (error) {
-    console.error('❌ MongoDB Error:', error.message);
-    process.exit(1);
-  }
-};
+// Connect to database - exits if connection fails
 connectDB();
 
 /* -------------------- HEALTH ROUTES -------------------- */
@@ -58,6 +52,7 @@ app.get('/api/health', (req, res) => {
   res.json({
     status: 'OK',
     database: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected',
+    environment: config.nodeEnv,
     time: new Date().toISOString()
   });
 });
@@ -67,6 +62,7 @@ app.get('/api/test-db', async (req, res) => {
     const collections = await mongoose.connection.db.listCollections().toArray();
     res.json({
       connected: true,
+      database: mongoose.connection.name,
       collections: collections.map(c => c.name)
     });
   } catch (error) {
@@ -76,16 +72,16 @@ app.get('/api/test-db', async (req, res) => {
 
 /* -------------------- API ROUTES -------------------- */
 
-app.use('/api/auth', require('./routes/auth'));
+app.use('/api/auth', require('./backend/routes/authRoutes'));
 app.use('/api/users', require('./routes/users'));
 
-app.use('/api/patient', require('./routes/patientRoutes'));
-app.use('/api/doctor', require('./routes/doctorRoutes'));
-app.use('/api/admin', require('./routes/adminRoutes'));
-app.use('/api/appointments', require('./routes/appointmentRoutes'));
-app.use('/api/profile', require('./routes/profileRoutes'));
+app.use('/api/patient', require('./backend/routes/patientRoutes'));
+app.use('/api/doctor', require('./backend/routes/doctorRoutes'));
+app.use('/api/admin', require('./backend/routes/adminRoutes'));
+app.use('/api/appointments', require('./backend/routes/appointmentRoutes'));
+app.use('/api/profile', require('./backend/routes/profileRoutes'));
 
-// ✅ MEDICAL REPORT ROUTE (ONLY ONE)
+// Medical reports
 app.use('/api/medical-reports', require('./routes/medicalReportRoutes'));
 
 /* -------------------- 404 HANDLER -------------------- */
@@ -99,8 +95,9 @@ app.use('/api/*', (req, res) => {
 
 /* -------------------- FRONTEND HANDLING -------------------- */
 
-if (process.env.NODE_ENV === 'production') {
+if (config.nodeEnv === 'production') {
   app.use(express.static(path.join(__dirname, 'frontend-react', 'dist')));
+
   app.get('*', (req, res) => {
     res.sendFile(
       path.resolve(__dirname, 'frontend-react', 'dist', 'index.html')
@@ -128,10 +125,10 @@ app.use((err, req, res, next) => {
 
 /* -------------------- SERVER -------------------- */
 
-const PORT = process.env.PORT || 5000;
-
-app.listen(PORT, () => {
+// Only start server if we got this far (env vars + DB validated)
+app.listen(config.port, () => {
   console.log('🚀 Server running');
-  console.log(`📡 API: http://localhost:${PORT}/api`);
-  console.log(`💚 Health: http://localhost:${PORT}/api/health`);
+  console.log(`📡 Port: ${config.port}`);
+  console.log(`🌍 Environment: ${config.nodeEnv}`);
+  console.log(`💚 Health check: /api/health`);
 });

@@ -50,4 +50,6 @@ const medicalReportSchema = new mongoose.Schema(
 medicalReportSchema.index({ patient: 1 });
 medicalReportSchema.index({ appointment: 1 });
 
-module.exports = mongoose.model('MedicalReport', medicalReportSchema);
+// Avoid OverwriteModelError
+const MedicalReport = mongoose.models.MedicalReport || mongoose.model('MedicalReport', medicalReportSchema);
+module.exports = MedicalReport;
