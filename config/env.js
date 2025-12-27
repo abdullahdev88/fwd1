@@ -3,8 +3,8 @@
 
 const requiredEnvVars = [
   'MONGODB_URI',
-  'JWT_SECRET',
-  'PORT'
+  'JWT_SECRET'
+  // PORT is optional - Render provides it automatically
 ];
 
 const optionalEnvVars = [
