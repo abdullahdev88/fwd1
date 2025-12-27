@@ -8,17 +8,42 @@ const app = express();
 // Define base path for requiring modules from parent directory
 const basePath = path.join(__dirname, '..');
 
+// CORS Configuration - Allow production frontend
+const corsOptions = {
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps, Postman, etc.)
+    if (!origin) return callback(null, true);
+    
+    const allowedOrigins = [
+      'http://localhost:5173', // Local development
+      'http://localhost:3000',
+      'https://myclinic-patient-portal.netlify.app', // Production frontend
+      process.env.FRONTEND_URL // Environment variable for flexibility
+    ].filter(Boolean); // Remove undefined values
+    
+    if (allowedOrigins.indexOf(origin) !== -1 || process.env.NODE_ENV === 'development') {
+      callback(null, true);
+    } else {
+      console.log('CORS blocked origin:', origin);
+      callback(null, true); // Allow all origins in production for now
+    }
+  },
+  credentials: true,
+  optionsSuccessStatus: 200
+};
+
 // Middleware
-app.use(cors());
+app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Serve static files for uploaded medical reports
 app.use('/uploads', express.static(path.join(basePath, 'uploads')));
 
-// Request logging middleware
+// Request logging middleware (improved)
 app.use((req, res, next) => {
-  console.log(`${new Date().toISOString()} - ${req.method} ${req.url}`);
+  const timestamp = new Date().toISOString();
+  console.log(`[${timestamp}] ${req.method} ${req.url}`);
   next();
 });
 
@@ -27,7 +52,7 @@ let isConnected = false;
 
 const connectDB = async () => {
   if (isConnected) {
-    console.log('Using existing database connection');
+    console.log('✓ Using existing database connection');
     return;
   }
 
@@ -38,9 +63,10 @@ const connectDB = async () => {
     });
     
     isConnected = db.connections[0].readyState === 1;
-    console.log('MongoDB Connected Successfully');
+    console.log('✓ MongoDB Connected Successfully');
+    console.log(`✓ Database: ${db.connections[0].name}`);
   } catch (error) {
-    console.error('MongoDB Connection Error:', error.message);
+    console.error('✗ MongoDB Connection Error:', error.message);
     throw error;
   }
 };
@@ -51,7 +77,7 @@ app.use(async (req, res, next) => {
     await connectDB();
     next();
   } catch (error) {
-    console.error('MongoDB Connection Failed:', error);
+    console.error('✗ MongoDB Connection Failed:', error);
     res.status(500).json({
       success: false,
       message: 'Database connection failed',

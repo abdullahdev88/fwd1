@@ -6,6 +6,9 @@ import AdminPrescriptionManager from '../../components/admin/AdminPrescriptionMa
 import PrescriptionView from '../../components/doctor/PrescriptionView';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, BarChart, Bar, PieChart, Pie, Cell } from 'recharts';
 
+// Use environment variable for API URL
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+
 // Reports Section Component
 const ReportsSection = () => {
   const [reportsData, setReportsData] = useState({
@@ -38,11 +41,11 @@ const ReportsSection = () => {
       const headers = { Authorization: `Bearer ${token}` };
 
       const [overviewRes, doctorsRes, appointmentsRes, patientsRes, prescriptionsRes] = await Promise.all([
-        axios.get('http://localhost:5000/api/admin/reports/overview', { headers }),
-        axios.get('http://localhost:5000/api/admin/reports/doctors', { headers }),
-        axios.get('http://localhost:5000/api/admin/reports/appointments', { headers }),
-        axios.get('http://localhost:5000/api/admin/reports/patients', { headers }),
-        axios.get('http://localhost:5000/api/admin/reports/prescriptions', { headers })
+        axios.get(`${API_BASE_URL}/admin/reports/overview`, { headers }),
+        axios.get(`${API_BASE_URL}/admin/reports/doctors`, { headers }),
+        axios.get(`${API_BASE_URL}/admin/reports/appointments`, { headers }),
+        axios.get(`${API_BASE_URL}/admin/reports/patients`, { headers }),
+        axios.get(`${API_BASE_URL}/admin/reports/prescriptions`, { headers })
       ]);
 
       setReportsData({
@@ -346,7 +349,7 @@ const AdminDashboard = () => {
   const fetchDashboardData = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.get('http://localhost:5000/api/admin/dashboard-stats', {
+      const response = await axios.get(`${API_BASE_URL}/admin/dashboard-stats`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (response.data.success) {
@@ -360,7 +363,7 @@ const AdminDashboard = () => {
   const fetchPendingDoctors = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.get('http://localhost:5000/api/admin/pending-doctors', {
+      const response = await axios.get(`${API_BASE_URL}/admin/pending-doctors`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (response.data.success) {
@@ -374,7 +377,7 @@ const AdminDashboard = () => {
   const fetchAppointmentLogs = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.get('http://localhost:5000/api/admin/appointment-logs', {
+      const response = await axios.get(`${API_BASE_URL}/admin/appointment-logs`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (response.data.success) {
@@ -404,7 +407,7 @@ const AdminDashboard = () => {
   const fetchAllUsers = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.get('http://localhost:5000/api/admin/all-users', {
+      const response = await axios.get(`${API_BASE_URL}/admin/all-users`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (response.data.success) {
@@ -418,7 +421,7 @@ const AdminDashboard = () => {
   const fetchPaymentStats = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.get('http://localhost:5000/api/payments/statistics', {
+      const response = await axios.get(`${API_BASE_URL}/payments/statistics`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (response.data.success) {
@@ -434,7 +437,7 @@ const AdminDashboard = () => {
       const token = localStorage.getItem('token');
       const endpoint = action === 'approve' ? 'approve-doctor' : 'reject-doctor';
       
-      const response = await axios.put(`http://localhost:5000/api/admin/${endpoint}/${doctorId}`, {}, {
+      const response = await axios.put(`${API_BASE_URL}/admin/${endpoint}/${doctorId}`, {}, {
         headers: { Authorization: `Bearer ${token}` }
       });
 

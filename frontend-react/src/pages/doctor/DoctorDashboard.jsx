@@ -6,6 +6,9 @@ import PrescriptionList from '../../components/doctor/PrescriptionList';
 import PrescriptionView from '../../components/doctor/PrescriptionView';
 import ClinicPaymentConfirmation from '../../components/doctor/ClinicPaymentConfirmation';
 
+// Use environment variable for API URL
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+
 const DoctorDashboard = () => {
   const { user } = useAuth();
   
@@ -44,8 +47,8 @@ const DoctorDashboard = () => {
 
       // Dono API calls ek sath
       const [appointmentsRes, availabilityRes] = await Promise.all([
-        axios.get('http://localhost:5000/api/doctor/appointments', config),
-        axios.get('http://localhost:5000/api/doctor/availability', config)
+        axios.get(`${API_BASE_URL}/doctor/appointments`, config),
+        axios.get(`${API_BASE_URL}/doctor/availability`, config)
       ]);
 
       // Handle Appointments Data
@@ -119,7 +122,7 @@ const DoctorDashboard = () => {
       
       console.log('Saving availability:', { date: selectedDate, timeSlots });
       
-      const response = await axios.post('http://localhost:5000/api/doctor/availability', {
+      const response = await axios.post(`${API_BASE_URL}/doctor/availability`, {
         date: selectedDate,
         timeSlots
       }, {
@@ -148,7 +151,7 @@ const DoctorDashboard = () => {
     if (!window.confirm('Are you sure you want to delete this availability date?')) return;
     try {
       const token = localStorage.getItem('token');
-      await axios.delete(`http://localhost:5000/api/doctor/availability/${availId}`, {
+      await axios.delete(`${API_BASE_URL}/doctor/availability/${availId}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       fetchDashboardData(false); // Refresh immediately

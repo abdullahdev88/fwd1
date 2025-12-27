@@ -4,6 +4,8 @@ import LoadingSpinner from '../../components/common/LoadingSpinner';
 import ErrorMessage from '../../components/common/ErrorMessage';
 import Button from '../../components/common/Button';
 
+const API_BASE_URL = import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:5000';
+
 const DoctorSecondOpinions = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -321,7 +323,7 @@ const DoctorSecondOpinions = () => {
                           <span className="text-2xl">📄</span>
                           <div className="flex-1">
                             <a 
-                              href={`http://localhost:5000${report.fileUrl}`}
+                              href={`${API_BASE_URL}${report.fileUrl}`}
                               target="_blank"
                               rel="noopener noreferrer"
                               className="text-[rgb(var(--accent))] hover:underline font-medium"
@@ -334,7 +336,7 @@ const DoctorSecondOpinions = () => {
                             </div>
                           </div>
                           <a
-                            href={`http://localhost:5000${report.fileUrl}`}
+                            href={`${API_BASE_URL}${report.fileUrl}`}
                             download
                             className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 text-sm"
                           >

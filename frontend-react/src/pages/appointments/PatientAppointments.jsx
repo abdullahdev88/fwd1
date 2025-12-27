@@ -6,6 +6,8 @@ import LoadingSpinner from '../../components/common/LoadingSpinner';
 import ErrorMessage from '../../components/common/ErrorMessage';
 import PaymentModal from '../../components/payment/PaymentModal';
 
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+
 const PatientAppointments = () => {
   const { user } = useAuth();
   const [appointments, setAppointments] = useState([]);
@@ -78,7 +80,7 @@ const PatientAppointments = () => {
 
   const handleDownloadInvoice = (payment) => {
     const token = localStorage.getItem('token');
-    const invoiceUrl = `http://localhost:5000/api/invoices/download/${payment.invoiceNumber}`;
+    const invoiceUrl = `${API_BASE_URL}/invoices/download/${payment.invoiceNumber}`;
     
     // Add authorization header (for download)
     fetch(invoiceUrl, {

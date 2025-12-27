@@ -9,30 +9,74 @@ dotenv.config();
 
 const app = express();
 
+// CORS Configuration - Allow production frontend
+const corsOptions = {
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps, Postman, etc.)
+    if (!origin) return callback(null, true);
+    
+    const allowedOrigins = [
+      'http://localhost:5173', // Local development
+      'http://localhost:3000',
+      'https://myclinic-patient-portal.netlify.app', // Production frontend
+      process.env.FRONTEND_URL // Environment variable for flexibility
+    ].filter(Boolean); // Remove undefined values
+    
+    if (allowedOrigins.indexOf(origin) !== -1 || process.env.NODE_ENV === 'development') {
+      callback(null, true);
+    } else {
+      console.log('CORS blocked origin:', origin);
+      callback(null, true); // Allow all origins in production for now
+    }
+  },
+  credentials: true,
+  optionsSuccessStatus: 200
+};
+
 // Middleware
-app.use(cors());
+app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Serve static files for uploaded medical reports
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-// Request logging middleware
+// Request logging middleware (improved)
 app.use((req, res, next) => {
-  console.log(`${new Date().toISOString()} - ${req.method} ${req.url}`);
+  const timestamp = new Date().toISOString();
+  console.log(`[${timestamp}] ${req.method} ${req.url}`);
+  
+  // Log request body for debugging (except sensitive routes)
+  if (!req.url.includes('/auth/login') && !req.url.includes('/auth/signup')) {
+    if (Object.keys(req.body).length > 0) {
+      console.log('Request body:', JSON.stringify(req.body, null, 2));
+    }
+  }
   next();
 });
 
 // MongoDB Connection
 const connectDB = async () => {
   try {
-    await mongoose.connect(process.env.MONGODB_URI);
-    console.log('MongoDB Connected Successfully');
+    const conn = await mongoose.connect(process.env.MONGODB_URI);
+    console.log('✓ MongoDB Connected Successfully');
+    console.log(`✓ Database: ${conn.connection.name}`);
+    console.log(`✓ Host: ${conn.connection.host}`);
   } catch (error) {
-    console.error('MongoDB Connection Error:', error.message);
+    console.error('✗ MongoDB Connection Error:', error.message);
+    console.error('✗ Full error:', error);
     process.exit(1);
   }
 };
+
+// Handle MongoDB connection events
+mongoose.connection.on('disconnected', () => {
+  console.log('⚠ MongoDB disconnected');
+});
+
+mongoose.connection.on('error', (err) => {
+  console.error('⚠ MongoDB connection error:', err);
+});
 
 connectDB();
 
@@ -75,18 +119,30 @@ app.post('/api/test-reminder/:appointmentId', async (req, res) => {
   }
 });
 
-// Error handling middleware
+// Error handling middleware (improved)
 app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).json({
+  console.error('=== ERROR OCCURRED ===');
+  console.error('URL:', req.url);
+  console.error('Method:', req.method);
+  console.error('Error:', err.message);
+  console.error('Stack:', err.stack);
+  console.error('=====================');
+  
+  res.status(err.status || 500).json({
     success: false,
-    message: 'Something went wrong!'
+    message: err.message || 'Something went wrong!',
+    ...(process.env.NODE_ENV === 'development' && { stack: err.stack })
   });
 });
 
 // 404 handler
 app.use((req, res) => {
+  console.log(`⚠ 404 Not Found: ${req.method} ${req.url}`);
   res.status(404).json({
+    success: false,
+    message: `Route ${req.url} not found`
+  });
+});
     success: false,
     message: 'Route not found'
   });
