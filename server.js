@@ -8,6 +8,10 @@ const mongoose = require('mongoose');
 // Load env variables
 dotenv.config();
 
+// Debug: Check if env vars are loaded
+console.log('🔍 MONGODB_URI exists:', !!process.env.MONGODB_URI);
+console.log('🔍 Environment:', process.env.NODE_ENV);
+
 const app = express();
 
 /* -------------------- MIDDLEWARE -------------------- */
